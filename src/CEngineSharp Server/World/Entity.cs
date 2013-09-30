@@ -35,14 +35,29 @@ namespace CEngineSharp_Server.World
 
         public virtual ushort GetVital(Vitals vital)
         {
-            return _vitals[(int)vital];
+            if (vital != Vitals.Count)
+                return _vitals[(int)vital];
+            else
+                return 0;
         }
 
         public virtual void SetVital(Vitals vital, ushort value)
         {
-            _vitals[(int)vital] = value;
+            if (vital != Vitals.Count)
+                _vitals[(int)vital] = value;
         }
 
-        public abstract void Kill(Entity killer);
+        public abstract void Attack(Entity attacker);
+
+        public abstract void Interact(Entity interactor);
+
+        public abstract void Save();
+
+        public abstract void Load(string fileName);
+
+        public virtual bool IsDead()
+        {
+            return (_vitals[(int)Vitals.HitPoints] <= 0);
+        }
     }
 }

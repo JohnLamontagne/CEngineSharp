@@ -3,7 +3,7 @@ using System.IO;
 
 namespace CEngineSharp_Server.Utilities
 {
-    public class ServerConfiguration
+    public static class ServerConfiguration
     {
         private static string _serverIP;
         private static int _serverPort;

@@ -33,7 +33,7 @@ namespace CEngineSharp_Server.Utilities
         {
             using (StreamWriter streamWriter = File.AppendText(Constants.FilePath_Data + "Errors.log"))
             {
-                streamWriter.WriteLine("[{0}] - Error Level: {1}, Error Message: {2}", DateTime.Now.ToString("M/d/yyyy"), errorLevel.ToString(), ex.Message);
+                streamWriter.WriteLine("[{0}] - Error Level: {1}, Error Message: {2} at {3}", DateTime.Now.ToString("M/d/yyyy"), errorLevel.ToString(), ex.Message, ex.StackTrace);
             }
         }
     }

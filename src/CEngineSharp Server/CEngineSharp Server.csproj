@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ED4FF59C-B197-41C4-89D6-1FE53CE97F25}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
@@ -38,20 +41,45 @@
     <Compile Include="Constants.cs" />
     <Compile Include="GameLogic\ServerLoop.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Net\Networking.cs" />
+    <Compile Include="Net\Packets\AlertMessagePacket.cs" />
+    <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="Utilities\Color.cs" />
     <Compile Include="Utilities\ErrorHandler.cs" />
+    <Compile Include="Utilities\Rect.cs" />
     <Compile Include="Utilities\ServerConfig.cs" />
+    <Compile Include="Utilities\TextboxStreamWriter.cs" />
     <Compile Include="World\Entity.cs" />
     <Compile Include="World\GameWorld.cs" />
+    <Compile Include="World\Map.cs" />
+    <Compile Include="World\NPC.cs" />
     <Compile Include="World\Player.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="SharpNetty">
-      <HintPath>..\..\..\..\Documents\GitHub\SharpNetty\src\bin\Debug\SharpNetty.dll</HintPath>
+    <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SharpNetty\src\bin\Debug\SharpNetty.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -13,7 +13,7 @@ namespace CEngineSharp_Server
         {
             get
             {
-                return GameWorld.Players.Length - 1;
+                return GameWorld.Players.Count;
             }
         }
 

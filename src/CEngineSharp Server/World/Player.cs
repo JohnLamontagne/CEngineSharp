@@ -8,23 +8,37 @@ namespace CEngineSharp_Server.World
     {
         private string _password;
         private bool _loggedIn = false;
+        private int mapNum;
 
         public bool LoggedIn
         {
             get { return _loggedIn; }
-
-            set { _loggedIn = value; }
         }
 
-        public override void Kill(Entity killer)
+        public override void Attack(Entity killer)
         {
         }
 
-        public void Load(string playerName)
+        public override void Interact(Entity interactor)
+        {
+        }
+
+        public static void JoinMap(Map map, int playerIndex)
+        {
+            map.Players.Add(playerIndex);
+            GameWorld.Players[playerIndex].mapNum = GameWorld.Maps.IndexOf(map);
+        }
+
+        public static void LeaveMap(Map map, int playerIndex)
+        {
+            map.Players.RemoveAt(playerIndex);
+        }
+
+        public override void Load(string fileName)
         {
             try
             {
-                string filePath = Constants.FilePath_Accounts + playerName + ".dat";
+                string filePath = Constants.FilePath_Accounts + fileName + ".dat";
 
                 using (FileStream fs = new FileStream(filePath, FileMode.Open))
                 {
@@ -40,6 +54,8 @@ namespace CEngineSharp_Server.World
                         }
                     }
                 }
+
+                _loggedIn = true;
             }
             catch (Exception ex)
             {
@@ -48,13 +64,13 @@ namespace CEngineSharp_Server.World
             }
         }
 
-        public void Save()
+        public override void Save()
         {
             try
             {
                 string filePath = Constants.FilePath_Accounts + this.Name + ".dat";
 
-                using (FileStream fs = new FileStream(filePath, FileMode.Open))
+                using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate))
                 {
                     using (BinaryWriter bw = new BinaryWriter(fs))
                     {
@@ -80,7 +96,7 @@ namespace CEngineSharp_Server.World
         {
             try
             {
-                string[] names = File.ReadAllLines((@"C:\Users\John\Desktop\names.txt"));
+                string[] names = File.ReadAllLines((Constants.FilePath_Data + "names.txt"));
 
                 foreach (var playernames in names)
                 {
@@ -106,7 +122,7 @@ namespace CEngineSharp_Server.World
             {
                 using (StreamWriter streamWriter = File.AppendText(Constants.FilePath_Data + "names.txt"))
                 {
-                    streamWriter.Write(name);
+                    streamWriter.WriteLine(name);
                 }
             }
             catch (Exception ex)

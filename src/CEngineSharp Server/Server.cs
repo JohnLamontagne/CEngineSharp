@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Server.GameLogic;
 using CEngineSharp_Server.Net;
+using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using System;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CEngineSharp_Server
 {
@@ -16,46 +18,85 @@ namespace CEngineSharp_Server
     {
         public static Networking Networking;
 
-        private static ServerLoop _serverLoop;
+        public static MainWindow ServerWindow;
 
-        private static Thread _serverLoopThread;
-
-        // Keeps it safe from the GC.
-        private static ConsoleEventDelegate handler;
-
-        // Pinvoke
-        private delegate bool ConsoleEventDelegate(int eventType);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate callback, bool add);
-
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
         private static void Main(string[] args)
         {
-            handler = new ConsoleEventDelegate(ConsoleEventCallback);
-            SetConsoleCtrlHandler(handler, true);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
-            ServerConfiguration.LoadConfig();
+            ServerWindow = new MainWindow();
 
-            Console.Title = ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" + ServerConfiguration.ServerPort + " - Player Count: " + Globals.CurrentConnections +
-                " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off");
-
-            Server.Networking = new Networking();
-
-            _serverLoop = new ServerLoop();
-            _serverLoopThread = new Thread(_serverLoop.Start);
+            Application.Run(ServerWindow);
         }
 
-        private static bool ConsoleEventCallback(int eventType)
+        public static void HandleCommand(string value)
         {
-            if (eventType == 2)
+            string[] command = value.Split(' ');
+
+            if (command[0] == "") return;
+
+            switch (command[0].ToLower())
             {
-                Globals.ShuttingDown = true;
+                case "shutdown":
+                    Console.WriteLine("Shutting down the server...");
+                    Globals.ShuttingDown = true;
+                    break;
 
-                // Save the game world.
-                GameWorld.SaveGameWorld();
+                case "kick":
+
+                    if (command[1].ToLower() == "all")
+                    {
+                        Console.WriteLine("Kicking all players...");
+
+                        for (int i = GameWorld.Players.Count - 1; i >= 0; i++)
+                        {
+                            if (GameWorld.Players[i].LoggedIn)
+                                Server.Networking.KickPlayer(i);
+                        }
+
+                        return;
+                    }
+
+                    foreach (var player in GameWorld.Players)
+                    {
+                        if (player.Value.Name.ToLower() == command[1] && player.Value.LoggedIn)
+                        {
+                            Console.WriteLine("Kicking player: " + command[1]);
+                            Networking.KickPlayer(player.Key);
+                            return;
+                        }
+                    }
+
+                    Console.WriteLine(command[1] + " is not logged in!");
+
+                    break;
+
+                case "say":
+                    var chatMessagePacket = new ChatMessagePacket();
+                    string message = "";
+
+                    for (int i = 1; i < command.Length; i++)
+                    {
+                        message += command[i];
+                    }
+
+                    chatMessagePacket.WriteData("Server: " + message);
+
+                    Server.Networking.BroadcastPacket(chatMessagePacket);
+
+                    Console.WriteLine("Server: " + message);
+
+                    break;
+
+                default:
+                    Console.WriteLine("Unknown command:" + command[0]);
+                    break;
             }
-
-            return false;
         }
     }
 }
