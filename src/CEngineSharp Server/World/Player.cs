@@ -6,13 +6,47 @@ namespace CEngineSharp_Server.World
 {
     public class Player : Entity
     {
+        public enum AccessLevels
+        {
+            Player = 0,
+            Player_Moderator,
+            Moderator,
+            Admin
+        }
+
         private string _password;
         private bool _loggedIn = false;
-        private int mapNum;
+        private int _mapNum;
+        private string _ip;
+        private AccessLevels _accessLevel;
 
         public bool LoggedIn
         {
             get { return _loggedIn; }
+        }
+
+        public string IP
+        {
+            get { return _ip; }
+        }
+
+        public AccessLevels AccessLevel
+        {
+            get { return _accessLevel; }
+            set { _accessLevel = value; }
+        }
+
+        public int MapNum
+        {
+            get { return _mapNum; }
+
+            protected set { _mapNum = value; }
+        }
+
+        public Player(SharpNetty.NettyServer.Connection connection)
+        {
+            string ip = connection.Socket.RemoteEndPoint.ToString();
+            _ip = connection.Socket.RemoteEndPoint.ToString().Remove(ip.IndexOf(':'), ip.Length - ip.IndexOf(':'));
         }
 
         public override void Attack(Entity killer)
@@ -26,7 +60,7 @@ namespace CEngineSharp_Server.World
         public static void JoinMap(Map map, int playerIndex)
         {
             map.Players.Add(playerIndex);
-            GameWorld.Players[playerIndex].mapNum = GameWorld.Maps.IndexOf(map);
+            GameWorld.Players[playerIndex].MapNum = GameWorld.Maps.IndexOf(map);
         }
 
         public static void LeaveMap(Map map, int playerIndex)

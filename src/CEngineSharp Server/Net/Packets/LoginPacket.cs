@@ -25,14 +25,16 @@ namespace CEngineSharp_Server.Net.Packets
             string password = this.PacketBuffer.ReadString();
             bool loginOkay = GameWorld.Players[socketIndex].Authenticate(username, password);
 
-            if (loginOkay)
-                Console.WriteLine(username + " has logged in!");
-
             WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
-            Server.Networking.SendPacket(this, socketIndex);
+            Networking.SendPacket(this, socketIndex);
 
-            chatMessagePacket.WriteData(username + " has logged in!");
-            Server.Networking.BroadcastPacket(chatMessagePacket);
+            if (loginOkay)
+            {
+                Console.WriteLine(username + " has logged in!");
+                chatMessagePacket.WriteData(username + " has logged in!");
+                Networking.BroadcastPacket(chatMessagePacket);
+                Server.ServerWindow.AddPlayerToGrid(GameWorld.Players[socketIndex]);
+            }
         }
 
         public override string PacketID

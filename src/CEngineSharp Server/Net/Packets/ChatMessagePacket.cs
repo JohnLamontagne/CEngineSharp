@@ -21,7 +21,7 @@ namespace CEngineSharp_Server.Net.Packets
 
             this.WriteData(chatMessage);
 
-            Server.Networking.BroadcastPacket(this);
+            Networking.BroadcastPacket(this);
         }
 
         public override string PacketID

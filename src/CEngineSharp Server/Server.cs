@@ -16,8 +16,6 @@ namespace CEngineSharp_Server
 {
     public static class Server
     {
-        public static Networking Networking;
-
         public static MainWindow ServerWindow;
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace CEngineSharp_Server
                         for (int i = GameWorld.Players.Count - 1; i >= 0; i++)
                         {
                             if (GameWorld.Players[i].LoggedIn)
-                                Server.Networking.KickPlayer(i);
+                                Networking.KickPlayer(i);
                         }
 
                         return;
@@ -87,7 +85,7 @@ namespace CEngineSharp_Server
 
                     chatMessagePacket.WriteData("Server: " + message);
 
-                    Server.Networking.BroadcastPacket(chatMessagePacket);
+                    Networking.BroadcastPacket(chatMessagePacket);
 
                     Console.WriteLine("Server: " + message);
 

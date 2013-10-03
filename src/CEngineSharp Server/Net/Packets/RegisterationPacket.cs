@@ -26,17 +26,18 @@ namespace CEngineSharp_Server.Net.Packets
                 var chatMessagePacket = new ChatMessagePacket();
                 string username = this.PacketBuffer.ReadString();
                 string password = this.PacketBuffer.ReadString();
-
                 bool registrationOkay = GameWorld.Players[socketIndex].Register(username, password);
 
-                if (registrationOkay)
-                    Console.WriteLine("A new account has been registered: " + username);
-
                 this.WriteData(registrationOkay, registrationOkay ? "Your account has been registered, logging in now..." : "Your account has failed to register...", socketIndex);
-                Server.Networking.SendPacket(this, socketIndex);
+                Networking.SendPacket(this, socketIndex);
 
-                chatMessagePacket.WriteData(username + " has logged in!");
-                Server.Networking.BroadcastPacket(chatMessagePacket);
+                if (registrationOkay)
+                {
+                    Console.WriteLine("A new account has been registered: " + username);
+                    chatMessagePacket.WriteData(username + " has logged in!");
+                    Networking.BroadcastPacket(chatMessagePacket);
+                    Server.ServerWindow.AddPlayerToGrid(GameWorld.Players[socketIndex]);
+                }
             }
 
             catch (Exception ex)

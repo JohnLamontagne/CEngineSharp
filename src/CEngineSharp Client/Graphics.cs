@@ -18,17 +18,22 @@ namespace CEngineSharp_Client
 
         private string themeConfigurationPath = @"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Gui\Black.conf";
 
+        private Sprite _menuBackground;
+
         public Dictionary<string, Texture> CharacterTextures;
 
         public static RenderStates RenderState;
 
         public Graphics()
         {
-            _renderWindow = new RenderWindow(new VideoMode(800, 600), "CEngine#");
-            _renderWindow.SetFramerateLimit(30);
+            _renderWindow = new RenderWindow(new VideoMode(800, 600), "CEngine#", Styles.Close);
+
+            _renderWindow.SetFramerateLimit(60);
             _gui = new Gui(_renderWindow);
             _gui.GlobalFont = new Font(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Fonts\Georgia.ttf");
             this.CharacterTextures = new Dictionary<string, Texture>();
+
+            _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
 
             PrepareMenuGui();
         }
@@ -78,7 +83,7 @@ namespace CEngineSharp_Client
             #region Login Button
 
             Button loginButton = _gui.Add(new Button(themeConfigurationPath), "buttonLogin");
-            loginButton.Position = new Vector2f(100, 500);
+            loginButton.Position = new Vector2f(labelNews.Position.X, 500);
             loginButton.Text = "Login";
             loginButton.LeftMouseClickedCallback += buttonLogin_LeftMouseClickedCallback;
 
@@ -87,7 +92,7 @@ namespace CEngineSharp_Client
             #region Registration Button
 
             Button registrationButton = _gui.Add(new Button(themeConfigurationPath), "buttonRegistration");
-            registrationButton.Position = new Vector2f(470, 500);
+            registrationButton.Position = new Vector2f(labelNews.Position.X + (labelNews.Size.X - registrationButton.Size.X), 500);
             registrationButton.Text = "Register";
             registrationButton.LeftMouseClickedCallback += buttonRegistration_LeftMouseClickedCallback;
 
@@ -275,6 +280,7 @@ namespace CEngineSharp_Client
 
         private void RenderMenu()
         {
+            _renderWindow.Draw(_menuBackground);
         }
 
         private void RenderGame()

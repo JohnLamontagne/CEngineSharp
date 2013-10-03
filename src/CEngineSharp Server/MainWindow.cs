@@ -26,6 +26,8 @@ namespace CEngineSharp_Server
 
         private delegate void SetTitleDelegate(string value);
 
+        private delegate void AddPlayerToTableDelegate(Player player);
+
         public MainWindow()
         {
             InitializeComponent();
@@ -52,7 +54,8 @@ namespace CEngineSharp_Server
             // Load the game world.
             GameWorld.LoadWorld();
 
-            Server.Networking = new Networking();
+            // Prepare the server to start accepting connections.
+            Networking.Start();
 
             _serverLoop = new ServerLoop();
             _serverLoopThread = new Thread(_serverLoop.Start);
@@ -79,6 +82,16 @@ namespace CEngineSharp_Server
                 e.SuppressKeyPress = true;
 
                 textCommandInput.Text = "";
+            }
+        }
+
+        public void AddPlayerToGrid(Player player)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new AddPlayerToTableDelegate(this.AddPlayerToGrid), player);
+            else
+            {
+                this.dataGridPlayers.Rows.Add(player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Entity.Vitals.HitPoints), player.GetVital(Entity.Vitals.ManaPoints));
             }
         }
     }
