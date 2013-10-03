@@ -38,6 +38,7 @@ namespace CEngineSharp_Server.GameLogic
             int cps = 0;
             int cpsCount = 0;
 
+            // Continue processing the server-logic until it's time to shut things down.
             while (!Globals.ShuttingDown)
             {
                 if (lastConsoleTitleUpdateTime <= gameTime.GetTotalTimeElapsed())
@@ -57,9 +58,13 @@ namespace CEngineSharp_Server.GameLogic
                 else
                     cpsCount++;
             }
-
+            
+            // The server loop has stopped executing due to the Globals.ShuttingDown variable being set to true.
+            
+            // Save the game world.
             GameWorld.SaveWorld();
 
+            // Terminate the server.
             Environment.Exit(0);
         }
     }
