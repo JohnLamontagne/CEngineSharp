@@ -30,9 +30,9 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.textServerOutput = new System.Windows.Forms.TextBox();
             this.textCommandInput = new System.Windows.Forms.TextBox();
+            this.textServerOutput = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.dataGridPlayers = new System.Windows.Forms.DataGridView();
             this.PlayerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PlayerLevel = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -68,16 +68,12 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Console";
             // 
-            // tabPage2
+            // textCommandInput
             // 
-            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage2.Controls.Add(this.dataGridPlayers);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(665, 455);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Players";
+            this.textCommandInput.Location = new System.Drawing.Point(6, 429);
+            this.textCommandInput.Name = "textCommandInput";
+            this.textCommandInput.Size = new System.Drawing.Size(649, 20);
+            this.textCommandInput.TabIndex = 2;
             // 
             // textServerOutput
             // 
@@ -88,12 +84,16 @@
             this.textServerOutput.Size = new System.Drawing.Size(649, 417);
             this.textServerOutput.TabIndex = 1;
             // 
-            // textCommandInput
+            // tabPage2
             // 
-            this.textCommandInput.Location = new System.Drawing.Point(6, 429);
-            this.textCommandInput.Name = "textCommandInput";
-            this.textCommandInput.Size = new System.Drawing.Size(649, 20);
-            this.textCommandInput.TabIndex = 2;
+            this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage2.Controls.Add(this.dataGridPlayers);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(665, 455);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Players";
             // 
             // dataGridPlayers
             // 
@@ -158,6 +158,7 @@
             this.MinimumSize = new System.Drawing.Size(704, 539);
             this.Name = "MainWindow";
             this.Text = "MainWindow";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
             this.Load += new System.EventHandler(this.MainWindow_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

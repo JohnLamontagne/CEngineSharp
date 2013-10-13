@@ -17,11 +17,11 @@ namespace CEngineSharp_Server.Net.Packets
         {
             // todo Get the chat message type.
 
-            string chatMessage = GameWorld.Players[socketIndex].Name + " says: " + this.PacketBuffer.ReadString();
+            string chatMessage = PlayerManager.Players[socketIndex].Name + " says: " + this.PacketBuffer.ReadString();
 
             this.WriteData(chatMessage);
 
-            Networking.BroadcastPacket(this);
+            PlayerManager.BroadcastPacket(this);
         }
 
         public override string PacketID

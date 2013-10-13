@@ -10,8 +10,10 @@ namespace CEngineSharp_Server.Utilities
         {
             // Signifies an error that will not jeopardize system stability.
             Low,
+
             // Signifies an error that should not jeopardize system stability.
             Medium,
+
             // Signifies an error that will (most likely) jeopardize system stability.
             High
         }
@@ -31,7 +33,7 @@ namespace CEngineSharp_Server.Utilities
             if ((int)errorLevel >= (int)ServerConfiguration.SupressionLevel)
             {
                 Console.WriteLine("An unrecoverable error has occured; please check the error log files for additional details.");
-                
+
                 // Set the ShuttingDown variable to true.
                 // This will notify the GameLoop that it is time to clean things up.
                 Globals.ShuttingDown = true;

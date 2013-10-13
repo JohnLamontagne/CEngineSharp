@@ -18,7 +18,7 @@ namespace CEngineSharp_Client.Net
 
             nettyClient.Handle_ConnectionLost = Handle_ConnectionLost;
 
-            nettyClient.Connect("127.0.0.1", 25565, 1);
+            nettyClient.Connect("127.0.0.1", 25566, 1);
         }
 
         private static void Handle_ConnectionLost()

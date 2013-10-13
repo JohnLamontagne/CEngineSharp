@@ -52,7 +52,7 @@ namespace CEngineSharp_Server
                 " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off");
 
             // Load the game world.
-            GameWorld.LoadWorld();
+            Server.LoadWorld();
 
             // Prepare the server to start accepting connections.
             Networking.Start();
@@ -91,8 +91,13 @@ namespace CEngineSharp_Server
                 this.Invoke(new AddPlayerToTableDelegate(this.AddPlayerToGrid), player);
             else
             {
-                this.dataGridPlayers.Rows.Add(player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Entity.Vitals.HitPoints), player.GetVital(Entity.Vitals.ManaPoints));
+                this.dataGridPlayers.Rows.Add(player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Vitals.HitPoints), player.GetVital(Vitals.ManaPoints));
             }
+        }
+
+        private void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Globals.ShuttingDown = true;
         }
     }
 }

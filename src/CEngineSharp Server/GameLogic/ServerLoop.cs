@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.Utilities;
+﻿using CEngineSharp_Server.Net.Packets;
+using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using System;
 using System.Diagnostics;
@@ -58,14 +59,24 @@ namespace CEngineSharp_Server.GameLogic
                 else
                     cpsCount++;
             }
-            
-            // The server loop has stopped executing due to the Globals.ShuttingDown variable being set to true.
-            
-            // Save the game world.
-            GameWorld.SaveWorld();
 
+            // The server loop has stopped executing due to the Globals.ShuttingDown variable being set to true.
+
+            // Save the game world.
+            PlayerManager.SavePlayers();
             // Terminate the server.
             Environment.Exit(0);
+        }
+
+        public void ServerMessage()
+        {
+            Random random = new Random();
+            string message = Constants.SERVER_MESSAGE_HELLO;
+            var chatMessagePacket = new ChatMessagePacket();
+
+            chatMessagePacket.WriteData(message);
+
+            PlayerManager.BroadcastPacket(chatMessagePacket);
         }
     }
 }

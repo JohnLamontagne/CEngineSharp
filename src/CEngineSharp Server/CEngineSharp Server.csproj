@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ED4FF59C-B197-41C4-89D6-1FE53CE97F25}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
@@ -58,11 +58,10 @@
     <Compile Include="Utilities\Rect.cs" />
     <Compile Include="Utilities\ServerConfig.cs" />
     <Compile Include="Utilities\TextboxStreamWriter.cs" />
-    <Compile Include="World\Entity.cs" />
-    <Compile Include="World\GameWorld.cs" />
-    <Compile Include="World\Map.cs" />
-    <Compile Include="World\NPC.cs" />
-    <Compile Include="World\Player.cs" />
+    <Compile Include="World\Entity\IEntity.cs" />
+    <Compile Include="World\Entity\Player.cs" />
+    <Compile Include="World\Content Managers\PlayerManager.cs" />
+    <Compile Include="World\Vitals.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

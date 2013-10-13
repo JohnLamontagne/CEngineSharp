@@ -16,5 +16,7 @@ namespace CEngineSharp_Server
 
         public const int MIN_MAP_WIDTH = 25;
         public const int MIN_MAP_HEIGHT = 25;
+
+        public const string SERVER_MESSAGE_HELLO = "Hello";
     }
 }

@@ -5,6 +5,7 @@ using SFML.Graphics;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using TGUI;
@@ -26,16 +27,25 @@ namespace CEngineSharp_Client
 
         public Graphics()
         {
-            _renderWindow = new RenderWindow(new VideoMode(800, 600), "CEngine#", Styles.Close);
+            _renderWindow = new RenderWindow(new VideoMode(800, 600), "CEngine#");
+            _renderWindow.Resized += _renderWindow_Resized;
+
+            AudioManager.LoadSounds(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Sounds");
 
             _renderWindow.SetFramerateLimit(60);
             _gui = new Gui(_renderWindow);
             _gui.GlobalFont = new Font(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Fonts\Georgia.ttf");
+
             this.CharacterTextures = new Dictionary<string, Texture>();
 
             _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
 
             PrepareMenuGui();
+        }
+
+        private void _renderWindow_Resized(object sender, SizeEventArgs e)
+        {
+            _renderWindow.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
         }
 
         public void LoadGameTextures()
@@ -72,6 +82,14 @@ namespace CEngineSharp_Client
 
         private void PrepareMenuGui()
         {
+            #region Status Label
+
+            Label labelStatus = _gui.Add(new Label(), "labelStatus");
+            labelStatus.Position = new Vector2f((_renderWindow.Size.X / 2) - (labelStatus.Size.X / 2), 150);
+            labelStatus.Visible = false;
+
+            #endregion Status Label
+
             #region News Label
 
             Label labelNews = _gui.Add(new Label(), "labelNews");
@@ -215,6 +233,7 @@ namespace CEngineSharp_Client
             _gui.Get<Button>("buttonSendRegistration").Visible = true;
             _gui.Get<Label>("labelUsername").Visible = true;
             _gui.Get<Label>("labelPassword").Visible = true;
+            _gui.Get<Label>("labelStatus").Visible = true;
             _gui.Get<EditBox>("textUser").Visible = true;
             _gui.Get<EditBox>("textPassword").Visible = true;
             _gui.Get<Label>("labelNews").Visible = false;
@@ -228,6 +247,7 @@ namespace CEngineSharp_Client
             _gui.Get<Button>("buttonSendLogin").Visible = true;
             _gui.Get<Label>("labelUsername").Visible = true;
             _gui.Get<Label>("labelPassword").Visible = true;
+            _gui.Get<Label>("labelStatus").Visible = true;
             _gui.Get<EditBox>("textUser").Visible = true;
             _gui.Get<EditBox>("textPassword").Visible = true;
             _gui.Get<Label>("labelNews").Visible = false;
@@ -238,7 +258,12 @@ namespace CEngineSharp_Client
 
         private void buttonSendLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
+            _gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
+            _gui.Get<Label>("labelStatus").Position = new Vector2f((_renderWindow.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
             Networking.Connect();
+
+            _gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
+            _gui.Get<Label>("labelStatus").Position = new Vector2f((_renderWindow.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
             var loginPacket = new LoginPacket();
             loginPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
@@ -259,8 +284,6 @@ namespace CEngineSharp_Client
                     case RenderStates.Menu_Game_Transition:
                         PrepareGameGui();
                         Graphics.RenderState = RenderStates.Game;
-
-                        Program.GameGraphics.ToString();
                         break;
 
                     case RenderStates.Menu:

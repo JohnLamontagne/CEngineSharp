@@ -23,17 +23,17 @@ namespace CEngineSharp_Server.Net.Packets
             ChatMessagePacket chatMessagePacket = new ChatMessagePacket();
             string username = this.PacketBuffer.ReadString();
             string password = this.PacketBuffer.ReadString();
-            bool loginOkay = GameWorld.Players[socketIndex].Authenticate(username, password);
+            bool loginOkay = PlayerManager.Authenticate(username, password);
 
             WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
-            Networking.SendPacket(this, socketIndex);
+            PlayerManager.Players[socketIndex].SendPacket(this);
 
             if (loginOkay)
             {
                 Console.WriteLine(username + " has logged in!");
                 chatMessagePacket.WriteData(username + " has logged in!");
-                Networking.BroadcastPacket(chatMessagePacket);
-                Server.ServerWindow.AddPlayerToGrid(GameWorld.Players[socketIndex]);
+                PlayerManager.BroadcastPacket(chatMessagePacket);
+                Server.ServerWindow.AddPlayerToGrid(PlayerManager.Players[socketIndex]);
             }
         }
 

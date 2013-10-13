@@ -5,6 +5,7 @@ using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -51,16 +52,16 @@ namespace CEngineSharp_Server
                     {
                         Console.WriteLine("Kicking all players...");
 
-                        for (int i = GameWorld.Players.Count - 1; i >= 0; i++)
+                        for (int i = PlayerManager.Players.Count - 1; i >= 0; i++)
                         {
-                            if (GameWorld.Players[i].LoggedIn)
+                            if (PlayerManager.Players[i].LoggedIn)
                                 Networking.KickPlayer(i);
                         }
 
                         return;
                     }
 
-                    foreach (var player in GameWorld.Players)
+                    foreach (var player in PlayerManager.Players)
                     {
                         if (player.Value.Name.ToLower() == command[1] && player.Value.LoggedIn)
                         {
@@ -85,7 +86,7 @@ namespace CEngineSharp_Server
 
                     chatMessagePacket.WriteData("Server: " + message);
 
-                    Networking.BroadcastPacket(chatMessagePacket);
+                    PlayerManager.BroadcastPacket(chatMessagePacket);
 
                     Console.WriteLine("Server: " + message);
 
@@ -95,6 +96,25 @@ namespace CEngineSharp_Server
                     Console.WriteLine("Unknown command:" + command[0]);
                     break;
             }
+        }
+
+        public static void LoadWorld()
+        {
+            Console.WriteLine("Checking world integrity...");
+            // Check to make sure our files containing the world exist.
+            if (!Directory.Exists(Constants.FilePath_Accounts)) Directory.CreateDirectory(Constants.FilePath_Accounts);
+            if (!Directory.Exists(Constants.FilePath_Npcs)) Directory.CreateDirectory(Constants.FilePath_Npcs.TrimEnd('/'));
+            if (!Directory.Exists(Constants.FilePath_Maps)) Directory.CreateDirectory(Constants.FilePath_Maps.TrimEnd('/'));
+            if (!Directory.Exists(Constants.FilePath_Items)) Directory.CreateDirectory(Constants.FilePath_Items.TrimEnd('/'));
+
+            // Check to make sure the file for storing players name is there.
+            if (!File.Exists(Constants.FilePath_Data + "names.txt")) File.Create(Constants.FilePath_Data + "names.txt");
+        }
+
+        public static void SaveWorld()
+        {
+            Console.WriteLine("Saving players...");
+            PlayerManager.SavePlayers();
         }
     }
 }
