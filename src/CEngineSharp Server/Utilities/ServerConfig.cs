@@ -44,7 +44,7 @@ namespace CEngineSharp_Server.Utilities
 
         private static void CreateConfig()
         {
-            string filePath = Constants.FilePath_Data + "Config.configuration";
+            string filePath = Constants.FILEPATH_DATA + "Config.configuration";
 
             using (StreamWriter streamWriter = File.AppendText(filePath))
             {
@@ -61,7 +61,7 @@ namespace CEngineSharp_Server.Utilities
         {
             try
             {
-                string filePath = Constants.FilePath_Data + "Config.configuration";
+                string filePath = Constants.FILEPATH_DATA + "Config.configuration";
 
                 if (!File.Exists(filePath))
                     CreateConfig();

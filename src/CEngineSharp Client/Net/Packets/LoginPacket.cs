@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Client.World;
+﻿using CEngineSharp_Client.Graphicss;
+using CEngineSharp_Client.World;
 using SharpNetty;
 using System;
 
@@ -18,12 +19,14 @@ namespace CEngineSharp_Client.Net.Packets
             {
                 Globals.MyIndex = this.PacketBuffer.ReadInteger();
 
-                Program.GameGraphics.LoadGameTextures();
+                Program.CurrentRenderer = new GameRenderer(Program.CurrentRenderer.GetWindow());
 
-                GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
+                //Program.GameGraphics.LoadGameTextures();
 
-                Graphics.RenderState = RenderStates.Menu_Game_Transition;
+                //GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
             }
+
+            //Program.GameGraphics.SetMenuStatus(this.PacketBuffer.ReadString());
         }
 
         public override string PacketID

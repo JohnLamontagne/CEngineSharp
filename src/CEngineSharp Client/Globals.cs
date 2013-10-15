@@ -9,5 +9,6 @@ namespace CEngineSharp_Client
     public static class Globals
     {
         public static int MyIndex;
+        public static bool ShuttingDown = false;
     }
 }

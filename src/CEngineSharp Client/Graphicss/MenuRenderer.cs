@@ -1,91 +1,28 @@
 ﻿using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
-using CEngineSharp_Client.World;
 using SFML.Graphics;
 using SFML.Window;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using TGUI;
 
-namespace CEngineSharp_Client
+namespace CEngineSharp_Client.Graphicss
 {
-    public class Graphics
+    public class MenuRenderer : Renderer
     {
-        private RenderWindow _renderWindow;
-        private Gui _gui;
-
-        private string themeConfigurationPath = @"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Gui\Black.conf";
-
         private Sprite _menuBackground;
 
-        public Dictionary<string, Texture> CharacterTextures;
-
-        public static RenderStates RenderState;
-
-        public Graphics()
+        public MenuRenderer()
         {
-            _renderWindow = new RenderWindow(new VideoMode(800, 600), "CEngine#");
-            _renderWindow.Resized += _renderWindow_Resized;
-
-            AudioManager.LoadSounds(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Sounds");
-
-            _renderWindow.SetFramerateLimit(60);
-            _gui = new Gui(_renderWindow);
-            _gui.GlobalFont = new Font(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Fonts\Georgia.ttf");
-
-            this.CharacterTextures = new Dictionary<string, Texture>();
-
             _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
-
-            PrepareMenuGui();
         }
 
-        private void _renderWindow_Resized(object sender, SizeEventArgs e)
-        {
-            _renderWindow.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
-        }
-
-        public void LoadGameTextures()
-        {
-            DirectoryInfo characterDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/Characters/");
-
-            foreach (var file in characterDir.GetFiles("*.png", SearchOption.AllDirectories))
-            {
-                this.CharacterTextures.Add(file.Name.Replace(".png", ""), new Texture(file.FullName));
-            }
-        }
-
-        private void PrepareGameGui()
-        {
-            _gui.RemoveAllWidgets();
-
-            ChatBox textChat = _gui.Add(new ChatBox(themeConfigurationPath), "textChat");
-            textChat.Position = new Vector2f(5, 350);
-            textChat.Size = new Vector2f(400, 200);
-            textChat.Transparency = 150;
-
-            EditBox textMyChat = _gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
-            textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
-            textMyChat.Size = new Vector2f(textChat.Size.X, 40);
-            textMyChat.ReturnKeyPressedCallback += textMyChat_ReturnKeyPressedCallback;
-            textMyChat.Transparency = 150;
-
-            MessageBox messageBoxAlert = _gui.Add(new MessageBox(themeConfigurationPath), "messageBoxAlert");
-            messageBoxAlert.Visible = false;
-
-            messageBoxAlert.Add(new Label(), "labelAlert");
-            messageBoxAlert.Size = new Vector2f(400, 100);
-        }
-
-        private void PrepareMenuGui()
+        protected override void LoadInterface()
         {
             #region Status Label
 
             Label labelStatus = _gui.Add(new Label(), "labelStatus");
-            labelStatus.Position = new Vector2f((_renderWindow.Size.X / 2) - (labelStatus.Size.X / 2), 150);
+            labelStatus.Position = new Vector2f((_window.Size.X / 2) - (labelStatus.Size.X / 2), 150);
             labelStatus.Visible = false;
 
             #endregion Status Label
@@ -94,7 +31,7 @@ namespace CEngineSharp_Client
 
             Label labelNews = _gui.Add(new Label(), "labelNews");
             LoadNews(labelNews);
-            labelNews.Position = new Vector2f((_renderWindow.Size.X / 2) - (labelNews.Size.X / 2), 200);
+            labelNews.Position = new Vector2f((_window.Size.X / 2) - (labelNews.Size.X / 2), 200);
 
             #endregion News Label
 
@@ -184,6 +121,16 @@ namespace CEngineSharp_Client
             #endregion Back Button
         }
 
+        private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            Networking.Connect();
+
+            var registrationPacket = new RegisterationPacket();
+            registrationPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
+
+            Networking.SendPacket(registrationPacket);
+        }
+
         private void buttonBack_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
             _gui.Get<Button>("buttonBack").Visible = false;
@@ -196,36 +143,6 @@ namespace CEngineSharp_Client
             _gui.Get<Label>("labelNews").Visible = true;
             _gui.Get<Button>("buttonLogin").Visible = true;
             _gui.Get<Button>("buttonRegistration").Visible = true;
-        }
-
-        private void textMyChat_ReturnKeyPressedCallback(object sender, CallbackArgs e)
-        {
-            var textMyChat = _gui.Get<EditBox>("textMyChat");
-            var chatMessagePacket = new ChatMessagePacket();
-
-            chatMessagePacket.WriteData(textMyChat.Text);
-            Networking.SendPacket(chatMessagePacket);
-            textMyChat.Text = "";
-        }
-
-        private void LoadNews(Label labelNews)
-        {
-            string[] news = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "/Data/News.txt");
-
-            foreach (var line in news)
-            {
-                labelNews.Text += line + "\n";
-            }
-        }
-
-        private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            Networking.Connect();
-
-            var registrationPacket = new RegisterationPacket();
-            registrationPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
-
-            Networking.SendPacket(registrationPacket);
         }
 
         private void buttonRegistration_LeftMouseClickedCallback(object sender, CallbackArgs e)
@@ -259,11 +176,11 @@ namespace CEngineSharp_Client
         private void buttonSendLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
             _gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
-            _gui.Get<Label>("labelStatus").Position = new Vector2f((_renderWindow.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
             Networking.Connect();
 
             _gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
-            _gui.Get<Label>("labelStatus").Position = new Vector2f((_renderWindow.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
             var loginPacket = new LoginPacket();
             loginPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
@@ -271,70 +188,33 @@ namespace CEngineSharp_Client
             Networking.SendPacket(loginPacket);
         }
 
-        public void Render()
+        private void LoadNews(Label labelNews)
         {
-            while (_renderWindow.IsOpen())
+            string[] news = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "/Data/News.txt");
+
+            foreach (var line in news)
             {
-                _renderWindow.DispatchEvents();
-
-                _renderWindow.Clear();
-
-                switch (Graphics.RenderState)
-                {
-                    case RenderStates.Menu_Game_Transition:
-                        PrepareGameGui();
-                        Graphics.RenderState = RenderStates.Game;
-                        break;
-
-                    case RenderStates.Menu:
-                        RenderMenu();
-                        break;
-
-                    case RenderStates.Game:
-                        RenderGame();
-                        break;
-                }
-
-                _gui.Draw();
-
-                _renderWindow.Display();
+                labelNews.Text += line + "\n";
             }
         }
 
-        private void RenderMenu()
+        public void SetMenuStatus(string status)
         {
-            _renderWindow.Draw(_menuBackground);
+            _gui.Get<Label>("labelStatus").Text = status;
+            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
         }
 
-        private void RenderGame()
+        public override void Render()
         {
-            RenderPlayers();
-        }
+            _window.DispatchEvents();
 
-        private void RenderPlayers()
-        {
-            foreach (var player in GameWorld.Players)
-            {
-                player.Value.Draw(_renderWindow);
-            }
-        }
+            _window.Clear();
 
-        public void AddChatMessage(string message, Color color)
-        {
-            _gui.Get<ChatBox>("textChat").AddLine(message, color);
-        }
+            _window.Draw(_menuBackground);
 
-        public void DisplayAlert(string title, string alertMessage, int x, int y, Color color)
-        {
-            var messageBoxAlert = _gui.Get<MessageBox>("messageBoxAlert");
+            _gui.Draw();
 
-            messageBoxAlert.Title = title;
-            messageBoxAlert.Position = new Vector2f(x, y);
-            messageBoxAlert.TextColor = color;
-            messageBoxAlert.Visible = true;
-            messageBoxAlert.Get<Label>("labelAlert").Text = alertMessage;
-            messageBoxAlert.Get<Label>("labelAlert").TextSize = 20;
-            messageBoxAlert.Get<Label>("labelAlert").Position = new Vector2f(40, 50);
+            _window.Display();
         }
     }
 }

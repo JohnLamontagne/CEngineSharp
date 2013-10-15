@@ -14,11 +14,9 @@ namespace CEngineSharp_Client.Net.Packets
                 Globals.MyIndex = this.PacketBuffer.ReadInteger();
 
                 // Problem #1 is that I store the graphics class through a static reference in Program
-                Program.GameGraphics.LoadGameTextures();
+                //Program.GameGraphics.LoadGameTextures();
 
-                GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
-
-                Graphics.RenderState = RenderStates.Menu_Game_Transition;
+                //GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
             }
         }
 

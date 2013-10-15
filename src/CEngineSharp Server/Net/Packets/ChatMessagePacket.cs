@@ -17,11 +17,11 @@ namespace CEngineSharp_Server.Net.Packets
         {
             // todo Get the chat message type.
 
-            string chatMessage = PlayerManager.Players[socketIndex].Name + " says: " + this.PacketBuffer.ReadString();
+            string chatMessage = PlayerManager.GetPlayer(socketIndex).Name + " says: " + this.PacketBuffer.ReadString();
 
             this.WriteData(chatMessage);
 
-            PlayerManager.BroadcastPacket(this);
+            PlayerManager.GetPlayer(socketIndex).Map.SendPacket(this);
         }
 
         public override string PacketID

@@ -43,7 +43,7 @@ namespace CEngineSharp_Server.Utilities
         private static void LogError(Exception ex, ErrorLevels errorLevel)
         {
             // Append to the error-log file using StreamWriter.
-            using (StreamWriter streamWriter = File.AppendText(Constants.FilePath_Data + "Errors.log"))
+            using (StreamWriter streamWriter = File.AppendText(Constants.FILEPATH_DATA + "Errors.log"))
             {
                 // Write our error details to the log file.
                 streamWriter.WriteLine("[{0}] - Error Level: {1}, Error Message: {2} at {3}", DateTime.Now.ToString("M/d/yyyy"), errorLevel.ToString(), ex.Message, ex.StackTrace);

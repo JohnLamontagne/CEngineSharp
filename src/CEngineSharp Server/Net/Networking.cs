@@ -23,28 +23,28 @@ namespace CEngineSharp_Server.Net
 
         private static void Handle_NewConnection(int socketIndex)
         {
-            PlayerManager.Players.Add(socketIndex, new Player(_nettyServer.GetConnection(socketIndex)));
+            PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex)));
         }
 
         private static void Handle_LostConnection(int socketIndex)
         {
-            if (PlayerManager.Players[socketIndex].LoggedIn)
+            if (PlayerManager.GetPlayer(socketIndex).LoggedIn)
             {
-                PlayerManager.SavePlayer(PlayerManager.Players[socketIndex]);
-                Console.WriteLine(PlayerManager.Players[socketIndex].Name + " has left!");
+                PlayerManager.SavePlayer(PlayerManager.GetPlayer(socketIndex));
+                Console.WriteLine(PlayerManager.GetPlayer(socketIndex).Name + " has left!");
             }
 
-            PlayerManager.Players.Remove(socketIndex);
+            PlayerManager.RemovePlayer(socketIndex);
         }
 
         public static void KickPlayer(int index)
         {
             var alertMessagePacket = new AlertMessagePacket();
             alertMessagePacket.WriteData("Alert!", "You have been kicked from the server!", 300, 300, Color.Red);
-            PlayerManager.Players[index].SendPacket(alertMessagePacket);
+            PlayerManager.GetPlayer(index).SendPacket(alertMessagePacket);
 
             _nettyServer.RemoveConnection(index);
-            PlayerManager.Players.Remove(index);
+            PlayerManager.RemovePlayer(index);
         }
     }
 }

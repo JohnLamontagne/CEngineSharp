@@ -24,6 +24,8 @@ namespace CEngineSharp_Server.World
 
         void Interact(IEntity interactor);
 
-        bool IsDead();
+        void Die(IEntity murderer);
+
+        int GetDamage();
     }
 }

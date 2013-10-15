@@ -1,4 +1,6 @@
-﻿using CEngineSharp_Server.Utilities;
+﻿using CEngineSharp_Server.Net.Packets;
+using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 using System.IO;
@@ -16,73 +18,35 @@ namespace CEngineSharp_Server.World
         }
 
         private SharpNetty.NettyServer.Connection _connection;
-        private string _name;
-        private ushort _level;
-        private string _password;
-        private bool _loggedIn = false;
-        private int _mapNum;
-        private string _ip;
-        private AccessLevels _accessLevel;
         private ushort[] _vitals = new ushort[(int)Vitals.Energy + 1];
+        private ushort[] _stats = new ushort[(int)Stats.Strength + 1];
 
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                _name = value;
-            }
-        }
+        public string Name { get; set; }
 
-        public ushort Level
-        {
-            get
-            {
-                return _level;
-            }
-            set
-            {
-                _level = value;
-            }
-        }
+        public ushort Level { get; set; }
 
-        public bool LoggedIn
-        {
-            get { return _loggedIn; }
-            set { _loggedIn = value; }
-        }
+        public bool LoggedIn { get; set; }
 
-        public string IP
-        {
-            get { return _ip; }
-        }
+        public string IP { get; protected set; }
 
-        public string Password
-        {
-            get { return _password; }
-            set { _password = value; }
-        }
+        public string Password { get; set; }
 
-        public AccessLevels AccessLevel
-        {
-            get { return _accessLevel; }
-            set { _accessLevel = value; }
-        }
+        public AccessLevels AccessLevel { get; set; }
+
+        public Map Map { get; set; }
 
         public int MapNum
         {
-            get { return _mapNum; }
-
-            protected set { _mapNum = value; }
+            get
+            {
+                return MapManager.GetMapIndex(this.Map);
+            }
         }
 
         public Player(NettyServer.Connection connection)
         {
             string ip = connection.Socket.RemoteEndPoint.ToString();
-            _ip = connection.Socket.RemoteEndPoint.ToString().Remove(ip.IndexOf(':'), ip.Length - ip.IndexOf(':'));
+            this.IP = connection.Socket.RemoteEndPoint.ToString().Remove(ip.IndexOf(':'), ip.Length - ip.IndexOf(':'));
             _connection = connection;
         }
 
@@ -96,9 +60,50 @@ namespace CEngineSharp_Server.World
             _vitals[(int)vital] = value;
         }
 
+        public ushort GetStat(Stats stat)
+        {
+            return _stats[(int)stat];
+        }
+
+        public void SetStat(Stats stat, ushort value)
+        {
+            _stats[(int)stat] = value;
+        }
+
         public void Attack(IEntity attacker)
         {
-            throw new NotImplementedException();
+            int damage = attacker.GetDamage();
+
+            if (this.GetVital(Vitals.HitPoints) - damage <= 0)
+                this.Die(attacker);
+        }
+
+        public void Die(IEntity murderer)
+        {
+            var messagePacket = new ChatMessagePacket();
+            messagePacket.WriteData("Oh dear, you have died!");
+            this.SendPacket(messagePacket);
+
+            // Respawn the player.
+            this.Respawn();
+        }
+
+        public void EnterGame()
+        {
+            var messagePacket = new ChatMessagePacket();
+            messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
+            this.SendPacket(messagePacket);
+        }
+
+        private void Respawn()
+        {
+        }
+
+        public int GetDamage()
+        {
+            Random random = new Random();
+
+            return (int)((this.GetStat(Stats.Strength) * random.NextDouble()) + random.Next(1, 10));
         }
 
         public void Interact(IEntity interactor)
@@ -106,14 +111,15 @@ namespace CEngineSharp_Server.World
             throw new NotImplementedException();
         }
 
-        public bool IsDead()
-        {
-            throw new NotImplementedException();
-        }
-
         public void SendPacket(Packet packet)
         {
             _connection.SendPacket(packet);
+        }
+
+        public void JoinMap(Map map)
+        {
+            map.Players.Add(this);
+            this.Map = map;
         }
     }
 }

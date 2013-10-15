@@ -23,7 +23,6 @@ namespace CEngineSharp_Client.Net
 
         private static void Handle_ConnectionLost()
         {
-            Graphics.RenderState = RenderStates.Menu;
         }
 
         public static void SendPacket(Packet packet)

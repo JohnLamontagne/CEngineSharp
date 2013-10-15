@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using CEngineSharp_Client.Graphicss;
+using SFML.Graphics;
 using SharpNetty;
 using System;
 
@@ -10,9 +11,12 @@ namespace CEngineSharp_Client.Net.Packets
         {
             try
             {
-                string message = this.PacketBuffer.ReadString();
-
-                Program.GameGraphics.AddChatMessage(message, Color.White);
+                if (Program.CurrentRenderer.GetType() == typeof(GameRenderer))
+                {
+                    string message = this.PacketBuffer.ReadString();
+                    GameRenderer gameRenderer = Program.CurrentRenderer as GameRenderer;
+                    gameRenderer.AddChatMessage(message, Color.White);
+                }
             }
             catch (Exception ex)
             {

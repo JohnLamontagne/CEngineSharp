@@ -58,9 +58,13 @@
     <Compile Include="Utilities\Rect.cs" />
     <Compile Include="Utilities\ServerConfig.cs" />
     <Compile Include="Utilities\TextboxStreamWriter.cs" />
+    <Compile Include="Utilities\Vector2i.cs" />
+    <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Entity\IEntity.cs" />
     <Compile Include="World\Entity\Player.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
+    <Compile Include="World\Map.cs" />
+    <Compile Include="World\Stats.cs" />
     <Compile Include="World\Vitals.cs" />
   </ItemGroup>
   <ItemGroup>

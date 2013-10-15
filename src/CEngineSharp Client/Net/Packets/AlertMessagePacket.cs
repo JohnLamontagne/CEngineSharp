@@ -17,7 +17,7 @@ namespace CEngineSharp_Client.Net.Packets
             byte b = this.PacketBuffer.ReadByte();
             Color alertColor = new Color(r, g, b);
 
-            Program.GameGraphics.DisplayAlert(alertTitle, alertMessage, alertX, alertY, alertColor);
+            //Program.GameGraphics.DisplayAlert(alertTitle, alertMessage, alertX, alertY, alertColor);
         }
 
         public override string PacketID

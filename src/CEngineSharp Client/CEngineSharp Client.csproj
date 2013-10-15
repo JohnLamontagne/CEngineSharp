@@ -75,16 +75,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioManager.cs" />
+    <Compile Include="GameLoop.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="Graphicss\GameRenderer.cs" />
+    <Compile Include="Graphicss\MenuRenderer.cs" />
+    <Compile Include="Graphicss\Renderer.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
-    <Compile Include="Graphics.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
     <Compile Include="Net\Networking.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
-    <Compile Include="RenderStates.cs" />
     <Compile Include="World\GameWorld.cs" />
     <Compile Include="World\Player.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

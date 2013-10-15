@@ -3,6 +3,7 @@ using CEngineSharp_Server.Net;
 using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,21 +53,23 @@ namespace CEngineSharp_Server
                     {
                         Console.WriteLine("Kicking all players...");
 
-                        for (int i = PlayerManager.Players.Count - 1; i >= 0; i++)
+                        for (int i = PlayerManager.PlayerCount - 1; i >= 0; i++)
                         {
-                            if (PlayerManager.Players[i].LoggedIn)
+                            if (PlayerManager.GetPlayer(i).LoggedIn)
                                 Networking.KickPlayer(i);
                         }
 
                         return;
                     }
 
-                    foreach (var player in PlayerManager.Players)
+                    for (int i = 0; i < PlayerManager.PlayerCount; i++)
                     {
-                        if (player.Value.Name.ToLower() == command[1] && player.Value.LoggedIn)
+                        var player = PlayerManager.GetPlayer(i);
+
+                        if (player.Name.ToLower() == command[1] && player.LoggedIn)
                         {
                             Console.WriteLine("Kicking player: " + command[1]);
-                            Networking.KickPlayer(player.Key);
+                            Networking.KickPlayer(i);
                             return;
                         }
                     }
@@ -102,13 +105,15 @@ namespace CEngineSharp_Server
         {
             Console.WriteLine("Checking world integrity...");
             // Check to make sure our files containing the world exist.
-            if (!Directory.Exists(Constants.FilePath_Accounts)) Directory.CreateDirectory(Constants.FilePath_Accounts);
-            if (!Directory.Exists(Constants.FilePath_Npcs)) Directory.CreateDirectory(Constants.FilePath_Npcs.TrimEnd('/'));
-            if (!Directory.Exists(Constants.FilePath_Maps)) Directory.CreateDirectory(Constants.FilePath_Maps.TrimEnd('/'));
-            if (!Directory.Exists(Constants.FilePath_Items)) Directory.CreateDirectory(Constants.FilePath_Items.TrimEnd('/'));
+            if (!Directory.Exists(Constants.FILEPATH_ACCOUNTS)) Directory.CreateDirectory(Constants.FILEPATH_ACCOUNTS);
+            if (!Directory.Exists(Constants.FILEPATH_NPCS)) Directory.CreateDirectory(Constants.FILEPATH_NPCS.TrimEnd('/'));
+            if (!Directory.Exists(Constants.FILEPATH_MAPS)) Directory.CreateDirectory(Constants.FILEPATH_MAPS.TrimEnd('/'));
+            if (!Directory.Exists(Constants.FILEPATH_ITEMS)) Directory.CreateDirectory(Constants.FILEPATH_ITEMS.TrimEnd('/'));
 
             // Check to make sure the file for storing players name is there.
-            if (!File.Exists(Constants.FilePath_Data + "names.txt")) File.Create(Constants.FilePath_Data + "names.txt");
+            if (!File.Exists(Constants.FILEPATH_DATA + "names.txt")) File.Create(Constants.FILEPATH_DATA + "names.txt");
+
+            MapManager.LoadMaps();
         }
 
         public static void SaveWorld()

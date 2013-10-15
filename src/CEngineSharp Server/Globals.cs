@@ -9,14 +9,6 @@ namespace CEngineSharp_Server
 {
     public static class Globals
     {
-        public static int CurrentConnections
-        {
-            get
-            {
-                return PlayerManager.Players.Count - 1;
-            }
-        }
-
         public static bool ShuttingDown = false;
     }
 }

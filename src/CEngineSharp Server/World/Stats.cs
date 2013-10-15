@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CEngineSharp_Client
+namespace CEngineSharp_Server.World
 {
-    public enum RenderStates
+    public enum Stats
     {
-        Menu,
-        Menu_Game_Transition,
-        Game
+        Strength
     }
 }

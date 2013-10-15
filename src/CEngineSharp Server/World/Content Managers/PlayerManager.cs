@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,33 @@ namespace CEngineSharp_Server.World
 {
     public static class PlayerManager
     {
-        public static Dictionary<int, Player> Players = new Dictionary<int, Player>();
+        private static Dictionary<int, Player> _players = new Dictionary<int, Player>();
+
+        public static Player GetPlayer(int index)
+        {
+            return _players[index];
+        }
+
+        public static void AddPlayer(int socketIndex, Player player)
+        {
+            _players.Add(socketIndex, player);
+        }
+
+        public static void RemovePlayer(int socketIndex)
+        {
+            _players.Remove(socketIndex);
+        }
+
+        public static int PlayerCount
+        {
+            get { return _players.Count; }
+        }
 
         private static bool CheckName(string name)
         {
             try
             {
-                string[] names = File.ReadAllLines((Constants.FilePath_Data + "names.txt"));
+                string[] names = File.ReadAllLines((Constants.FILEPATH_DATA + "names.txt"));
 
                 foreach (var playernames in names)
                 {
@@ -39,7 +60,7 @@ namespace CEngineSharp_Server.World
         {
             try
             {
-                using (StreamWriter streamWriter = File.AppendText(Constants.FilePath_Data + "names.txt"))
+                using (StreamWriter streamWriter = File.AppendText(Constants.FILEPATH_DATA + "names.txt"))
                 {
                     streamWriter.WriteLine(name);
                 }
@@ -51,17 +72,6 @@ namespace CEngineSharp_Server.World
             }
         }
 
-        //public static void JoinMap(Map map, int playerIndex)
-        //{
-        //    map.Players.Add(playerIndex);
-        //    // PlayerManager.Players[playerIndex].MapNum = GameWorld.Maps.IndexOf(map);
-        //}
-
-        //public static void LeaveMap(Map map, int playerIndex)
-        //{
-        //    map.Players.RemoveAt(playerIndex);
-        //}
-
         public static bool RegisterPlayer(Player player, string name, string password)
         {
             if (PlayerManager.CheckName(name)) return false;
@@ -69,27 +79,30 @@ namespace CEngineSharp_Server.World
             player.Name = name;
             player.Password = password;
             player.Level = 1;
+            player.JoinMap(MapManager.GetMap(Constants.SERVER_STARTER_MAP));
 
             foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
             {
                 player.SetVital(vital, 10);
             }
 
-            player.LoggedIn = true;
-
             PlayerManager.SavePlayer(player);
 
             AddPlayerName(name);
 
+            player.LoggedIn = true;
+
+            player.EnterGame();
+
             return true;
         }
 
-        public static Player LoadPlayer(string fileName, NettyServer.Connection connection)
+        public static void LoadPlayer(string fileName, int index)
         {
             try
             {
-                Player player = new Player(connection);
-                string filePath = Constants.FilePath_Accounts + fileName + ".dat";
+                Player player = _players[index];
+                string filePath = Constants.FILEPATH_ACCOUNTS + fileName + ".dat";
 
                 using (FileStream fs = new FileStream(filePath, FileMode.Open))
                 {
@@ -103,18 +116,17 @@ namespace CEngineSharp_Server.World
                         {
                             player.SetVital(vital, br.ReadUInt16());
                         }
+
+                        player.JoinMap(MapManager.GetMap(br.ReadInt32()));
                     }
                 }
 
                 player.LoggedIn = true;
-
-                return player;
             }
             catch (Exception ex)
             {
                 // Let the error handler take care of this problem; since it's an error only effecting a particular player, flag it as a low level error.
                 ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-                return null;
             }
         }
 
@@ -122,7 +134,7 @@ namespace CEngineSharp_Server.World
         {
             try
             {
-                string filePath = Constants.FilePath_Accounts + player.Name + ".dat";
+                string filePath = Constants.FILEPATH_ACCOUNTS + player.Name + ".dat";
 
                 using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate))
                 {
@@ -136,6 +148,8 @@ namespace CEngineSharp_Server.World
                         {
                             bw.Write(player.GetVital(vital));
                         }
+
+                        bw.Write(player.MapNum);
                     }
                 }
             }
@@ -148,7 +162,7 @@ namespace CEngineSharp_Server.World
 
         public static void SavePlayers()
         {
-            foreach (var player in PlayerManager.Players.Values)
+            foreach (var player in PlayerManager._players.Values)
             {
                 PlayerManager.SavePlayer(player);
             }
@@ -159,7 +173,9 @@ namespace CEngineSharp_Server.World
             string playerName;
             string playerPassword;
 
-            using (FileStream fs = new FileStream(Constants.FilePath_Accounts + name + ".data", FileMode.Open))
+            if (!File.Exists(Constants.FILEPATH_ACCOUNTS + name + ".dat")) return false;
+
+            using (FileStream fs = new FileStream(Constants.FILEPATH_ACCOUNTS + name + ".dat", FileMode.Open))
             {
                 using (BinaryReader br = new BinaryReader(fs))
                 {
@@ -173,7 +189,7 @@ namespace CEngineSharp_Server.World
 
         public static void BroadcastPacket(Packet packet)
         {
-            foreach (var player in PlayerManager.Players.Values)
+            foreach (var player in PlayerManager._players.Values)
             {
                 if (player.LoggedIn)
                     player.SendPacket(packet);

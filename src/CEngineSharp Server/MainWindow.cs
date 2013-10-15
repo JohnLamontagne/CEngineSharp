@@ -48,7 +48,7 @@ namespace CEngineSharp_Server
 
             ServerConfiguration.LoadConfig();
 
-            this.Text = ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" + ServerConfiguration.ServerPort + " - Player Count: " + Globals.CurrentConnections +
+            this.Text = ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" + ServerConfiguration.ServerPort + " - Player Count: " + PlayerManager.PlayerCount +
                 " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off");
 
             // Load the game world.

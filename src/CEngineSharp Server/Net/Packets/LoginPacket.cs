@@ -14,8 +14,9 @@ namespace CEngineSharp_Server.Net.Packets
             if (loginOkay)
             {
                 this.PacketBuffer.WriteInteger(playerIndex);
-                this.PacketBuffer.WriteString(message);
             }
+
+            this.PacketBuffer.WriteString(message);
         }
 
         public override void Execute(Netty netty, int socketIndex)
@@ -25,15 +26,16 @@ namespace CEngineSharp_Server.Net.Packets
             string password = this.PacketBuffer.ReadString();
             bool loginOkay = PlayerManager.Authenticate(username, password);
 
-            WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
-            PlayerManager.Players[socketIndex].SendPacket(this);
+            this.WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
+            PlayerManager.GetPlayer(socketIndex).SendPacket(this);
 
             if (loginOkay)
             {
+                PlayerManager.LoadPlayer(username, socketIndex);
                 Console.WriteLine(username + " has logged in!");
                 chatMessagePacket.WriteData(username + " has logged in!");
                 PlayerManager.BroadcastPacket(chatMessagePacket);
-                Server.ServerWindow.AddPlayerToGrid(PlayerManager.Players[socketIndex]);
+                Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(socketIndex));
             }
         }
 
