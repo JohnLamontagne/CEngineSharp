@@ -1,4 +1,4 @@
-﻿using CEngineSharp_Client.Graphicss;
+﻿using CEngineSharp_Client.Graphics;
 using SFML.Graphics;
 using SharpNetty;
 using System;

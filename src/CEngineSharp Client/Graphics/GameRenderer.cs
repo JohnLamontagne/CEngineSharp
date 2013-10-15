@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGUI;
 
-namespace CEngineSharp_Client.Graphicss
+namespace CEngineSharp_Client.Graphics
 {
     public class GameRenderer : Renderer
     {

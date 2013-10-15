@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using TGUI;
 
-namespace CEngineSharp_Client.Graphicss
+namespace CEngineSharp_Client.Graphics
 {
     public class MenuRenderer : Renderer
     {

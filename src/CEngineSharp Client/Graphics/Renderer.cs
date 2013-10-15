@@ -3,7 +3,7 @@ using SFML.Window;
 using System;
 using TGUI;
 
-namespace CEngineSharp_Client.Graphicss
+namespace CEngineSharp_Client.Graphics
 {
     public abstract class Renderer
     {

@@ -77,9 +77,9 @@
     <Compile Include="AudioManager.cs" />
     <Compile Include="GameLoop.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="Graphicss\GameRenderer.cs" />
-    <Compile Include="Graphicss\MenuRenderer.cs" />
-    <Compile Include="Graphicss\Renderer.cs" />
+    <Compile Include="Graphics\GameRenderer.cs" />
+    <Compile Include="Graphics\MenuRenderer.cs" />
+    <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
