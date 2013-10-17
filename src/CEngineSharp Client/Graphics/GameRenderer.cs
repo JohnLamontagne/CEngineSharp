@@ -40,9 +40,15 @@ namespace CEngineSharp_Client.Graphics
 
             MessageBox messageBoxAlert = _gui.Add(new MessageBox(themeConfigurationPath), "messageBoxAlert");
             messageBoxAlert.Visible = false;
-
+            messageBoxAlert.ClosedCallback += messageBoxAlert_ClosedCallback;
             messageBoxAlert.Add(new Label(), "labelAlert");
             messageBoxAlert.Size = new Vector2f(400, 100);
+        }
+
+        private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
+        {
+            RenderManager.SetRenderState(RenderStates.Render_Menu);
+            Networking.Disconnect();
         }
 
         public void LoadGameTextures()

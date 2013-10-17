@@ -16,13 +16,22 @@ namespace CEngineSharp_Client.Net
         {
             nettyClient = new NettyClient(true);
 
+            if (nettyClient.Connected)
+                nettyClient.Disconnect();
+
             nettyClient.Handle_ConnectionLost = Handle_ConnectionLost;
 
             nettyClient.Connect("127.0.0.1", 25566, 1);
         }
 
+        public static void Disconnect()
+        {
+            nettyClient.Disconnect();
+        }
+
         private static void Handle_ConnectionLost()
         {
+            nettyClient = null;
         }
 
         public static void SendPacket(Packet packet)

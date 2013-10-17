@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Client.World;
+﻿using CEngineSharp_Client.Graphics;
+using CEngineSharp_Client.World;
 using SharpNetty;
 using System;
 
@@ -13,11 +14,19 @@ namespace CEngineSharp_Client.Net.Packets
             {
                 Globals.MyIndex = this.PacketBuffer.ReadInteger();
 
-                // Problem #1 is that I store the graphics class through a static reference in Program
-                //Program.GameGraphics.LoadGameTextures();
+                RenderManager.SetRenderState(RenderStates.Render_Game);
 
-                //GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
+                GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
+
+                gameRenderer.LoadGameTextures();
+
+                GameWorld.Players.Add(Globals.MyIndex, new Player(gameRenderer.CharacterTextures["Bob"]));
+                return;
             }
+
+            MenuRenderer menuRenderer = RenderManager.CurrentRenderer as MenuRenderer;
+
+            menuRenderer.SetMenuStatus(this.PacketBuffer.ReadString());
         }
 
         public void WriteData(string user, string pass)

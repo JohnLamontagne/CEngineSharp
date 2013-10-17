@@ -11,10 +11,10 @@ namespace CEngineSharp_Client.Net.Packets
         {
             try
             {
-                if (Program.CurrentRenderer.GetType() == typeof(GameRenderer))
+                if (RenderManager.CurrentRenderer.GetType() == typeof(GameRenderer))
                 {
                     string message = this.PacketBuffer.ReadString();
-                    GameRenderer gameRenderer = Program.CurrentRenderer as GameRenderer;
+                    GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
                     gameRenderer.AddChatMessage(message, Color.White);
                 }
             }

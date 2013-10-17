@@ -72,19 +72,6 @@ namespace CEngineSharp_Server
                 this.Text = text;
         }
 
-        private void textCommandInput_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                Server.HandleCommand(textCommandInput.Text);
-
-                e.Handled = true;
-                e.SuppressKeyPress = true;
-
-                textCommandInput.Text = "";
-            }
-        }
-
         public void AddPlayerToGrid(Player player)
         {
             if (this.InvokeRequired)
@@ -98,6 +85,19 @@ namespace CEngineSharp_Server
         private void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             Globals.ShuttingDown = true;
+        }
+
+        private void textCommandInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                Server.HandleCommand(textCommandInput.Text);
+
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+
+                textCommandInput.Text = "";
+            }
         }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CEngineSharp_Client.Graphics;
+using System;
 
 namespace CEngineSharp_Client
 {
@@ -12,7 +9,7 @@ namespace CEngineSharp_Client
         {
             while (!Globals.ShuttingDown)
             {
-                Program.CurrentRenderer.Render();
+                RenderManager.Render();
             }
         }
     }

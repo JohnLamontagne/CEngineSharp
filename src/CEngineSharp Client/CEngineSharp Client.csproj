@@ -80,6 +80,8 @@
     <Compile Include="Graphics\GameRenderer.cs" />
     <Compile Include="Graphics\MenuRenderer.cs" />
     <Compile Include="Graphics\Renderer.cs" />
+    <Compile Include="Graphics\RenderManager.cs" />
+    <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />

@@ -6,20 +6,15 @@ namespace CEngineSharp_Client
 {
     internal static class Program
     {
-        // I feel like that's not a good practice.
-        // Yeah, I couldn't think of any other way to allow the rest of the program to interact with the graphics... unless I pass it around a ton.
-        // Problem #2
-        public static Renderer CurrentRenderer;
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         private static void Main()
         {
-            AudioManager.LoadSounds(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Sounds");
+            AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 
-            CurrentRenderer = new MenuRenderer();
+            RenderManager.Init();
 
             GameLoop.Start();
         }

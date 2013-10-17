@@ -12,6 +12,12 @@ namespace CEngineSharp_Client.Graphics
     {
         private Sprite _menuBackground;
 
+        public MenuRenderer(RenderWindow window)
+            : base(window)
+        {
+            _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
+        }
+
         public MenuRenderer()
         {
             _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));

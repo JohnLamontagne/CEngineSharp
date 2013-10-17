@@ -18,6 +18,7 @@ namespace CEngineSharp_Server.Net
             _nettyServer.Handle_NewConnection = Networking.Handle_NewConnection;
 
             _nettyServer.BindSocket(ServerConfiguration.ServerIP, ServerConfiguration.ServerPort);
+
             _nettyServer.Listen();
         }
 
@@ -31,6 +32,7 @@ namespace CEngineSharp_Server.Net
             if (PlayerManager.GetPlayer(socketIndex).LoggedIn)
             {
                 PlayerManager.SavePlayer(PlayerManager.GetPlayer(socketIndex));
+                PlayerManager.GetPlayer(socketIndex).LeaveGame();
                 Console.WriteLine(PlayerManager.GetPlayer(socketIndex).Name + " has left!");
             }
 

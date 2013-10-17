@@ -95,6 +95,11 @@ namespace CEngineSharp_Server.World
             this.SendPacket(messagePacket);
         }
 
+        public void LeaveGame()
+        {
+            this.Map.Players.Remove(this);
+        }
+
         private void Respawn()
         {
         }
@@ -118,6 +123,9 @@ namespace CEngineSharp_Server.World
 
         public void JoinMap(Map map)
         {
+            if (this.Map != null)
+                this.Map.Players.Remove(this);
+
             map.Players.Add(this);
             this.Map = map;
         }

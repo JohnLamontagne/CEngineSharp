@@ -19,14 +19,20 @@ namespace CEngineSharp_Client.Net.Packets
             {
                 Globals.MyIndex = this.PacketBuffer.ReadInteger();
 
-                Program.CurrentRenderer = new GameRenderer(Program.CurrentRenderer.GetWindow());
+                RenderManager.SetRenderState(RenderStates.Render_Game);
 
-                //Program.GameGraphics.LoadGameTextures();
+                GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
 
-                //GameWorld.Players.Add(Globals.MyIndex, new Player(Program.GameGraphics.CharacterTextures["Bob"]));
+                gameRenderer.LoadGameTextures();
+
+                GameWorld.Players.Add(Globals.MyIndex, new Player(gameRenderer.CharacterTextures["Bob"]));
+
+                return;
             }
 
-            //Program.GameGraphics.SetMenuStatus(this.PacketBuffer.ReadString());
+            MenuRenderer menuRenderer = RenderManager.CurrentRenderer as MenuRenderer;
+
+            menuRenderer.SetMenuStatus(this.PacketBuffer.ReadString());
         }
 
         public override string PacketID

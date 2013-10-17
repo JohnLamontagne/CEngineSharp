@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using CEngineSharp_Client.Graphics;
+using SFML.Graphics;
 using SharpNetty;
 using System;
 
@@ -17,7 +18,11 @@ namespace CEngineSharp_Client.Net.Packets
             byte b = this.PacketBuffer.ReadByte();
             Color alertColor = new Color(r, g, b);
 
-            //Program.GameGraphics.DisplayAlert(alertTitle, alertMessage, alertX, alertY, alertColor);
+            if (RenderManager.CurrentRenderer.GetType() == typeof(GameRenderer))
+            {
+                GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
+                gameRenderer.DisplayAlert(alertTitle, alertMessage, alertX, alertY, alertColor);
+            }
         }
 
         public override string PacketID

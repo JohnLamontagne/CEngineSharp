@@ -74,6 +74,7 @@
             this.textCommandInput.Name = "textCommandInput";
             this.textCommandInput.Size = new System.Drawing.Size(649, 20);
             this.textCommandInput.TabIndex = 2;
+            this.textCommandInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textCommandInput_KeyDown);
             // 
             // textServerOutput
             // 
@@ -83,6 +84,7 @@
             this.textServerOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textServerOutput.Size = new System.Drawing.Size(649, 417);
             this.textServerOutput.TabIndex = 1;
+
             // 
             // tabPage2
             // 

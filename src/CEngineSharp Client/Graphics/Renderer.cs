@@ -43,6 +43,13 @@ namespace CEngineSharp_Client.Graphics
 
         public abstract void Render();
 
+        public void Unload()
+        {
+            _gui.GetWidgets().Clear();
+
+            _gui = null;
+        }
+
         public RenderWindow GetWindow()
         {
             return _window;
