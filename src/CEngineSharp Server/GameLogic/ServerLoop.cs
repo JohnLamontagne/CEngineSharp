@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -9,11 +10,11 @@ namespace CEngineSharp_Server.GameLogic
 {
     public class ServerLoop
     {
-        public class GameTime
+        public class GameTimer
         {
             private Stopwatch stopWatch;
 
-            public GameTime()
+            public GameTimer()
             {
                 stopWatch = new Stopwatch();
                 stopWatch.Start();
@@ -25,12 +26,12 @@ namespace CEngineSharp_Server.GameLogic
             }
         }
 
+        public static GameTimer GameTime;
+
         public ServerLoop()
         {
-            gameTime = new GameTime();
+            GameTime = new GameTimer();
         }
-
-        private GameTime gameTime;
 
         public void Start()
         {
@@ -42,19 +43,19 @@ namespace CEngineSharp_Server.GameLogic
             // Continue processing the server-logic until it's time to shut things down.
             while (!Globals.ShuttingDown)
             {
-                if (lastConsoleTitleUpdateTime <= gameTime.GetTotalTimeElapsed())
+                if (lastConsoleTitleUpdateTime <= GameTime.GetTotalTimeElapsed())
                 {
                     Server.ServerWindow.SetTitle(ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" + ServerConfiguration.ServerPort + " - Player Count: " + PlayerManager.PlayerCount +
                         " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off") + " - Cps: " + cps + "/sec");
 
-                    lastConsoleTitleUpdateTime = gameTime.GetTotalTimeElapsed() + 500;
+                    lastConsoleTitleUpdateTime = GameTime.GetTotalTimeElapsed() + 500;
                 }
 
-                if (lastCpsCheck <= gameTime.GetTotalTimeElapsed())
+                if (lastCpsCheck <= GameTime.GetTotalTimeElapsed())
                 {
                     cps = cpsCount;
                     cpsCount = 0;
-                    lastCpsCheck = gameTime.GetTotalTimeElapsed() + 1000;
+                    lastCpsCheck = GameTime.GetTotalTimeElapsed() + 1000;
                 }
                 else
                     cpsCount++;

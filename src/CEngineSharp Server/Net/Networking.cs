@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -24,7 +25,7 @@ namespace CEngineSharp_Server.Net
 
         private static void Handle_NewConnection(int socketIndex)
         {
-            PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex)));
+            PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex), socketIndex));
         }
 
         private static void Handle_LostConnection(int socketIndex)

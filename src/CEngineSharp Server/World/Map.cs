@@ -9,7 +9,11 @@ namespace CEngineSharp_Server.World
     {
         public class Tile
         {
-            public Layer[] _layers;
+            private Layer[] _layers;
+
+            public bool Blocked { get; set; }
+
+            public bool IsOccupied { get; set; }
 
             public class Layer
             {
@@ -17,7 +21,7 @@ namespace CEngineSharp_Server.World
             }
         }
 
-        public Tile[,] _tiles
+        public Tile[,] Tiles
         {
             get;
             protected set;
@@ -37,13 +41,13 @@ namespace CEngineSharp_Server.World
         public void ResizeMap(int newWidth, int newHeight)
         {
             var newArray = new Tile[newWidth, newHeight];
-            int columnCount = _tiles.GetLength(1);
+            int columnCount = Tiles.GetLength(1);
             int columnCount2 = newHeight;
-            int columns = _tiles.GetUpperBound(0);
+            int columns = Tiles.GetUpperBound(0);
             for (int co = 0; co <= columns; co++)
-                Array.Copy(_tiles, co * columnCount, newArray, co * columnCount2, columnCount);
+                Array.Copy(Tiles, co * columnCount, newArray, co * columnCount2, columnCount);
 
-            _tiles = newArray;
+            Tiles = newArray;
         }
 
         public void SendPacket(Packet packet)

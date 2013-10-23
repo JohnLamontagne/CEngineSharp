@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CEngineSharp_Server.World
+namespace CEngineSharp_Server.World.Content_Managers
 {
     public static class PlayerManager
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SFML.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,9 @@ namespace CEngineSharp_Client
     {
         public static int MyIndex;
         public static bool ShuttingDown = false;
+
+        public static int CurrentResolutionWidth { get; set; }
+
+        public static int CurrentResolutionHeight { get; set; }
     }
 }

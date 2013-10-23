@@ -6,9 +6,7 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
 using TGUI;
 
 namespace CEngineSharp_Client.Graphics
@@ -17,10 +15,43 @@ namespace CEngineSharp_Client.Graphics
     {
         public Dictionary<string, Texture> CharacterTextures;
 
+        private int fpsCounter;
+        private int fpsTimer;
+
         public GameRenderer(RenderWindow window)
             : base(window)
         {
             this.CharacterTextures = new Dictionary<string, Texture>();
+
+            _window.KeyPressed += _window_KeyPressed;
+        }
+
+        private void _window_KeyPressed(object sender, KeyEventArgs e)
+        {
+            var movementPacket = new MovementPacket();
+
+            switch (e.Code)
+            {
+                case Keyboard.Key.Up:
+                    movementPacket.WriteData(GameWorld.Players[Globals.MyIndex].X, GameWorld.Players[Globals.MyIndex].Y - 1);
+                    Networking.SendPacket(movementPacket);
+                    break;
+
+                case Keyboard.Key.Down:
+                    movementPacket.WriteData(GameWorld.Players[Globals.MyIndex].X, GameWorld.Players[Globals.MyIndex].Y + 1);
+                    Networking.SendPacket(movementPacket);
+                    break;
+
+                case Keyboard.Key.Right:
+                    movementPacket.WriteData(GameWorld.Players[Globals.MyIndex].X + 1, GameWorld.Players[Globals.MyIndex].Y);
+                    Networking.SendPacket(movementPacket);
+                    break;
+
+                case Keyboard.Key.Left:
+                    movementPacket.WriteData(GameWorld.Players[Globals.MyIndex].X - 1, GameWorld.Players[Globals.MyIndex].Y);
+                    Networking.SendPacket(movementPacket);
+                    break;
+            }
         }
 
         protected override void LoadInterface()
@@ -43,6 +74,10 @@ namespace CEngineSharp_Client.Graphics
             messageBoxAlert.ClosedCallback += messageBoxAlert_ClosedCallback;
             messageBoxAlert.Add(new Label(), "labelAlert");
             messageBoxAlert.Size = new Vector2f(400, 100);
+
+            Label labelFps = _gui.Add(new Label(themeConfigurationPath), "labelFps");
+            labelFps.TextSize = 15;
+            labelFps.Position = new Vector2f(10, 10);
         }
 
         private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
@@ -82,6 +117,15 @@ namespace CEngineSharp_Client.Graphics
             _gui.Draw();
 
             _window.Display();
+
+            if (this.fpsTimer < Client.GameTime.GetTotalTimeElapsed())
+            {
+                _gui.Get<Label>("labelFps").Text = "Fps: " + this.fpsCounter;
+                this.fpsCounter = 0;
+                this.fpsTimer = (int)Client.GameTime.GetTotalTimeElapsed() + 1000;
+            }
+
+            this.fpsCounter++;
         }
 
         private void RenderPlayers()

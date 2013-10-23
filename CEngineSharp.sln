@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEngineSharp Server", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEngineSharp Client", "src\CEngineSharp Client\CEngineSharp Client.csproj", "{6B289105-55B7-49BC-8DB9-20EF617ACF11}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEngineSharp Editor", "src\CEngineSharp Editor\CEngineSharp Editor.csproj", "{A9FB2BF6-BD27-424C-A849-8104E7A93412}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{6B289105-55B7-49BC-8DB9-20EF617ACF11}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6B289105-55B7-49BC-8DB9-20EF617ACF11}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6B289105-55B7-49BC-8DB9-20EF617ACF11}.Release|x86.ActiveCfg = Release|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A9FB2BF6-BD27-424C-A849-8104E7A93412}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

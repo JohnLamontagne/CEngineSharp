@@ -20,6 +20,7 @@ namespace CEngineSharp_Server.World
         private SharpNetty.NettyServer.Connection _connection;
         private ushort[] _vitals = new ushort[(int)Vitals.Energy + 1];
         private ushort[] _stats = new ushort[(int)Stats.Strength + 1];
+        private readonly int _playerIndex;
 
         public string Name { get; set; }
 
@@ -35,6 +36,10 @@ namespace CEngineSharp_Server.World
 
         public Map Map { get; set; }
 
+        public Vector2i Position { get; set; }
+
+        public int PlayerIndex { get { return _playerIndex; } }
+
         public int MapNum
         {
             get
@@ -43,11 +48,12 @@ namespace CEngineSharp_Server.World
             }
         }
 
-        public Player(NettyServer.Connection connection)
+        public Player(NettyServer.Connection connection, int index)
         {
             string ip = connection.Socket.RemoteEndPoint.ToString();
             this.IP = connection.Socket.RemoteEndPoint.ToString().Remove(ip.IndexOf(':'), ip.Length - ip.IndexOf(':'));
             _connection = connection;
+            _playerIndex = index;
         }
 
         public ushort GetVital(Vitals vital)
@@ -80,12 +86,30 @@ namespace CEngineSharp_Server.World
 
         public void Die(IEntity murderer)
         {
-            var messagePacket = new ChatMessagePacket();
-            messagePacket.WriteData("Oh dear, you have died!");
-            this.SendPacket(messagePacket);
+            this.SendMessage("Oh dear, you are dead!");
 
             // Respawn the player.
             this.Respawn();
+        }
+
+        public void MoveTo(Vector2i vector)
+        {
+            //// If the tile is blocked, we obviously can't move to it.
+            //if (this.Map.Tiles[vector.X, vector.Y].Blocked || this.Map.Tiles[vector.X, vector.Y].IsOccupied)
+            //    return;
+
+            // Unblock the previous tile so that another entity may occupy it.
+            //this.Map.Tiles[this.Position.X, this.Position.Y].IsOccupied = false;
+
+            // Change our character's position to the new position.
+            this.Position = vector;
+
+            // Block the tile that we're moving to.
+            //this.Map.Tiles[this.Position.X, this.Position.Y].IsOccupied = true;
+
+            var movementPacket = new MovementPacket();
+            movementPacket.WriteData(this.PlayerIndex, this.Position);
+            this.Map.SendPacket(movementPacket);
         }
 
         public void EnterGame()
@@ -128,6 +152,13 @@ namespace CEngineSharp_Server.World
 
             map.Players.Add(this);
             this.Map = map;
+        }
+
+        public void SendMessage(string message)
+        {
+            var chatMessagePacket = new ChatMessagePacket();
+            chatMessagePacket.WriteData(message);
+            this.SendPacket(chatMessagePacket);
         }
     }
 }

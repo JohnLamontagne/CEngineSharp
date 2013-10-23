@@ -16,11 +16,21 @@ namespace CEngineSharp_Client.Net.Packets
 
                 RenderManager.SetRenderState(RenderStates.Render_Game);
 
+                // We need to wait for the transition to occur, otherwise we won't be able to make any valid calls to the Game Renderer.
+                while ((RenderManager.CurrentRenderer as GameRenderer) == null)
+                {
+                    System.Threading.Thread.Sleep(1);
+                }
+
+                // It looks like we'll be able to makes calls to the Game Renderer object (finally), let's go ahead and create a reference to it.
                 GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
 
+                // Load the game textures.
                 gameRenderer.LoadGameTextures();
 
+                // Set our player's character-texture.
                 GameWorld.Players.Add(Globals.MyIndex, new Player(gameRenderer.CharacterTextures["Bob"]));
+
                 return;
             }
 

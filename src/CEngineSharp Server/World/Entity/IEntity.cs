@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CEngineSharp_Server.Utilities;
+using System;
 
 namespace CEngineSharp_Server.World
 {
@@ -25,6 +26,8 @@ namespace CEngineSharp_Server.World
         void Interact(IEntity interactor);
 
         void Die(IEntity murderer);
+
+        void MoveTo(Vector2i vector);
 
         int GetDamage();
     }
