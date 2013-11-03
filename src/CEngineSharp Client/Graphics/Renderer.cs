@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using CEngineSharp_Client.Graphics.TextureManager;
+using SFML.Graphics;
 using SFML.Window;
 using System;
 using TGUI;
@@ -7,7 +8,7 @@ namespace CEngineSharp_Client.Graphics
 {
     public abstract class Renderer
     {
-        protected string themeConfigurationPath = @"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Gui\Black.conf";
+        protected readonly string themeConfigurationPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Gui\Black.conf";
 
         public Renderer()
         {
@@ -15,7 +16,7 @@ namespace CEngineSharp_Client.Graphics
             _window.Resized += _window_Resized;
             _gui = new Gui(_window);
 
-            _gui.GlobalFont = new Font(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Fonts\Georgia.ttf");
+            _gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Fonts\MainFont.ttf");
 
             LoadInterface();
         }
@@ -30,7 +31,7 @@ namespace CEngineSharp_Client.Graphics
             _window = window;
             _gui = new Gui(_window);
 
-            _gui.GlobalFont = new Font(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Fonts\Georgia.ttf");
+            _gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Fonts\MainFont.ttf");
 
             LoadInterface();
         }

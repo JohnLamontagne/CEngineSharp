@@ -1,7 +1,9 @@
-﻿using System;
+﻿using CEngineSharp_Server.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,17 +31,13 @@ namespace CEngineSharp_Server.World.Content_Managers
         public static void LoadMaps()
         {
             DirectoryInfo dI = new DirectoryInfo(Constants.FILEPATH_MAPS);
-            FileInfo[] fileInfo = dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly);
-
-            // for testing purposed only
-            _maps.Add(new Map());
-            //
+            FileInfo[] fileInfo = dI.GetFiles("*.map", SearchOption.TopDirectoryOnly);
 
             Console.WriteLine("Loading maps...");
 
             foreach (var mapFile in fileInfo)
             {
-                MapManager.LoadMap(mapFile.Name);
+                _maps.Add(MapManager.LoadMap(mapFile.Name));
             }
 
             Console.WriteLine("Loaded {0} maps", fileInfo.Count());
@@ -48,24 +46,54 @@ namespace CEngineSharp_Server.World.Content_Managers
         private static Map LoadMap(string fileName)
         {
             Map map = new Map();
-            int mapHeight;
-            int mapWidth;
 
             using (FileStream fileStream = new FileStream(Constants.FILEPATH_MAPS + fileName, FileMode.Open))
             {
                 using (BinaryReader binaryReader = new BinaryReader(fileStream))
                 {
-                    mapWidth = binaryReader.ReadInt32();
-                    mapHeight = binaryReader.ReadInt32();
+                    map.Name = binaryReader.ReadString();
+
+                    int mapWidth = binaryReader.ReadInt32();
+                    int mapHeight = binaryReader.ReadInt32();
+
                     map.ResizeMap(mapWidth, mapHeight);
+
+                    for (int x = 0; x < mapWidth; x++)
+                    {
+                        for (int y = 0; y < mapHeight; y++)
+                        {
+                            map.SetTile(x, y, new Map.Tile());
+
+                            foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
+                            {
+                                if (binaryReader.ReadBoolean() == false) continue;
+
+                                int tileSetTextureIndex = binaryReader.ReadInt32();
+                                int tileLeft = binaryReader.ReadInt32();
+                                int tileTop = binaryReader.ReadInt32();
+                                int tileWidth = binaryReader.ReadInt32();
+                                int tileHeight = binaryReader.ReadInt32();
+
+                                map.GetTile(x, y).Layers[(int)layer] = new Map.Tile.Layer();
+                                map.GetTile(x, y).Layers[(int)layer].SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth);
+                                map.GetTile(x, y).Layers[(int)layer].TextureNumber = tileSetTextureIndex;
+                            }
+                        }
+                    }
                 }
             }
-
             return map;
         }
 
-        public static void SaveMaps()
+        public static byte[] GetMapCacheChecksum(string mapName)
         {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(Constants.FILEPATH_MAPS + mapName + ".map"))
+                {
+                    return md5.ComputeHash(stream);
+                }
+            }
         }
     }
 }

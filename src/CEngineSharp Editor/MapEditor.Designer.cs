@@ -35,6 +35,11 @@
             this.tileSetScrollX = new System.Windows.Forms.HScrollBar();
             this.tileSetForwardButton = new System.Windows.Forms.Button();
             this.tileSetBackButton = new System.Windows.Forms.Button();
+            this.mapList = new System.Windows.Forms.ListBox();
+            this.newMapButton = new System.Windows.Forms.Button();
+            this.removeMapButton = new System.Windows.Forms.Button();
+            this.fillMapButton = new System.Windows.Forms.Button();
+            this.clearMapButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.mapDisplayPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tileSetPicture)).BeginInit();
             this.SuspendLayout();
@@ -43,7 +48,7 @@
             // 
             this.mapPropertyGrid.Location = new System.Drawing.Point(12, 12);
             this.mapPropertyGrid.Name = "mapPropertyGrid";
-            this.mapPropertyGrid.Size = new System.Drawing.Size(181, 607);
+            this.mapPropertyGrid.Size = new System.Drawing.Size(181, 480);
             this.mapPropertyGrid.TabIndex = 3;
             // 
             // mapDisplayPicture
@@ -80,7 +85,7 @@
             // 
             // tileSetForwardButton
             // 
-            this.tileSetForwardButton.Location = new System.Drawing.Point(550, 528);
+            this.tileSetForwardButton.Location = new System.Drawing.Point(550, 517);
             this.tileSetForwardButton.Name = "tileSetForwardButton";
             this.tileSetForwardButton.Size = new System.Drawing.Size(58, 25);
             this.tileSetForwardButton.TabIndex = 7;
@@ -90,7 +95,7 @@
             // 
             // tileSetBackButton
             // 
-            this.tileSetBackButton.Location = new System.Drawing.Point(332, 528);
+            this.tileSetBackButton.Location = new System.Drawing.Point(332, 517);
             this.tileSetBackButton.Name = "tileSetBackButton";
             this.tileSetBackButton.Size = new System.Drawing.Size(58, 25);
             this.tileSetBackButton.TabIndex = 8;
@@ -98,11 +103,65 @@
             this.tileSetBackButton.UseVisualStyleBackColor = true;
             this.tileSetBackButton.Click += new System.EventHandler(this.tileSetBackButton_Click);
             // 
+            // mapList
+            // 
+            this.mapList.FormattingEnabled = true;
+            this.mapList.Location = new System.Drawing.Point(12, 498);
+            this.mapList.Name = "mapList";
+            this.mapList.Size = new System.Drawing.Size(181, 108);
+            this.mapList.TabIndex = 9;
+            this.mapList.SelectedIndexChanged += new System.EventHandler(this.mapList_SelectedIndexChanged);
+            // 
+            // newMapButton
+            // 
+            this.newMapButton.Location = new System.Drawing.Point(12, 612);
+            this.newMapButton.Name = "newMapButton";
+            this.newMapButton.Size = new System.Drawing.Size(80, 23);
+            this.newMapButton.TabIndex = 10;
+            this.newMapButton.Text = "New Map";
+            this.newMapButton.UseVisualStyleBackColor = true;
+            this.newMapButton.Click += new System.EventHandler(this.newMapButton_Click);
+            // 
+            // removeMapButton
+            // 
+            this.removeMapButton.Location = new System.Drawing.Point(111, 612);
+            this.removeMapButton.Name = "removeMapButton";
+            this.removeMapButton.Size = new System.Drawing.Size(82, 23);
+            this.removeMapButton.TabIndex = 11;
+            this.removeMapButton.Text = "Remove Map";
+            this.removeMapButton.UseVisualStyleBackColor = true;
+            this.removeMapButton.Click += new System.EventHandler(this.removeMapButton_Click);
+            // 
+            // fillMapButton
+            // 
+            this.fillMapButton.Location = new System.Drawing.Point(677, 498);
+            this.fillMapButton.Name = "fillMapButton";
+            this.fillMapButton.Size = new System.Drawing.Size(75, 23);
+            this.fillMapButton.TabIndex = 12;
+            this.fillMapButton.Text = "Fill Map";
+            this.fillMapButton.UseVisualStyleBackColor = true;
+            this.fillMapButton.Click += new System.EventHandler(this.fillMapButton_Click);
+            // 
+            // clearMapButton
+            // 
+            this.clearMapButton.Location = new System.Drawing.Point(774, 498);
+            this.clearMapButton.Name = "clearMapButton";
+            this.clearMapButton.Size = new System.Drawing.Size(75, 23);
+            this.clearMapButton.TabIndex = 13;
+            this.clearMapButton.Text = "Clear Map";
+            this.clearMapButton.UseVisualStyleBackColor = true;
+            this.clearMapButton.Click += new System.EventHandler(this.clearMapButton_Click);
+            // 
             // MapEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1266, 642);
+            this.ClientSize = new System.Drawing.Size(1266, 677);
+            this.Controls.Add(this.clearMapButton);
+            this.Controls.Add(this.fillMapButton);
+            this.Controls.Add(this.removeMapButton);
+            this.Controls.Add(this.newMapButton);
+            this.Controls.Add(this.mapList);
             this.Controls.Add(this.tileSetBackButton);
             this.Controls.Add(this.tileSetForwardButton);
             this.Controls.Add(this.tileSetScrollX);
@@ -112,6 +171,8 @@
             this.Controls.Add(this.mapDisplayPicture);
             this.Name = "MapEditor";
             this.Text = "MapEditor";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MapEditor_FormClosed);
+            this.Load += new System.EventHandler(this.MapEditor_Load);
             ((System.ComponentModel.ISupportInitialize)(this.mapDisplayPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tileSetPicture)).EndInit();
             this.ResumeLayout(false);
@@ -127,5 +188,10 @@
         private System.Windows.Forms.HScrollBar tileSetScrollX;
         private System.Windows.Forms.Button tileSetForwardButton;
         private System.Windows.Forms.Button tileSetBackButton;
+        private System.Windows.Forms.ListBox mapList;
+        private System.Windows.Forms.Button newMapButton;
+        private System.Windows.Forms.Button removeMapButton;
+        private System.Windows.Forms.Button fillMapButton;
+        private System.Windows.Forms.Button clearMapButton;
     }
 }

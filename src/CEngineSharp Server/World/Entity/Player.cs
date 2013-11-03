@@ -114,6 +114,8 @@ namespace CEngineSharp_Server.World
 
         public void EnterGame()
         {
+            this.JoinMap(MapManager.GetMap(0));
+
             var messagePacket = new ChatMessagePacket();
             messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
             this.SendPacket(messagePacket);
@@ -121,7 +123,7 @@ namespace CEngineSharp_Server.World
 
         public void LeaveGame()
         {
-            this.Map.Players.Remove(this);
+            this.Map.RemovePlayer(this);
         }
 
         private void Respawn()
@@ -148,10 +150,14 @@ namespace CEngineSharp_Server.World
         public void JoinMap(Map map)
         {
             if (this.Map != null)
-                this.Map.Players.Remove(this);
+                this.Map.RemovePlayer(this);
 
-            map.Players.Add(this);
+            map.AddPlayer(this);
             this.Map = map;
+
+            MapCheckPacket mapCheckPacket = new MapCheckPacket();
+            mapCheckPacket.WriteData(this.Map.Name);
+            this.SendPacket(mapCheckPacket);
         }
 
         public void SendMessage(string message)

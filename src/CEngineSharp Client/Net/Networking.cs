@@ -1,4 +1,6 @@
-﻿using CEngineSharp_Client.Net.Packets;
+﻿using CEngineSharp_Client.Graphics;
+using CEngineSharp_Client.Net.Packets;
+using CEngineSharp_Client.World;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -27,11 +29,13 @@ namespace CEngineSharp_Client.Net
         public static void Disconnect()
         {
             nettyClient.Disconnect();
+            GameWorld.Players.Clear();
         }
 
         private static void Handle_ConnectionLost()
         {
             nettyClient = null;
+            GameWorld.Players.Clear();
         }
 
         public static void SendPacket(Packet packet)

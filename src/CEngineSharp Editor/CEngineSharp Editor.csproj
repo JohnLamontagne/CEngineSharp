@@ -59,7 +59,7 @@
     <Compile Include="EditorSuite.Designer.cs">
       <DependentUpon>EditorSuite.cs</DependentUpon>
     </Compile>
-    <Compile Include="Graphics\List.cs" />
+    <Compile Include="IChildFormActions.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="Graphics\MapRenderer.cs" />
     <Compile Include="MapEditor.cs">

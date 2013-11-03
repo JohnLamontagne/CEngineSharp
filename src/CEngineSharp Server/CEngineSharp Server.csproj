@@ -51,6 +51,8 @@
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
+    <Compile Include="Net\Packets\MapCheckPacket.cs" />
+    <Compile Include="Net\Packets\MapDataPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="Server.cs" />

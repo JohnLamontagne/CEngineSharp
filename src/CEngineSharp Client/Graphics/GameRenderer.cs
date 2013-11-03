@@ -1,6 +1,8 @@
-﻿using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Graphics.TextureManager;
+using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using SFML.Graphics;
 using SFML.Window;
 using System;
@@ -13,17 +15,20 @@ namespace CEngineSharp_Client.Graphics
 {
     public class GameRenderer : Renderer
     {
-        public Dictionary<string, Texture> CharacterTextures;
-
         private int fpsCounter;
         private int fpsTimer;
+
+        public GameTextureManager TextureManager { get; private set; }
+
+        private Sprite testSprite;
 
         public GameRenderer(RenderWindow window)
             : base(window)
         {
-            this.CharacterTextures = new Dictionary<string, Texture>();
-
             _window.KeyPressed += _window_KeyPressed;
+
+            this.TextureManager = new GameTextureManager();
+            this.TextureManager.LoadTextures();
         }
 
         private void _window_KeyPressed(object sender, KeyEventArgs e)
@@ -76,7 +81,8 @@ namespace CEngineSharp_Client.Graphics
             messageBoxAlert.Size = new Vector2f(400, 100);
 
             Label labelFps = _gui.Add(new Label(themeConfigurationPath), "labelFps");
-            labelFps.TextSize = 15;
+            labelFps.TextSize = 30;
+            labelFps.TextColor = Color.Black;
             labelFps.Position = new Vector2f(10, 10);
         }
 
@@ -84,16 +90,6 @@ namespace CEngineSharp_Client.Graphics
         {
             RenderManager.SetRenderState(RenderStates.Render_Menu);
             Networking.Disconnect();
-        }
-
-        public void LoadGameTextures()
-        {
-            DirectoryInfo characterDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/Characters/");
-
-            foreach (var file in characterDir.GetFiles("*.png", SearchOption.AllDirectories))
-            {
-                this.CharacterTextures.Add(file.Name.Replace(".png", ""), new Texture(file.FullName));
-            }
         }
 
         private void textMyChat_ReturnKeyPressedCallback(object sender, CallbackArgs e)
@@ -111,6 +107,9 @@ namespace CEngineSharp_Client.Graphics
             _window.DispatchEvents();
 
             _window.Clear();
+
+            if (MapManager.Map != null)
+                MapManager.Map.Draw(_window);
 
             this.RenderPlayers();
 

@@ -37,6 +37,8 @@ namespace CEngineSharp_Server.Net.Packets
                 chatMessagePacket.WriteData(username + " has logged in!");
                 PlayerManager.BroadcastPacket(chatMessagePacket);
                 Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(socketIndex));
+
+                PlayerManager.GetPlayer(socketIndex).EnterGame();
             }
         }
 

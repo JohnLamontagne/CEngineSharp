@@ -74,22 +74,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioManager.cs" />
+    <Compile Include="Audio\AudioManager.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="GameLoop.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Graphics\GameRenderer.cs" />
     <Compile Include="Graphics\MenuRenderer.cs" />
+    <Compile Include="Graphics\TextureManager\GameTextureManager.cs" />
+    <Compile Include="Graphics\TextureManager\MenuTextureManager.cs" />
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Graphics\RenderManager.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
+    <Compile Include="Graphics\TextureManager\ITextureManager.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
     <Compile Include="Net\Networking.cs" />
+    <Compile Include="Net\Packets\MapCheckPacket.cs" />
+    <Compile Include="Net\Packets\MapDataPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
+    <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\GameWorld.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Player.cs" />

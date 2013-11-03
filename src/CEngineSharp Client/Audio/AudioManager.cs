@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CEngineSharp_Client
+namespace CEngineSharp_Client.Audio
 {
     public class AudioManager
     {

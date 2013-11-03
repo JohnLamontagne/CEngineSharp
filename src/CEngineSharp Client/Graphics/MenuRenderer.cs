@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Graphics.TextureManager;
+using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using SFML.Graphics;
 using SFML.Window;
@@ -10,17 +11,25 @@ namespace CEngineSharp_Client.Graphics
 {
     public class MenuRenderer : Renderer
     {
-        private Sprite _menuBackground;
+        public MenuTextureManager TextureManager { get; private set; }
+
+        private Sprite menuBackground;
 
         public MenuRenderer(RenderWindow window)
             : base(window)
         {
-            _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
+            this.TextureManager = new MenuTextureManager();
+            this.TextureManager.LoadTextures();
+
+            this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
         }
 
         public MenuRenderer()
         {
-            _menuBackground = new Sprite(new Texture(@"C:\Users\John\Documents\GitHub\CEngineSharp\src\CEngineSharp Client\bin\Debug\Data\Graphics\Backgrounds\MainMenu.png"));
+            this.TextureManager = new MenuTextureManager();
+            this.TextureManager.LoadTextures();
+
+            this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
         }
 
         protected override void LoadInterface()
@@ -216,7 +225,7 @@ namespace CEngineSharp_Client.Graphics
 
             _window.Clear();
 
-            _window.Draw(_menuBackground);
+            _window.Draw(this.menuBackground);
 
             _gui.Draw();
 

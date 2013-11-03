@@ -79,7 +79,6 @@ namespace CEngineSharp_Server.World.Content_Managers
             player.Name = name;
             player.Password = password;
             player.Level = 1;
-            player.JoinMap(MapManager.GetMap(Constants.SERVER_STARTER_MAP));
 
             foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
             {
@@ -116,8 +115,6 @@ namespace CEngineSharp_Server.World.Content_Managers
                         {
                             player.SetVital(vital, br.ReadUInt16());
                         }
-
-                        player.JoinMap(MapManager.GetMap(br.ReadInt32()));
                     }
                 }
 

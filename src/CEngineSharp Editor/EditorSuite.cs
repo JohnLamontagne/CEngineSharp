@@ -36,5 +36,17 @@ namespace CEngineSharp_Editor
                 _mapEditor.Show();
             }
         }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.ActiveMdiChild != null)
+                (this.ActiveMdiChild as IChildFormActions).SaveData();
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.ActiveMdiChild != null)
+                (this.ActiveMdiChild as IChildFormActions).LoadData();
+        }
     }
 }
