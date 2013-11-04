@@ -30,25 +30,31 @@ namespace CEngineSharp_Client.Graphics
 
         public static void Render()
         {
-            if (_renderStateChanged)
+            try
             {
-                switch (_renderstate)
+                if (_renderStateChanged)
                 {
-                    case RenderStates.Render_Game:
-                        _renderer.Unload();
-                        RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
-                        _renderStateChanged = false;
-                        break;
+                    switch (_renderstate)
+                    {
+                        case RenderStates.Render_Game:
+                            _renderer.Unload();
+                            RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
+                            _renderStateChanged = false;
+                            break;
 
-                    case RenderStates.Render_Menu:
-                        _renderer.Unload();
-                        RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
-                        _renderStateChanged = false;
-                        break;
+                        case RenderStates.Render_Menu:
+                            _renderer.Unload();
+                            RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+                            _renderStateChanged = false;
+                            break;
+                    }
                 }
-            }
 
-            _renderer.Render();
+                _renderer.Render();
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

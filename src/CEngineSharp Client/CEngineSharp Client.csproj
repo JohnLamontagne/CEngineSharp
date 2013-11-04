@@ -97,9 +97,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
+    <Compile Include="World\Entity\Directions.cs" />
     <Compile Include="World\GameWorld.cs" />
     <Compile Include="World\Map.cs" />
-    <Compile Include="World\Player.cs" />
+    <Compile Include="World\Entity\Player.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
