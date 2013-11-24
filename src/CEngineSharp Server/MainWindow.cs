@@ -3,16 +3,11 @@ using CEngineSharp_Server.Net;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
+using SharedGameData;
+using SharedGameData.World;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CEngineSharp_Server
@@ -28,6 +23,8 @@ namespace CEngineSharp_Server
         private delegate void SetTitleDelegate(string value);
 
         private delegate void AddPlayerToTableDelegate(Player player);
+
+        private delegate void RemovePlayerFromTableDelegate(int playerIndex);
 
         public MainWindow()
         {
@@ -80,6 +77,16 @@ namespace CEngineSharp_Server
             else
             {
                 this.dataGridPlayers.Rows.Add(player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Vitals.HitPoints), player.GetVital(Vitals.ManaPoints));
+            }
+        }
+
+        public void RemovePlayerFromGrid(int playerIndex)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new RemovePlayerFromTableDelegate(this.RemovePlayerFromGrid), playerIndex);
+            else
+            {
+                this.dataGridPlayers.Rows.RemoveAt(playerIndex);
             }
         }
 

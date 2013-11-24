@@ -3,8 +3,6 @@ using SFML.Graphics;
 using SFML.Window;
 using System;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CEngineSharp_Client.World
 {
@@ -69,6 +67,8 @@ namespace CEngineSharp_Client.World
 
         public int Height { get { return this.tiles.GetLength(1); } }
 
+        public int Version { get; set; }
+
         public Map()
         {
             this.tiles = new Tile[0, 0];
@@ -82,21 +82,6 @@ namespace CEngineSharp_Client.World
         public void SetTile(int x, int y, Tile tile)
         {
             this.tiles[x, y] = tile;
-        }
-
-        public void Draw(RenderWindow window)
-        {
-            for (int x = 0; x < this.Width; x++)
-            {
-                for (int y = 0; y < this.Height; y++)
-                {
-                    foreach (var layer in this.tiles[x, y].GetLayers())
-                    {
-                        if (layer != null)
-                            window.Draw(layer.Sprite);
-                    }
-                }
-            }
         }
 
         public void ResizeMap(int newWidth, int newHeight)
@@ -118,6 +103,8 @@ namespace CEngineSharp_Client.World
                 using (BinaryWriter binaryWriter = new BinaryWriter(fileStream))
                 {
                     binaryWriter.Write(this.Name);
+
+                    binaryWriter.Write(this.Version);
 
                     binaryWriter.Write(this.tiles.GetLength(0));
                     binaryWriter.Write(this.tiles.GetLength(1));
@@ -157,10 +144,14 @@ namespace CEngineSharp_Client.World
                 {
                     this.Name = binaryReader.ReadString();
 
+                    this.Version = binaryReader.ReadInt32();
+
                     int mapWidth = binaryReader.ReadInt32();
                     int mapHeight = binaryReader.ReadInt32();
 
                     this.ResizeMap(mapWidth, mapHeight);
+
+                    while (RenderManager.CurrentRenderer is MenuRenderer) ;
 
                     for (int x = 0; x < mapWidth; x++)
                     {
@@ -184,6 +175,66 @@ namespace CEngineSharp_Client.World
                             }
                         }
                     }
+                }
+            }
+        }
+
+        public void Draw(RenderWindow window)
+        {
+            window.SetView(GameWorld.GetPlayer(Globals.MyIndex).Camera.GetView());
+
+            this.DrawLowerTiles(window);
+
+            foreach (var player in GameWorld.GetPlayers())
+                player.Draw(window);
+
+            this.DrawUpperTiles(window);
+
+            window.SetView(window.DefaultView);
+        }
+
+        private void DrawLowerTiles(RenderWindow window)
+        {
+            Camera camera = GameWorld.GetPlayer(Globals.MyIndex).Camera;
+
+            int left = camera.ViewLeft / 32;
+            int top = camera.ViewTop / 32;
+            int width = left + (Globals.CurrentResolutionWidth / 32) + 1;
+            int height = top + (Globals.CurrentResolutionHeight / 32) + 1;
+
+            if (width > this.Width)
+                width = this.Width;
+
+            if (height > this.Height)
+                height = this.Height;
+
+            for (int x = left; x < width; x++)
+            {
+                for (int y = top; y < height; y++)
+                {
+                    if (this.tiles[x, y].GetLayer(Layers.Ground) != null)
+                        window.Draw(this.tiles[x, y].GetLayer(Layers.Ground).Sprite);
+
+                    if (this.tiles[x, y].GetLayer(Layers.Mask) != null)
+                        window.Draw(this.tiles[x, y].GetLayer(Layers.Mask).Sprite);
+
+                    if (this.tiles[x, y].GetLayer(Layers.Mask2) != null)
+                        window.Draw(this.tiles[x, y].GetLayer(Layers.Mask2).Sprite);
+                }
+            }
+        }
+
+        private void DrawUpperTiles(RenderWindow window)
+        {
+            for (int x = 0; x < this.Width; x++)
+            {
+                for (int y = 0; y < this.Height; y++)
+                {
+                    if (this.tiles[x, y].GetLayer(Layers.Fringe) != null)
+                        window.Draw(this.tiles[x, y].GetLayer(Layers.Fringe).Sprite);
+
+                    if (this.tiles[x, y].GetLayer(Layers.Fringe2) != null)
+                        window.Draw(this.tiles[x, y].GetLayer(Layers.Fringe2).Sprite);
                 }
             }
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CEngineSharp_Server.Utilities
+﻿namespace CEngineSharp_Server.Utilities
 {
     public class Rect
     {
@@ -12,27 +6,27 @@ namespace CEngineSharp_Server.Utilities
         private int _top;
         private int _height;
         private int _width;
-        
+
         public int Left
         {
             get { return _left; }
         }
-        
+
         public int Top
         {
             get { return _top; }
         }
-        
+
         public int Height
         {
             get { return _height; }
         }
-        
+
         public int Width
         {
             get { return _width; }
         }
-        
+
         public Rect(int left, int top, int height, int width)
         {
             _left = left;
@@ -40,6 +34,5 @@ namespace CEngineSharp_Server.Utilities
             _height = height;
             _width = width;
         }
-
     }
 }

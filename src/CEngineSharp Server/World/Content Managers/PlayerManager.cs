@@ -1,6 +1,6 @@
 ﻿using CEngineSharp_Server.Utilities;
-using CEngineSharp_Server.World;
-using CEngineSharp_Server.World.Content_Managers;
+using SharedGameData;
+using SharedGameData.World;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,21 @@ namespace CEngineSharp_Server.World.Content_Managers
 
         public static Player GetPlayer(int index)
         {
-            return _players[index];
+            try
+            {
+                return _players[index];
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public static Player[] GetPlayers()
+        {
+            Player[] players = new Player[_players.Count];
+            _players.Values.CopyTo(players, 0);
+            return players;
         }
 
         public static void AddPlayer(int socketIndex, Player player)
@@ -91,8 +105,6 @@ namespace CEngineSharp_Server.World.Content_Managers
 
             player.LoggedIn = true;
 
-            player.EnterGame();
-
             return true;
         }
 
@@ -115,6 +127,10 @@ namespace CEngineSharp_Server.World.Content_Managers
                         {
                             player.SetVital(vital, br.ReadUInt16());
                         }
+
+                        player.Map = MapManager.GetMap(br.ReadInt32());
+
+                        player.Position = new Vector2i(br.ReadInt32(), br.ReadInt32());
                     }
                 }
 
@@ -147,6 +163,9 @@ namespace CEngineSharp_Server.World.Content_Managers
                         }
 
                         bw.Write(player.MapNum);
+
+                        bw.Write(player.Position.X);
+                        bw.Write(player.Position.Y);
                     }
                 }
             }
@@ -171,6 +190,12 @@ namespace CEngineSharp_Server.World.Content_Managers
             string playerPassword;
 
             if (!File.Exists(Constants.FILEPATH_ACCOUNTS + name + ".dat")) return false;
+
+            foreach (var player in _players.Values)
+            {
+                if (player.LoggedIn)
+                    if (player.Name.ToLower() == name.ToLower()) return false;
+            }
 
             using (FileStream fs = new FileStream(Constants.FILEPATH_ACCOUNTS + name + ".dat", FileMode.Open))
             {

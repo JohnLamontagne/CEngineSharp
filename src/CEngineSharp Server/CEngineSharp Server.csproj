@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ED4FF59C-B197-41C4-89D6-1FE53CE97F25}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
@@ -35,7 +35,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
@@ -51,9 +53,11 @@
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
+    <Compile Include="Net\Packets\LogoutPacket.cs" />
     <Compile Include="Net\Packets\MapCheckPacket.cs" />
     <Compile Include="Net\Packets\MapDataPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
+    <Compile Include="Net\Packets\PlayerDataPacket.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Utilities\Color.cs" />
@@ -66,6 +70,7 @@
     <Compile Include="World\Entity\IEntity.cs" />
     <Compile Include="World\Entity\Player.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
+    <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Stats.cs" />
     <Compile Include="World\Vitals.cs" />

@@ -1,5 +1,4 @@
-﻿using CEngineSharp_Server.World;
-using CEngineSharp_Server.World.Content_Managers;
+﻿using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -9,20 +8,25 @@ namespace CEngineSharp_Server.Net.Packets
     {
         public void WriteData(string message)
         {
-            this.PacketBuffer.Flush();
+            this.DataBuffer.Flush();
 
-            this.PacketBuffer.WriteString(message);
+            this.DataBuffer.WriteString(message);
         }
 
         public override void Execute(Netty netty, int socketIndex)
         {
-            // todo Get the chat message type.
+            try
+            {
+                string chatMessage = PlayerManager.GetPlayer(socketIndex).Name + " says: " + this.DataBuffer.ReadString();
 
-            string chatMessage = PlayerManager.GetPlayer(socketIndex).Name + " says: " + this.PacketBuffer.ReadString();
+                this.WriteData(chatMessage);
 
-            this.WriteData(chatMessage);
-
-            PlayerManager.GetPlayer(socketIndex).Map.SendPacket(this);
+                PlayerManager.GetPlayer(socketIndex).Map.SendPacket(this);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Chat Message Error: " + ex.StackTrace);
+            }
         }
 
         public override string PacketID

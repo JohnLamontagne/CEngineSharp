@@ -1,7 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using SFML.Graphics;
 using SharpNetty;
-using System;
 
 namespace CEngineSharp_Client.Net.Packets
 {
@@ -9,13 +8,13 @@ namespace CEngineSharp_Client.Net.Packets
     {
         public override void Execute(Netty netty, int socketIndex)
         {
-            string alertTitle = this.PacketBuffer.ReadString();
-            string alertMessage = this.PacketBuffer.ReadString();
-            int alertX = this.PacketBuffer.ReadInteger();
-            int alertY = this.PacketBuffer.ReadInteger();
-            byte r = this.PacketBuffer.ReadByte();
-            byte g = this.PacketBuffer.ReadByte();
-            byte b = this.PacketBuffer.ReadByte();
+            string alertTitle = this.DataBuffer.ReadString();
+            string alertMessage = this.DataBuffer.ReadString();
+            int alertX = this.DataBuffer.ReadInteger();
+            int alertY = this.DataBuffer.ReadInteger();
+            byte r = this.DataBuffer.ReadByte();
+            byte g = this.DataBuffer.ReadByte();
+            byte b = this.DataBuffer.ReadByte();
             Color alertColor = new Color(r, g, b);
 
             if (RenderManager.CurrentRenderer.GetType() == typeof(GameRenderer))

@@ -1,9 +1,12 @@
-﻿using CEngineSharp_Server.Net.Packets;
+﻿using CEngineSharp_Server.Net;
+using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Content_Managers;
+using SharedGameData;
+using SharedGameData.World;
+using SharedGameData.World.Entities;
 using SharpNetty;
 using System;
-using System.IO;
 
 namespace CEngineSharp_Server.World
 {
@@ -40,6 +43,10 @@ namespace CEngineSharp_Server.World
 
         public int PlayerIndex { get { return _playerIndex; } }
 
+        public byte Direction { get; set; }
+
+        public SharpNetty.NettyServer.Connection Connection { get { return _connection; } }
+
         public int MapNum
         {
             get
@@ -52,6 +59,9 @@ namespace CEngineSharp_Server.World
         {
             string ip = connection.Socket.RemoteEndPoint.ToString();
             this.IP = connection.Socket.RemoteEndPoint.ToString().Remove(ip.IndexOf(':'), ip.Length - ip.IndexOf(':'));
+
+            this.Position = new Vector2i(0, 0);
+
             _connection = connection;
             _playerIndex = index;
         }
@@ -92,23 +102,25 @@ namespace CEngineSharp_Server.World
             this.Respawn();
         }
 
-        public void MoveTo(Vector2i vector)
+        public void MoveTo(Vector2i vector, byte direction)
         {
+            this.Direction = direction;
+
             //// If the tile is blocked, we obviously can't move to it.
-            //if (this.Map.Tiles[vector.X, vector.Y].Blocked || this.Map.Tiles[vector.X, vector.Y].IsOccupied)
-            //    return;
+            if (vector.X >= 0 && vector.Y >= 0 && vector.X < this.Map.MapWidth && vector.Y < this.Map.MapHeight && !this.Map.GetTile(vector).Blocked && !this.Map.GetTile(vector).IsOccupied)
+            {
+                // Unblock the previous tile so that another entity may occupy it.
+                this.Map.GetTile(this.Position).IsOccupied = false;
 
-            // Unblock the previous tile so that another entity may occupy it.
-            //this.Map.Tiles[this.Position.X, this.Position.Y].IsOccupied = false;
+                // Change our character's position to the new position.
+                this.Position = vector;
 
-            // Change our character's position to the new position.
-            this.Position = vector;
-
-            // Block the tile that we're moving to.
-            //this.Map.Tiles[this.Position.X, this.Position.Y].IsOccupied = true;
+                // Block the tile that we're moving to.
+                this.Map.GetTile(vector).IsOccupied = true;
+            }
 
             var movementPacket = new MovementPacket();
-            movementPacket.WriteData(this.PlayerIndex, this.Position);
+            movementPacket.WriteData(this.PlayerIndex, this.Position, direction);
             this.Map.SendPacket(movementPacket);
         }
 
@@ -116,12 +128,26 @@ namespace CEngineSharp_Server.World
         {
             this.JoinMap(MapManager.GetMap(0));
 
+            Console.WriteLine(this.Name + " has logged in!");
+
+            var chatMessagePacket = new ChatMessagePacket();
+            chatMessagePacket.WriteData(this.Name + " has logged in!");
+            PlayerManager.BroadcastPacket(chatMessagePacket);
+
             var messagePacket = new ChatMessagePacket();
             messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
             this.SendPacket(messagePacket);
         }
 
         public void LeaveGame()
+        {
+            this.LeaveMap();
+
+            PlayerManager.SavePlayer(this);
+            PlayerManager.RemovePlayer(this.PlayerIndex);
+        }
+
+        public void LeaveMap()
         {
             this.Map.RemovePlayer(this);
         }
@@ -150,13 +176,13 @@ namespace CEngineSharp_Server.World
         public void JoinMap(Map map)
         {
             if (this.Map != null)
-                this.Map.RemovePlayer(this);
+                this.LeaveMap();
 
             map.AddPlayer(this);
             this.Map = map;
 
             MapCheckPacket mapCheckPacket = new MapCheckPacket();
-            mapCheckPacket.WriteData(this.Map.Name);
+            mapCheckPacket.WriteData(this.Map.Name, this.Map.Version);
             this.SendPacket(mapCheckPacket);
         }
 

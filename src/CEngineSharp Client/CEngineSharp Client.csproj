@@ -47,7 +47,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\sfmlnet-window-2.dll</HintPath>
     </Reference>
-    <Reference Include="SharpNetty">
+    <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\SharpNetty\src\bin\Debug\SharpNetty.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -76,8 +77,10 @@
   <ItemGroup>
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Direction.cs" />
     <Compile Include="GameLoop.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\GameRenderer.cs" />
     <Compile Include="Graphics\MenuRenderer.cs" />
     <Compile Include="Graphics\TextureManager\GameTextureManager.cs" />
@@ -90,15 +93,18 @@
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
     <Compile Include="Net\Networking.cs" />
+    <Compile Include="Net\Packets\LogoutPacket.cs" />
     <Compile Include="Net\Packets\MapCheckPacket.cs" />
     <Compile Include="Net\Packets\MapDataPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="Net\Packets\PlayerDataPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Entity\Directions.cs" />
     <Compile Include="World\GameWorld.cs" />
+    <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Entity\Player.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

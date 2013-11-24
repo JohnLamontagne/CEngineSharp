@@ -13,9 +13,13 @@ namespace CEngineSharp_Client.Net.Packets
         {
             Map map = new Map();
 
-            map.Name = this.PacketBuffer.ReadString();
+            map.Name = this.DataBuffer.ReadString();
 
-            map.ResizeMap(PacketBuffer.ReadInteger(), PacketBuffer.ReadInteger());
+            map.Version = this.DataBuffer.ReadInteger();
+
+            map.ResizeMap(DataBuffer.ReadInteger(), DataBuffer.ReadInteger());
+
+            while (RenderManager.CurrentRenderer is MenuRenderer) ;
 
             for (int x = 0; x < map.Width; x++)
             {
@@ -25,13 +29,13 @@ namespace CEngineSharp_Client.Net.Packets
 
                     foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
                     {
-                        if (this.PacketBuffer.ReadBool())
+                        if (this.DataBuffer.ReadBool())
                         {
-                            int textureNumber = this.PacketBuffer.ReadInteger();
-                            int left = this.PacketBuffer.ReadInteger();
-                            int top = this.PacketBuffer.ReadInteger();
-                            int width = this.PacketBuffer.ReadInteger();
-                            int height = this.PacketBuffer.ReadInteger();
+                            int textureNumber = this.DataBuffer.ReadInteger();
+                            int left = this.DataBuffer.ReadInteger();
+                            int top = this.DataBuffer.ReadInteger();
+                            int width = this.DataBuffer.ReadInteger();
+                            int height = this.DataBuffer.ReadInteger();
 
                             IntRect textureRect = new IntRect(left, top, width, height);
 

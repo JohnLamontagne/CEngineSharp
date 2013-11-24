@@ -1,7 +1,6 @@
 ﻿using SFML.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 
 namespace CEngineSharp_Client.Graphics.TextureManager
@@ -11,6 +10,8 @@ namespace CEngineSharp_Client.Graphics.TextureManager
         private Dictionary<string, Texture> characterTextures;
 
         private List<Texture> tileSetTextures;
+
+        private List<Texture> itemTextures;
 
         public Texture GetCharacterTexture(string textureName)
         {
@@ -22,6 +23,11 @@ namespace CEngineSharp_Client.Graphics.TextureManager
             return tileSetTextures[index];
         }
 
+        public Texture GetItemTexture(int index)
+        {
+            return this.itemTextures[index];
+        }
+
         public int GetTileSetTextureIndex(Texture texture)
         {
             return tileSetTextures.IndexOf(texture);
@@ -31,9 +37,11 @@ namespace CEngineSharp_Client.Graphics.TextureManager
         {
             this.characterTextures = new Dictionary<string, Texture>();
             this.tileSetTextures = new List<Texture>();
+            this.itemTextures = new List<Texture>();
 
             this.LoadCharacterTextures();
             this.LoadTileSetTextures();
+            this.LoadItemTextures();
         }
 
         private void LoadCharacterTextures()
@@ -53,6 +61,16 @@ namespace CEngineSharp_Client.Graphics.TextureManager
             foreach (var file in dI.GetFiles("*.png"))
             {
                 this.tileSetTextures.Add(new Texture(file.FullName));
+            }
+        }
+
+        private void LoadItemTextures()
+        {
+            DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Items/");
+
+            foreach (var file in dI.GetFiles("*.png"))
+            {
+                this.itemTextures.Add(new Texture(file.FullName));
             }
         }
 

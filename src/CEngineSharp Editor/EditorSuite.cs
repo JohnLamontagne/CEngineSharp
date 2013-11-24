@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CEngineSharp_Editor
@@ -13,6 +6,8 @@ namespace CEngineSharp_Editor
     public partial class EditorSuite : Form
     {
         private MapEditor _mapEditor;
+
+        private string dataPath;
 
         public EditorSuite()
         {
@@ -30,7 +25,10 @@ namespace CEngineSharp_Editor
         {
             if (_mapEditor == null)
             {
-                _mapEditor = new MapEditor();
+                if (dataPath == null || dataPath == "")
+                    LoadDataPath();
+
+                _mapEditor = new MapEditor(this.dataPath);
                 _mapEditor.Disposed += _mapEditor_Disposed;
                 _mapEditor.MdiParent = this;
                 _mapEditor.Show();
@@ -47,6 +45,13 @@ namespace CEngineSharp_Editor
         {
             if (this.ActiveMdiChild != null)
                 (this.ActiveMdiChild as IChildFormActions).LoadData();
+        }
+
+        private void LoadDataPath()
+        {
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.ShowDialog();
+            this.dataPath = dialog.SelectedPath;
         }
     }
 }

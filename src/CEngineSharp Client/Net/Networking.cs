@@ -1,12 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
-using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.World;
 using SharpNetty;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEngineSharp_Client.Net
 {
@@ -14,7 +8,7 @@ namespace CEngineSharp_Client.Net
     {
         private static NettyClient nettyClient;
 
-        public static void Connect()
+        public static bool Connect()
         {
             nettyClient = new NettyClient(true);
 
@@ -23,19 +17,22 @@ namespace CEngineSharp_Client.Net
 
             nettyClient.Handle_ConnectionLost = Handle_ConnectionLost;
 
-            nettyClient.Connect("127.0.0.1", 25566, 1);
+            return nettyClient.Connect("127.0.0.1", 4000, 1);
         }
 
         public static void Disconnect()
         {
             nettyClient.Disconnect();
-            GameWorld.Players.Clear();
+            GameWorld.ClearPlayers();
+            Globals.InGame = false;
         }
 
         private static void Handle_ConnectionLost()
         {
             nettyClient = null;
-            GameWorld.Players.Clear();
+            GameWorld.ClearPlayers();
+
+            RenderManager.SetRenderState(RenderStates.Render_Menu);
         }
 
         public static void SendPacket(Packet packet)

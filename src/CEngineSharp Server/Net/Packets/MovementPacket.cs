@@ -7,18 +7,36 @@ namespace CEngineSharp_Server.Net.Packets
 {
     public class MovementPacket : Packet
     {
-        public void WriteData(int playerIndex, Vector2i position)
+        public void WriteData(int playerIndex, Vector2i position, byte direction)
         {
-            this.PacketBuffer.WriteInteger(position.X);
-            this.PacketBuffer.WriteInteger(position.Y);
+            try
+            {
+                this.DataBuffer.Flush();
+                this.DataBuffer.WriteInteger(playerIndex);
+                this.DataBuffer.WriteInteger(position.X);
+                this.DataBuffer.WriteInteger(position.Y);
+                this.DataBuffer.WriteByte(direction);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public override void Execute(Netty netty, int socketIndex)
         {
-            int x = this.PacketBuffer.ReadInteger();
-            int y = this.PacketBuffer.ReadInteger();
+            try
+            {
+                int x = this.DataBuffer.ReadInteger();
+                int y = this.DataBuffer.ReadInteger();
+                byte direction = this.DataBuffer.ReadByte();
 
-            PlayerManager.GetPlayer(socketIndex).MoveTo(new Vector2i(x, y));
+                PlayerManager.GetPlayer(socketIndex).MoveTo(new Vector2i(x, y), direction);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public override string PacketID

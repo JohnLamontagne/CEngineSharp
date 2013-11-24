@@ -1,5 +1,4 @@
-﻿using CEngineSharp_Server.World;
-using CEngineSharp_Server.World.Content_Managers;
+﻿using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -9,22 +8,28 @@ namespace CEngineSharp_Server.Net.Packets
     {
         private void WriteData(bool loginOkay, string message, int playerIndex)
         {
-            this.PacketBuffer.Flush();
-
-            this.PacketBuffer.WriteByte((byte)(loginOkay == true ? 1 : 0));
-            if (loginOkay)
+            try
             {
-                this.PacketBuffer.WriteInteger(playerIndex);
-            }
+                this.DataBuffer.Flush();
 
-            this.PacketBuffer.WriteString(message);
+                this.DataBuffer.WriteByte((byte)(loginOkay == true ? 1 : 0));
+                if (loginOkay)
+                {
+                    this.DataBuffer.WriteInteger(playerIndex);
+                }
+
+                this.DataBuffer.WriteString(message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public override void Execute(Netty netty, int socketIndex)
         {
-            ChatMessagePacket chatMessagePacket = new ChatMessagePacket();
-            string username = this.PacketBuffer.ReadString();
-            string password = this.PacketBuffer.ReadString();
+            string username = this.DataBuffer.ReadString();
+            string password = this.DataBuffer.ReadString();
             bool loginOkay = PlayerManager.Authenticate(username, password);
 
             this.WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
@@ -33,12 +38,14 @@ namespace CEngineSharp_Server.Net.Packets
             if (loginOkay)
             {
                 PlayerManager.LoadPlayer(username, socketIndex);
-                Console.WriteLine(username + " has logged in!");
-                chatMessagePacket.WriteData(username + " has logged in!");
-                PlayerManager.BroadcastPacket(chatMessagePacket);
+
                 Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(socketIndex));
 
                 PlayerManager.GetPlayer(socketIndex).EnterGame();
+            }
+            else
+            {
+                Networking.RemoveConnection(socketIndex);
             }
         }
 

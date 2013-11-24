@@ -1,5 +1,4 @@
-﻿using CEngineSharp_Client.Graphics.TextureManager;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.Window;
 using System;
 using TGUI;
@@ -10,35 +9,38 @@ namespace CEngineSharp_Client.Graphics
     {
         protected readonly string themeConfigurationPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Gui\Black.conf";
 
+        public bool CanRender { get; set; }
+
         public Renderer()
         {
-            _window = new RenderWindow(new VideoMode(800, 600), "CEngine# Client", Styles.Default);
-            _window.Resized += _window_Resized;
-            _gui = new Gui(_window);
+            _window = new RenderWindow(new VideoMode(832, 640), "CEngine# Client", Styles.Default);
+            _window.Closed += _window_Closed;
 
-            _gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Fonts\MainFont.ttf");
+            this.Gui = new Gui(_window);
+
+            this.Gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Fonts\MainFont.ttf");
 
             LoadInterface();
         }
 
-        private void _window_Resized(object sender, SizeEventArgs e)
+        private void _window_Closed(object sender, EventArgs e)
         {
-            _window.SetView(new View(new FloatRect(0, 0, e.Width, e.Height)));
+            Environment.Exit(0);
         }
 
         public Renderer(RenderWindow window)
         {
             _window = window;
-            _gui = new Gui(_window);
+            this.Gui = new Gui(_window);
 
-            _gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Fonts\MainFont.ttf");
+            this.Gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Fonts\MainFont.ttf");
 
             LoadInterface();
         }
 
         protected RenderWindow _window;
 
-        protected Gui _gui;
+        public Gui Gui { get; set; }
 
         protected abstract void LoadInterface();
 
@@ -46,9 +48,9 @@ namespace CEngineSharp_Client.Graphics
 
         public void Unload()
         {
-            _gui.GetWidgets().Clear();
+            this.Gui.GetWidgets().Clear();
 
-            _gui = null;
+            this.Gui = null;
         }
 
         public RenderWindow GetWindow()

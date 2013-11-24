@@ -1,6 +1,5 @@
 ﻿using CEngineSharp_Client.World.Content_Managers;
 using SharpNetty;
-using System;
 
 namespace CEngineSharp_Client.Net.Packets
 {
@@ -8,25 +7,29 @@ namespace CEngineSharp_Client.Net.Packets
     {
         private void WriteData(bool mapExists)
         {
-            this.PacketBuffer.Flush();
-            this.PacketBuffer.WriteBool(mapExists);
+            this.DataBuffer.Flush();
+            this.DataBuffer.WriteBool(mapExists);
         }
 
         public override void Execute(Netty netty, int socketIndex)
         {
-            string mapName = this.PacketBuffer.ReadString();
+            string mapName = this.DataBuffer.ReadString();
+            int mapVersion = this.DataBuffer.ReadInteger();
 
             bool mapExistence = MapManager.CheckMapExistence(mapName);
 
-            this.WriteData(mapExistence);
-
-            Networking.SendPacket(this);
+            bool mapVersionMatch = false;
 
             if (mapExistence == true)
             {
                 MapManager.Map = new World.Map();
                 MapManager.Map.LoadCache(mapName);
+                mapVersionMatch = (MapManager.Map.Version == mapVersion);
             }
+
+            this.WriteData((mapExistence & mapVersionMatch));
+
+            Networking.SendPacket(this);
         }
 
         public override string PacketID

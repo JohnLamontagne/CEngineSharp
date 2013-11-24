@@ -1,7 +1,6 @@
 ﻿using CEngineSharp_Server.World;
 using SharpNetty;
 using System;
-using System.Diagnostics;
 
 namespace CEngineSharp_Server.Net.Packets
 {
@@ -9,9 +8,12 @@ namespace CEngineSharp_Server.Net.Packets
     {
         public void WriteData(Map map)
         {
-            this.PacketBuffer.WriteString(map.Name);
-            this.PacketBuffer.WriteInteger(map.MapWidth);
-            this.PacketBuffer.WriteInteger(map.MapHeight);
+            this.DataBuffer.WriteString(map.Name);
+
+            this.DataBuffer.WriteInteger(map.Version);
+
+            this.DataBuffer.WriteInteger(map.MapWidth);
+            this.DataBuffer.WriteInteger(map.MapHeight);
 
             for (int x = 0; x < map.MapWidth; x++)
             {
@@ -21,16 +23,16 @@ namespace CEngineSharp_Server.Net.Packets
                     {
                         if (map.GetTile(x, y).Layers[(int)layer] == null)
                         {
-                            this.PacketBuffer.WriteBool(false);
+                            this.DataBuffer.WriteBool(false);
                             continue;
                         }
 
-                        this.PacketBuffer.WriteBool(true);
-                        this.PacketBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].TextureNumber);
-                        this.PacketBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Left);
-                        this.PacketBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Top);
-                        this.PacketBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Width);
-                        this.PacketBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Height);
+                        this.DataBuffer.WriteBool(true);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].TextureNumber);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Left);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Top);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Width);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Height);
                     }
                 }
             }

@@ -1,6 +1,5 @@
 ﻿using CEngineSharp_Client.Audio;
 using CEngineSharp_Client.Graphics;
-using CEngineSharp_Client.Net;
 using System;
 
 namespace CEngineSharp_Client
@@ -15,6 +14,9 @@ namespace CEngineSharp_Client
         [STAThread]
         private static void Main()
         {
+            Globals.ShuttingDown = false;
+            Globals.KeyDirection = World.Entity.Directions.None;
+
             AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 
             RenderManager.Init();

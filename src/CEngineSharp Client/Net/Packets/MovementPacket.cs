@@ -1,7 +1,6 @@
 ﻿using CEngineSharp_Client.World;
-using SFML.Window;
+using CEngineSharp_Client.World.Entity;
 using SharpNetty;
-using System;
 
 namespace CEngineSharp_Client.Net.Packets
 {
@@ -9,15 +8,19 @@ namespace CEngineSharp_Client.Net.Packets
     {
         public override void Execute(Netty netty, int socketIndex)
         {
-            int x = this.PacketBuffer.ReadInteger();
-            int y = this.PacketBuffer.ReadInteger();
-            GameWorld.Players[socketIndex].MovePlayer(x, y);
+            int playerIndex = this.DataBuffer.ReadInteger();
+            int x = this.DataBuffer.ReadInteger();
+            int y = this.DataBuffer.ReadInteger();
+            Directions direction = (Directions)this.DataBuffer.ReadByte();
+
+            GameWorld.GetPlayer(playerIndex).Move(x, y, direction);
         }
 
-        public void WriteData(int x, int y)
+        public void WriteData(int x, int y, Directions direction)
         {
-            this.PacketBuffer.WriteInteger(x);
-            this.PacketBuffer.WriteInteger(y);
+            this.DataBuffer.WriteInteger(x);
+            this.DataBuffer.WriteInteger(y);
+            this.DataBuffer.WriteByte((byte)direction);
         }
 
         public override string PacketID

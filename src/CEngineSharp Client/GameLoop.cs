@@ -1,6 +1,5 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
-using System;
 using System.Diagnostics;
 
 namespace CEngineSharp_Client
@@ -37,27 +36,21 @@ namespace CEngineSharp_Client
 
         public static void Start()
         {
-            int renderTmr = 0;
-            int playerUpdateTmr = 0;
+            long renderTmr = 0;
 
             Client.GameTime = new GameTimer();
 
             while (!Globals.ShuttingDown)
             {
-                if (playerUpdateTmr < Client.GameTime.GetTotalTimeElapsed())
+                if (Globals.MyIndex < GameWorld.PlayerCount && GameWorld.GetPlayer(Globals.MyIndex) != null && Globals.InGame)
                 {
-                    foreach (var player in GameWorld.Players.Values)
-                    {
-                        player.Update();
-
-                        playerUpdateTmr = (int)Client.GameTime.GetTotalTimeElapsed() + 10;
-                    }
+                    GameWorld.GetPlayer(Globals.MyIndex).TryMove();
                 }
 
                 if (renderTmr < Client.GameTime.GetTotalTimeElapsed())
                 {
                     RenderManager.Render();
-                    renderTmr = (int)Client.GameTime.GetTotalTimeElapsed() + 10;
+                    renderTmr = Client.GameTime.GetTotalTimeElapsed() + 10;
                 }
             }
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CEngineSharp_Server.Utilities
+﻿namespace CEngineSharp_Server.Utilities
 {
     public class Vector2i
     {

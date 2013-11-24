@@ -1,6 +1,6 @@
-﻿using CEngineSharp_Server.Net.Packets;
+﻿using CEngineSharp_Server.Net;
+using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
-using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using System;
 using System.Diagnostics;
@@ -39,6 +39,7 @@ namespace CEngineSharp_Server.GameLogic
             long lastCpsCheck = 0;
             int cps = 0;
             int cpsCount = 0;
+            long lastDisconnectCheck = 0;
 
             // Continue processing the server-logic until it's time to shut things down.
             while (!Globals.ShuttingDown)
@@ -51,6 +52,19 @@ namespace CEngineSharp_Server.GameLogic
                     lastConsoleTitleUpdateTime = GameTime.GetTotalTimeElapsed() + 500;
                 }
 
+                if (lastDisconnectCheck <= GameTime.GetTotalTimeElapsed())
+                {
+                    foreach (var player in PlayerManager.GetPlayers())
+                    {
+                        if (!player.Connection.Connected)
+                        {
+                            Networking.RemoveConnection(player.PlayerIndex);
+                        }
+                    }
+
+                    lastDisconnectCheck = GameTime.GetTotalTimeElapsed() + 15000;
+                }
+
                 if (lastCpsCheck <= GameTime.GetTotalTimeElapsed())
                 {
                     cps = cpsCount;
@@ -60,8 +74,6 @@ namespace CEngineSharp_Server.GameLogic
                 else
                     cpsCount++;
             }
-
-            // The server loop has stopped executing due to the Globals.ShuttingDown variable being set to true.
 
             // Save the game world.
             PlayerManager.SavePlayers();

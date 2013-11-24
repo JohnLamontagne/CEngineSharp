@@ -1,5 +1,4 @@
-﻿using CEngineSharp_Client.Graphics.TextureManager;
-using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using SFML.Graphics;
 using SFML.Window;
@@ -22,6 +21,8 @@ namespace CEngineSharp_Client.Graphics
             this.TextureManager.LoadTextures();
 
             this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
+
+            this.CanRender = true;
         }
 
         public MenuRenderer()
@@ -30,13 +31,15 @@ namespace CEngineSharp_Client.Graphics
             this.TextureManager.LoadTextures();
 
             this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
+
+            this.CanRender = true;
         }
 
         protected override void LoadInterface()
         {
             #region Status Label
 
-            Label labelStatus = _gui.Add(new Label(), "labelStatus");
+            Label labelStatus = this.Gui.Add(new Label(), "labelStatus");
             labelStatus.Position = new Vector2f((_window.Size.X / 2) - (labelStatus.Size.X / 2), 150);
             labelStatus.Visible = false;
 
@@ -44,7 +47,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region News Label
 
-            Label labelNews = _gui.Add(new Label(), "labelNews");
+            Label labelNews = this.Gui.Add(new Label(), "labelNews");
             LoadNews(labelNews);
             labelNews.Position = new Vector2f((_window.Size.X / 2) - (labelNews.Size.X / 2), 200);
 
@@ -52,7 +55,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Login Button
 
-            Button loginButton = _gui.Add(new Button(themeConfigurationPath), "buttonLogin");
+            Button loginButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogin");
             loginButton.Position = new Vector2f(labelNews.Position.X, 500);
             loginButton.Text = "Login";
             loginButton.LeftMouseClickedCallback += buttonLogin_LeftMouseClickedCallback;
@@ -61,7 +64,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Registration Button
 
-            Button registrationButton = _gui.Add(new Button(themeConfigurationPath), "buttonRegistration");
+            Button registrationButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonRegistration");
             registrationButton.Position = new Vector2f(labelNews.Position.X + (labelNews.Size.X - registrationButton.Size.X), 500);
             registrationButton.Text = "Register";
             registrationButton.LeftMouseClickedCallback += buttonRegistration_LeftMouseClickedCallback;
@@ -70,7 +73,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region User Label
 
-            Label labelUsername = _gui.Add(new Label(), "labelUsername");
+            Label labelUsername = this.Gui.Add(new Label(), "labelUsername");
             labelUsername.Position = new Vector2f(100, 100);
             labelUsername.Text = "Username: ";
             labelUsername.Visible = false;
@@ -79,7 +82,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Password Label
 
-            Label labelPassword = _gui.Add(new Label(), "labelPassword");
+            Label labelPassword = this.Gui.Add(new Label(), "labelPassword");
             labelPassword.Position = new Vector2f(100, 160);
             labelPassword.Text = "Password: ";
             labelPassword.Visible = false;
@@ -88,7 +91,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Text User
 
-            EditBox textUser = _gui.Add(new EditBox(themeConfigurationPath), "textUser");
+            EditBox textUser = this.Gui.Add(new EditBox(themeConfigurationPath), "textUser");
             textUser.Position = new Vector2f(255, 90);
             textUser.Size = new Vector2f(340, 40);
             textUser.Visible = false;
@@ -97,7 +100,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Text Password
 
-            EditBox textPassword = _gui.Add(new EditBox(themeConfigurationPath), "textPassword");
+            EditBox textPassword = this.Gui.Add(new EditBox(themeConfigurationPath), "textPassword");
             textPassword.Position = new Vector2f(255, 150);
             textPassword.Size = new Vector2f(340, 40);
             textPassword.PasswordCharacter = "*";
@@ -107,7 +110,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region SendLogin Button
 
-            Button buttonSendLogin = _gui.Add(new Button(themeConfigurationPath), "buttonSendLogin");
+            Button buttonSendLogin = this.Gui.Add(new Button(themeConfigurationPath), "buttonSendLogin");
             buttonSendLogin.Position = new Vector2f(300, 250);
             buttonSendLogin.Text = "Login!";
             buttonSendLogin.LeftMouseClickedCallback += buttonSendLogin_LeftMouseClickedCallback;
@@ -117,7 +120,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region SendRegistration Button
 
-            Button buttonSendRegistration = _gui.Add(new Button(themeConfigurationPath), "buttonSendRegistration");
+            Button buttonSendRegistration = this.Gui.Add(new Button(themeConfigurationPath), "buttonSendRegistration");
             buttonSendRegistration.Position = new Vector2f(300, 250);
             buttonSendRegistration.Text = "Register!";
             buttonSendRegistration.LeftMouseClickedCallback += buttonSendRegistartion_LeftMouseClickedCallback;
@@ -127,7 +130,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Back Button
 
-            Button buttonBack = _gui.Add(new Button(themeConfigurationPath), "buttonBack");
+            Button buttonBack = this.Gui.Add(new Button(themeConfigurationPath), "buttonBack");
             buttonBack.Position = new Vector2f(300, 400);
             buttonBack.Visible = false;
             buttonBack.Text = "Back";
@@ -136,71 +139,17 @@ namespace CEngineSharp_Client.Graphics
             #endregion Back Button
         }
 
-        private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        public override void Render()
         {
-            Networking.Connect();
+            _window.DispatchEvents();
 
-            var registrationPacket = new RegisterationPacket();
-            registrationPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
+            _window.Clear();
 
-            Networking.SendPacket(registrationPacket);
-        }
+            _window.Draw(this.menuBackground);
 
-        private void buttonBack_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            _gui.Get<Button>("buttonBack").Visible = false;
-            _gui.Get<Button>("buttonSendRegistration").Visible = false;
-            _gui.Get<Button>("buttonSendLogin").Visible = false;
-            _gui.Get<EditBox>("textUser").Visible = false;
-            _gui.Get<EditBox>("textPassword").Visible = false;
-            _gui.Get<Label>("labelUsername").Visible = false;
-            _gui.Get<Label>("labelPassword").Visible = false;
-            _gui.Get<Label>("labelNews").Visible = true;
-            _gui.Get<Button>("buttonLogin").Visible = true;
-            _gui.Get<Button>("buttonRegistration").Visible = true;
-        }
+            this.Gui.Draw();
 
-        private void buttonRegistration_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            _gui.Get<Button>("buttonSendRegistration").Visible = true;
-            _gui.Get<Label>("labelUsername").Visible = true;
-            _gui.Get<Label>("labelPassword").Visible = true;
-            _gui.Get<Label>("labelStatus").Visible = true;
-            _gui.Get<EditBox>("textUser").Visible = true;
-            _gui.Get<EditBox>("textPassword").Visible = true;
-            _gui.Get<Label>("labelNews").Visible = false;
-            _gui.Get<Button>("buttonLogin").Visible = false;
-            _gui.Get<Button>("buttonRegistration").Visible = false;
-            _gui.Get<Button>("buttonBack").Visible = true;
-        }
-
-        private void buttonLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            _gui.Get<Button>("buttonSendLogin").Visible = true;
-            _gui.Get<Label>("labelUsername").Visible = true;
-            _gui.Get<Label>("labelPassword").Visible = true;
-            _gui.Get<Label>("labelStatus").Visible = true;
-            _gui.Get<EditBox>("textUser").Visible = true;
-            _gui.Get<EditBox>("textPassword").Visible = true;
-            _gui.Get<Label>("labelNews").Visible = false;
-            _gui.Get<Button>("buttonLogin").Visible = false;
-            _gui.Get<Button>("buttonRegistration").Visible = false;
-            _gui.Get<Button>("buttonBack").Visible = true;
-        }
-
-        private void buttonSendLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            _gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
-            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
-            Networking.Connect();
-
-            _gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
-            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
-
-            var loginPacket = new LoginPacket();
-            loginPacket.WriteData(_gui.Get<EditBox>("textUser").Text, _gui.Get<EditBox>("textPassword").Text);
-
-            Networking.SendPacket(loginPacket);
+            _window.Display();
         }
 
         private void LoadNews(Label labelNews)
@@ -215,21 +164,81 @@ namespace CEngineSharp_Client.Graphics
 
         public void SetMenuStatus(string status)
         {
-            _gui.Get<Label>("labelStatus").Text = status;
-            _gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (_gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            this.Gui.Get<Label>("labelStatus").Text = status;
+            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
         }
 
-        public override void Render()
+        private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            _window.DispatchEvents();
+            Networking.Connect();
 
-            _window.Clear();
+            var registrationPacket = new RegisterationPacket();
+            registrationPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
 
-            _window.Draw(this.menuBackground);
+            Networking.SendPacket(registrationPacket);
+        }
 
-            _gui.Draw();
+        private void buttonBack_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            this.Gui.Get<Button>("buttonBack").Visible = false;
+            this.Gui.Get<Button>("buttonSendRegistration").Visible = false;
+            this.Gui.Get<Button>("buttonSendLogin").Visible = false;
+            this.Gui.Get<EditBox>("textUser").Visible = false;
+            this.Gui.Get<EditBox>("textPassword").Visible = false;
+            this.Gui.Get<Label>("labelUsername").Visible = false;
+            this.Gui.Get<Label>("labelPassword").Visible = false;
+            this.Gui.Get<Label>("labelNews").Visible = true;
+            this.Gui.Get<Button>("buttonLogin").Visible = true;
+            this.Gui.Get<Button>("buttonRegistration").Visible = true;
+        }
 
-            _window.Display();
+        private void buttonRegistration_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            this.Gui.Get<Button>("buttonSendRegistration").Visible = true;
+            this.Gui.Get<Label>("labelUsername").Visible = true;
+            this.Gui.Get<Label>("labelPassword").Visible = true;
+            this.Gui.Get<Label>("labelStatus").Visible = true;
+            this.Gui.Get<EditBox>("textUser").Visible = true;
+            this.Gui.Get<EditBox>("textPassword").Visible = true;
+            this.Gui.Get<Label>("labelNews").Visible = false;
+            this.Gui.Get<Button>("buttonLogin").Visible = false;
+            this.Gui.Get<Button>("buttonRegistration").Visible = false;
+            this.Gui.Get<Button>("buttonBack").Visible = true;
+        }
+
+        private void buttonLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            this.Gui.Get<Button>("buttonSendLogin").Visible = true;
+            this.Gui.Get<Label>("labelUsername").Visible = true;
+            this.Gui.Get<Label>("labelPassword").Visible = true;
+            this.Gui.Get<Label>("labelStatus").Visible = true;
+            this.Gui.Get<EditBox>("textUser").Visible = true;
+            this.Gui.Get<EditBox>("textPassword").Visible = true;
+            this.Gui.Get<Label>("labelNews").Visible = false;
+            this.Gui.Get<Button>("buttonLogin").Visible = false;
+            this.Gui.Get<Button>("buttonRegistration").Visible = false;
+            this.Gui.Get<Button>("buttonBack").Visible = true;
+        }
+
+        private void buttonSendLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            this.Gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
+            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+
+            if (Networking.Connect())
+            {
+                this.Gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
+                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+
+                var loginPacket = new LoginPacket();
+                loginPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
+                Networking.SendPacket(loginPacket);
+            }
+            else
+            {
+                this.Gui.Get<Label>("labelStatus").Text = "Failed to connect to the server!";
+                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            }
         }
     }
 }

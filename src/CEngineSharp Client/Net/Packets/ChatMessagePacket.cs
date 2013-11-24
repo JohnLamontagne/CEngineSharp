@@ -13,7 +13,7 @@ namespace CEngineSharp_Client.Net.Packets
             {
                 if (RenderManager.CurrentRenderer.GetType() == typeof(GameRenderer))
                 {
-                    string message = this.PacketBuffer.ReadString();
+                    string message = this.DataBuffer.ReadString();
                     GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
                     gameRenderer.AddChatMessage(message, Color.White);
                 }
@@ -26,7 +26,7 @@ namespace CEngineSharp_Client.Net.Packets
 
         public void WriteData(string message)
         {
-            this.PacketBuffer.WriteString(message);
+            this.DataBuffer.WriteString(message);
         }
 
         public override string PacketID

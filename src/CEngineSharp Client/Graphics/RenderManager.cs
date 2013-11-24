@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEngineSharp_Client.Graphics
 {
@@ -30,31 +26,26 @@ namespace CEngineSharp_Client.Graphics
 
         public static void Render()
         {
-            try
+            if (_renderStateChanged)
             {
-                if (_renderStateChanged)
+                switch (_renderstate)
                 {
-                    switch (_renderstate)
-                    {
-                        case RenderStates.Render_Game:
-                            _renderer.Unload();
-                            RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
-                            _renderStateChanged = false;
-                            break;
+                    case RenderStates.Render_Game:
+                        _renderer.Unload();
+                        RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
+                        _renderStateChanged = false;
+                        break;
 
-                        case RenderStates.Render_Menu:
-                            _renderer.Unload();
-                            RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
-                            _renderStateChanged = false;
-                            break;
-                    }
+                    case RenderStates.Render_Menu:
+                        _renderer.Unload();
+                        RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+                        _renderStateChanged = false;
+                        break;
                 }
+            }
 
+            if (_renderer.CanRender)
                 _renderer.Render();
-            }
-            catch (Exception ex)
-            {
-            }
         }
     }
 }

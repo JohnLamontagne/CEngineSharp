@@ -4,6 +4,7 @@ using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
+using System.Net;
 
 namespace CEngineSharp_Server.Net
 {
@@ -25,29 +26,43 @@ namespace CEngineSharp_Server.Net
 
         private static void Handle_NewConnection(int socketIndex)
         {
+            // Check to make sure that the remote ip isn't already connected.
+            foreach (var player in PlayerManager.GetPlayers())
+            {
+                if ((player.Connection.Socket.RemoteEndPoint as IPEndPoint).Address == (_nettyServer.GetConnection(socketIndex).Socket.RemoteEndPoint as IPEndPoint).Address)
+                {
+                    _nettyServer.RemoveConnection(socketIndex);
+                    return;
+                }
+            }
+
             PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex), socketIndex));
         }
 
         private static void Handle_LostConnection(int socketIndex)
         {
-            if (PlayerManager.GetPlayer(socketIndex).LoggedIn)
+            if (PlayerManager.PlayerCount > socketIndex)
             {
-                PlayerManager.SavePlayer(PlayerManager.GetPlayer(socketIndex));
-                PlayerManager.GetPlayer(socketIndex).LeaveGame();
-                Console.WriteLine(PlayerManager.GetPlayer(socketIndex).Name + " has left!");
+                if (PlayerManager.GetPlayer(socketIndex).LoggedIn)
+                {
+                    PlayerManager.GetPlayer(socketIndex).LeaveGame();
+                    Server.ServerWindow.RemovePlayerFromGrid(socketIndex);
+                }
             }
-
-            PlayerManager.RemovePlayer(socketIndex);
         }
 
-        public static void KickPlayer(int index)
+        public static void KickPlayer(int playerIndex)
         {
             var alertMessagePacket = new AlertMessagePacket();
             alertMessagePacket.WriteData("Alert!", "You have been kicked from the server!", 300, 300, Color.Red);
-            PlayerManager.GetPlayer(index).SendPacket(alertMessagePacket);
+            PlayerManager.GetPlayer(playerIndex).SendPacket(alertMessagePacket);
 
-            _nettyServer.RemoveConnection(index);
-            PlayerManager.RemovePlayer(index);
+            Networking.RemoveConnection(playerIndex);
+        }
+
+        public static void RemoveConnection(int playerIndex)
+        {
+            _nettyServer.RemoveConnection(playerIndex);
         }
     }
 }

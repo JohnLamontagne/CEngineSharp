@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CEngineSharp_Client.Graphics.TextureManager
+﻿namespace CEngineSharp_Client.Graphics.TextureManager
 {
     public interface ITextureManager
     {

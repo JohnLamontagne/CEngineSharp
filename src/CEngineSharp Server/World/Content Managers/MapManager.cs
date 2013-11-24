@@ -3,9 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEngineSharp_Server.World.Content_Managers
 {
@@ -53,6 +50,8 @@ namespace CEngineSharp_Server.World.Content_Managers
                 {
                     map.Name = binaryReader.ReadString();
 
+                    map.Version = binaryReader.ReadInt32();
+
                     int mapWidth = binaryReader.ReadInt32();
                     int mapHeight = binaryReader.ReadInt32();
 
@@ -63,6 +62,8 @@ namespace CEngineSharp_Server.World.Content_Managers
                         for (int y = 0; y < mapHeight; y++)
                         {
                             map.SetTile(x, y, new Map.Tile());
+
+                            map.GetTile(x, y).Blocked = binaryReader.ReadBoolean();
 
                             foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
                             {
@@ -83,17 +84,6 @@ namespace CEngineSharp_Server.World.Content_Managers
                 }
             }
             return map;
-        }
-
-        public static byte[] GetMapCacheChecksum(string mapName)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(Constants.FILEPATH_MAPS + mapName + ".map"))
-                {
-                    return md5.ComputeHash(stream);
-                }
-            }
         }
     }
 }
