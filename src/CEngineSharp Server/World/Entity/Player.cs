@@ -7,6 +7,7 @@ using SharedGameData.World;
 using SharedGameData.World.Entities;
 using SharpNetty;
 using System;
+using System.Collections.Generic;
 
 namespace CEngineSharp_Server.World
 {
@@ -24,6 +25,7 @@ namespace CEngineSharp_Server.World
         private ushort[] _vitals = new ushort[(int)Vitals.Energy + 1];
         private ushort[] _stats = new ushort[(int)Stats.Strength + 1];
         private readonly int _playerIndex;
+        private List<Item> _inventory = new List<Item>();
 
         public string Name { get; set; }
 
@@ -64,6 +66,11 @@ namespace CEngineSharp_Server.World
 
             _connection = connection;
             _playerIndex = index;
+        }
+
+        public Item[] GetInventory()
+        {
+            return _inventory.ToArray();
         }
 
         public ushort GetVital(Vitals vital)
@@ -137,6 +144,34 @@ namespace CEngineSharp_Server.World
             var messagePacket = new ChatMessagePacket();
             messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
             this.SendPacket(messagePacket);
+
+            Item item = new Item();
+            item.Name = "Bla";
+            item.TextureNumber = 1;
+
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+            _inventory.Add(item);
+        }
+
+        public void SendPlayerData()
+        {
+            var playerDataPacket = new PlayerDataPacket();
+            playerDataPacket.WriteData(this);
+            this.SendPacket(playerDataPacket);
+
+            var inventoryUpdatePacket = new InventoryUpdatePacket();
+            inventoryUpdatePacket.WriteData(this);
+            this.SendPacket(inventoryUpdatePacket);
         }
 
         public void LeaveGame()

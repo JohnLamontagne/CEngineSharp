@@ -75,7 +75,7 @@ namespace CEngineSharp_Client.Graphics
             buttonLogout.LeftMouseClickedCallback += buttonLogout_LeftMouseClickedCallback;
 
             Picture picInventory = this.Gui.Add(new Picture(Constants.FILEPATH_GRAPHICS + "/Gui/Inventory.png"), "picInventory");
-            picInventory.Position = new Vector2f(300, 300);
+            picInventory.Position = new Vector2f(500, 400);
         }
 
         private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)

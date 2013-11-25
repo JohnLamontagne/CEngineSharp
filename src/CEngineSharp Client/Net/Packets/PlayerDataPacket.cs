@@ -27,8 +27,6 @@ namespace CEngineSharp_Client.Net.Packets
             {
                 player.Camera.SnapToTarget();
 
-                player.AddInventoryItem(new Item("Bla", gameRenderer.TextureManager.GetItemTexture(0)));
-
                 Globals.InGame = true;
             }
         }

@@ -10,10 +10,10 @@ namespace CEngineSharp_Client.World
 
         public Sprite Sprite { get; private set; }
 
-        public Item(string name, Texture itemTexture)
+        public Item(string name, int itemTextureNumber)
         {
             this.Name = name;
-            this.Sprite = new Sprite(itemTexture);
+            this.Sprite = new Sprite((RenderManager.CurrentRenderer as GameRenderer).TextureManager.GetItemTexture(itemTextureNumber));
         }
     }
 }

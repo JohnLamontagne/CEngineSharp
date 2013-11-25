@@ -33,18 +33,14 @@ namespace CEngineSharp_Server.Net.Packets
                     PlayerManager.GetPlayer(socketIndex).SendPacket(mapDataPacket);
                 }
 
-                // Send the map players.
-
-                var playerDataPacket = new PlayerDataPacket();
-                playerDataPacket.WriteData(PlayerManager.GetPlayer(socketIndex));
-                PlayerManager.GetPlayer(socketIndex).Map.SendPacket(playerDataPacket);
+                PlayerManager.GetPlayer(socketIndex).SendPlayerData();
 
                 // Send all of the players...
                 foreach (var player in PlayerManager.GetPlayer(socketIndex).Map.GetPlayers())
                 {
                     if (player == PlayerManager.GetPlayer(socketIndex)) continue;
 
-                    playerDataPacket = new PlayerDataPacket();
+                    var playerDataPacket = new PlayerDataPacket();
                     playerDataPacket.WriteData(player);
                     PlayerManager.GetPlayer(socketIndex).SendPacket(playerDataPacket);
                 }

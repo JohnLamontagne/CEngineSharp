@@ -4,6 +4,7 @@ using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.World.Content_Managers;
 using SFML.Graphics;
 using SFML.Window;
+using System;
 using System.Collections.Generic;
 using TGUI;
 
@@ -81,15 +82,16 @@ namespace CEngineSharp_Client.World.Entity
         {
             _inventory.Add(item);
 
-            int slotNum = _inventory.Count;
+            int slotNum = _inventory.Count - 1;
 
             GameRenderer gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
 
             float invenPosX = gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
             float invenPosY = gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
 
-            int itemPosY = (int)invenPosX + ((slotNum / 4) * 32);
-            int itemPosX = (int)invenPosY + ((slotNum / 5) * 32);
+            int itemPosY = (int)invenPosY + (32 * (slotNum / 5));
+
+            int itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
 
             item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
         }

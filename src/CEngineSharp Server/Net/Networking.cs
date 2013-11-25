@@ -29,7 +29,7 @@ namespace CEngineSharp_Server.Net
             // Check to make sure that the remote ip isn't already connected.
             foreach (var player in PlayerManager.GetPlayers())
             {
-                if ((player.Connection.Socket.RemoteEndPoint as IPEndPoint).Address == (_nettyServer.GetConnection(socketIndex).Socket.RemoteEndPoint as IPEndPoint).Address)
+                if (player.Connection.Socket != null && (player.Connection.Socket.RemoteEndPoint as IPEndPoint).Address == (_nettyServer.GetConnection(socketIndex).Socket.RemoteEndPoint as IPEndPoint).Address)
                 {
                     _nettyServer.RemoveConnection(socketIndex);
                     return;
