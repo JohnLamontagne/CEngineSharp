@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.Graphics;
+using CEngineSharp_Client.Net;
 using CEngineSharp_Client.World;
 using System.Diagnostics;
 
@@ -34,24 +35,30 @@ namespace CEngineSharp_Client
             }
         }
 
-        public static void Start()
+        public static void Start(GameTimer gameTime)
         {
-            long renderTmr = 0;
-
-            Client.GameTime = new GameTimer();
+            long playerUpdateTmr = 0;
 
             while (!Globals.ShuttingDown)
             {
-                if (Globals.MyIndex < GameWorld.PlayerCount && GameWorld.GetPlayer(Globals.MyIndex) != null && Globals.InGame)
+                Networking.ExecuteQueue();
+
+                if (Globals.MyIndex < GameWorld.PlayerCount && GameWorld.GetPlayer(Globals.MyIndex) != null)
                 {
                     GameWorld.GetPlayer(Globals.MyIndex).TryMove();
+
+                    if (playerUpdateTmr < gameTime.GetTotalTimeElapsed())
+                    {
+                        foreach (var player in GameWorld.GetPlayers())
+                        {
+                            player.Update();
+                        }
+
+                        playerUpdateTmr = gameTime.GetTotalTimeElapsed() + 9;
+                    }
                 }
 
-                if (renderTmr < Client.GameTime.GetTotalTimeElapsed())
-                {
-                    RenderManager.Render();
-                    renderTmr = Client.GameTime.GetTotalTimeElapsed() + 10;
-                }
+                RenderManager.Render(gameTime);
             }
         }
     }

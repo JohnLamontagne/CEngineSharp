@@ -37,11 +37,13 @@ namespace CEngineSharp_Client.World.Entity
 
         private List<Item> _inventory;
 
-        public int Step
+        private byte previousStep;
+
+        public byte Step
         {
             get
             {
-                return _sprite.TextureRect.Left / 32;
+                return (byte)(_sprite.TextureRect.Left / 32);
             }
             set
             {
@@ -73,9 +75,42 @@ namespace CEngineSharp_Client.World.Entity
             this.Camera = new Camera(this);
         }
 
-        public Item GetInventoryItem(int slot)
+        public int InvenCordToSlot(int invenX, int invenY)
         {
-            return _inventory[slot];
+            GameRenderer gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
+
+            int invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
+            int invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
+
+            int x = (invenPosX - invenX) / 32;
+            int y = (invenPosY - invenY) / 32;
+
+            // slotnum = (x + (y * 5))
+            // slotnum = x + (y * 5)
+            //
+
+            return (x + (y * 5));
+        }
+
+        public Item GetInventoryItem(int slotNum)
+        {
+            if (slotNum >= _inventory.Count || slotNum < 0)
+                return null;
+
+            return _inventory[slotNum];
+        }
+
+        public Item GetInventoryItem(int invenX, int invenY)
+        {
+            invenX *= 32;
+            invenY *= 32;
+
+            return this.GetInventoryItem(this.InvenCordToSlot(invenX, invenY));
+        }
+
+        public void ClearInventory()
+        {
+            _inventory.Clear();
         }
 
         public void AddInventoryItem(Item item)
@@ -94,6 +129,18 @@ namespace CEngineSharp_Client.World.Entity
             int itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
 
             item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
+        }
+
+        public void TryDropInventoryItem(int invenX, int invenY)
+        {
+            Item item = this.GetInventoryItem(invenX, invenY);
+
+            if (item != null)
+            {
+                DropItemPacket dropItemPacket = new DropItemPacket();
+                dropItemPacket.WriteData(item);
+                Networking.SendPacket(dropItemPacket);
+            }
         }
 
         public void Warp(int newX, int newY, Directions direction)
@@ -122,13 +169,22 @@ namespace CEngineSharp_Client.World.Entity
                 this.X = newX;
                 this.Y = newY;
 
-                if (this.Step < 2)
+                if (this.Step == 0)
                 {
+                    this.previousStep = 0;
                     this.Step++;
                 }
-                else
+                else if (this.Step == 2)
                 {
-                    this.Step = 0;
+                    this.previousStep = 2;
+                    this.Step--;
+                }
+                else if (this.Step == 1)
+                {
+                    if (this.previousStep == 2)
+                        this.Step--;
+                    else
+                        this.Step++;
                 }
             }
         }
@@ -174,7 +230,7 @@ namespace CEngineSharp_Client.World.Entity
             }
         }
 
-        private void UpdateSpritePosition()
+        public void Update()
         {
             int x = this.X * 32;
             int y = this.Y * 32;
@@ -210,8 +266,6 @@ namespace CEngineSharp_Client.World.Entity
 
         public void Draw(RenderWindow window)
         {
-            this.UpdateSpritePosition();
-
             window.Draw(_sprite);
         }
 

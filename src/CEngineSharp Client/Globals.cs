@@ -6,9 +6,9 @@ namespace CEngineSharp_Client
     {
         public static int MyIndex { get; set; }
 
-        public static bool ShuttingDown { get; set; }
-
         public static bool InGame { get; set; }
+
+        public static bool ShuttingDown { get; set; }
 
         public static int CurrentResolutionWidth { get; set; }
 

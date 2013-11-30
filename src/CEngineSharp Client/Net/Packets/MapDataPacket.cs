@@ -9,7 +9,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class MapDataPacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             Map map = new Map();
 
@@ -50,11 +50,16 @@ namespace CEngineSharp_Client.Net.Packets
 
             map.CacheMap();
             MapManager.Map = map;
+
+            // Notify the server that we're now in the game.
+            MapCheckPacket mapCheckPacket = new MapCheckPacket();
+            mapCheckPacket.WriteData(true);
+            Networking.SendPacket(mapCheckPacket);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "MapDataPacket"; }
+            get { return 6; }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace CEngineSharp_Server
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            ServerWindow = new MainWindow();
+            Server.ServerWindow = new MainWindow();
 
             Application.Run(ServerWindow);
         }
@@ -106,6 +106,7 @@ namespace CEngineSharp_Server
             if (!File.Exists(Constants.FILEPATH_DATA + "names.txt")) File.Create(Constants.FILEPATH_DATA + "names.txt");
 
             MapManager.LoadMaps();
+            ItemManager.LoadItems();
         }
 
         public static void SaveWorld()

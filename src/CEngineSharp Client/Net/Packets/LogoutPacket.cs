@@ -7,29 +7,25 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class LogoutPacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             int playerIndex = this.DataBuffer.ReadInteger();
 
             if (Globals.MyIndex == playerIndex)
             {
-                if (Globals.InGame)
-                {
-                    Globals.InGame = false;
-                    RenderManager.SetRenderState(RenderStates.Render_Menu);
+                RenderManager.SetRenderState(RenderStates.Render_Menu);
 
-                    GameWorld.ClearPlayers();
+                GameWorld.ClearPlayers();
 
-                    return;
-                }
+                return;
             }
 
             GameWorld.RemovePlayer(playerIndex);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "LogoutPacket"; }
+            get { return 4; }
         }
     }
 }

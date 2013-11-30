@@ -24,7 +24,7 @@ namespace CEngineSharp_Client.Graphics
 
         private static bool _renderStateChanged = false;
 
-        public static void Render()
+        public static void Render(GameLoop.GameTimer gameTime)
         {
             if (_renderStateChanged)
             {
@@ -33,6 +33,7 @@ namespace CEngineSharp_Client.Graphics
                     case RenderStates.Render_Game:
                         _renderer.Unload();
                         RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
+
                         _renderStateChanged = false;
                         break;
 
@@ -45,7 +46,7 @@ namespace CEngineSharp_Client.Graphics
             }
 
             if (_renderer.CanRender)
-                _renderer.Render();
+                _renderer.Render(gameTime);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class PlayerDataPacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             int playerIndex = this.DataBuffer.ReadInteger();
             string playerName = this.DataBuffer.ReadString();
@@ -31,9 +31,9 @@ namespace CEngineSharp_Client.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "PlayerDataPacket"; }
+            get { return 8; }
         }
     }
 }

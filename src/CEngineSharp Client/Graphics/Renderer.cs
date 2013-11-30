@@ -44,7 +44,7 @@ namespace CEngineSharp_Client.Graphics
 
         protected abstract void LoadInterface();
 
-        public abstract void Render();
+        public abstract void Render(GameLoop.GameTimer gameTime);
 
         public void Unload()
         {

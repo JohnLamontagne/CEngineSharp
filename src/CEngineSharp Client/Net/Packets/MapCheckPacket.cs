@@ -1,17 +1,18 @@
-﻿using CEngineSharp_Client.World.Content_Managers;
+﻿using CEngineSharp_Client.Graphics;
+using CEngineSharp_Client.World.Content_Managers;
 using SharpNetty;
 
 namespace CEngineSharp_Client.Net.Packets
 {
     public class MapCheckPacket : Packet
     {
-        private void WriteData(bool mapExists)
+        public void WriteData(bool mapExists)
         {
             this.DataBuffer.Flush();
             this.DataBuffer.WriteBool(mapExists);
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             string mapName = this.DataBuffer.ReadString();
             int mapVersion = this.DataBuffer.ReadInteger();
@@ -32,9 +33,9 @@ namespace CEngineSharp_Client.Net.Packets
             Networking.SendPacket(this);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "MapCheckPacket"; }
+            get { return 5; }
         }
     }
 }

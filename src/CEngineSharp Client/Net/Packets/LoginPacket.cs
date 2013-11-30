@@ -13,7 +13,7 @@ namespace CEngineSharp_Client.Net.Packets
             this.DataBuffer.WriteString(password);
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             if (this.DataBuffer.ReadByte() == 1)
             {
@@ -29,9 +29,9 @@ namespace CEngineSharp_Client.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "Login"; }
+            get { return 3; }
         }
     }
 }

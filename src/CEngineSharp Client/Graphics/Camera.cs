@@ -59,6 +59,11 @@ namespace CEngineSharp_Client.Graphics
             _view = view;
         }
 
+        public void Zoom(float factor)
+        {
+            _view.Zoom(factor);
+        }
+
         public void SnapToTarget()
         {
             int x = this.Target.X * 32;

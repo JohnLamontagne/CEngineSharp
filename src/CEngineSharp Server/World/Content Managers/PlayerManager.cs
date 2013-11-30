@@ -60,6 +60,7 @@ namespace CEngineSharp_Server.World.Content_Managers
 
                 return false;
             }
+
             catch (Exception ex)
             {
                 // Let the error handler take care of this problem; since it's an error affecting any registration or login attempts, flag it as a high level error.

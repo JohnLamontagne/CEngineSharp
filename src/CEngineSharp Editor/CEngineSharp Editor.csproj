@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="EditorSuite.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -60,6 +61,13 @@
       <DependentUpon>EditorSuite.cs</DependentUpon>
     </Compile>
     <Compile Include="IChildFormActions.cs" />
+    <Compile Include="ItemEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ItemEditor.Designer.cs">
+      <DependentUpon>ItemEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="Graphics\MapRenderer.cs" />
     <Compile Include="MapEditor.cs">
@@ -72,6 +80,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="EditorSuite.resx">
       <DependentUpon>EditorSuite.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ItemEditor.resx">
+      <DependentUpon>ItemEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MapEditor.resx">
       <DependentUpon>MapEditor.cs</DependentUpon>

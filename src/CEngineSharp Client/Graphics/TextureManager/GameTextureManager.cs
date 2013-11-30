@@ -68,9 +68,9 @@ namespace CEngineSharp_Client.Graphics.TextureManager
         {
             DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Items/");
 
-            foreach (var file in dI.GetFiles("*.png"))
+            for (int i = 1; i < dI.GetFiles("*.png").Length; i++)
             {
-                this.itemTextures.Add(new Texture(file.FullName));
+                this.itemTextures.Add(new Texture(dI.FullName + i + ".png"));
             }
         }
 

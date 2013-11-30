@@ -35,55 +35,7 @@ namespace CEngineSharp_Client.Graphics
             this.CanRender = true;
         }
 
-        protected override void LoadInterface()
-        {
-            this.Gui.RemoveAllWidgets();
-
-            ChatBox textChat = this.Gui.Add(new ChatBox(themeConfigurationPath), "textChat");
-            textChat.Position = new Vector2f(5, 350);
-            textChat.Size = new Vector2f(400, 200);
-            textChat.Transparency = 150;
-
-            EditBox textMyChat = this.Gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
-            textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
-            textMyChat.Size = new Vector2f(textChat.Size.X, 40);
-            textMyChat.ReturnKeyPressedCallback += textMyChat_ReturnKeyPressedCallback;
-            textMyChat.Transparency = 150;
-
-            MessageBox messageBoxAlert = this.Gui.Add(new MessageBox(themeConfigurationPath), "messageBoxAlert");
-            messageBoxAlert.Visible = false;
-            messageBoxAlert.ClosedCallback += messageBoxAlert_ClosedCallback;
-            messageBoxAlert.Add(new Label(), "labelAlert");
-            messageBoxAlert.Size = new Vector2f(400, 100);
-
-            Label labelFps = this.Gui.Add(new Label(themeConfigurationPath), "labelFps");
-            labelFps.TextSize = 30;
-            labelFps.TextColor = Color.Black;
-            labelFps.Position = new Vector2f(10, 10);
-
-            Button buttonInventory = this.Gui.Add(new Button(themeConfigurationPath), "buttonInventory");
-            buttonInventory.Text = "Inventory";
-            buttonInventory.Position = new Vector2f(550, 600);
-            buttonInventory.Size = new Vector2f(100, 25);
-            buttonInventory.Visible = true;
-
-            Button buttonLogout = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogout");
-            buttonLogout.Text = "Logout";
-            buttonLogout.Position = new Vector2f(700, 600);
-            buttonLogout.Size = new Vector2f(100, 25);
-            buttonLogout.Visible = true;
-            buttonLogout.LeftMouseClickedCallback += buttonLogout_LeftMouseClickedCallback;
-
-            Picture picInventory = this.Gui.Add(new Picture(Constants.FILEPATH_GRAPHICS + "/Gui/Inventory.png"), "picInventory");
-            picInventory.Position = new Vector2f(500, 400);
-        }
-
-        private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)
-        {
-            Networking.Disconnect();
-        }
-
-        public override void Render()
+        public override void Render(GameLoop.GameTimer gameTime)
         {
             _window.DispatchEvents();
 
@@ -95,19 +47,27 @@ namespace CEngineSharp_Client.Graphics
                     MapManager.Map.Draw(_window);
 
                 this.Gui.Draw();
-                GameWorld.GetPlayer(Globals.MyIndex).DrawInventory(_window);
+
+                Player player = GameWorld.GetPlayer(Globals.MyIndex);
+
+                if (player != null)
+                    player.DrawInventory(_window);
             }
 
             _window.Display();
 
-            if (this.fpsTimer < Client.GameTime.GetTotalTimeElapsed())
+            #region Fps Logic
+
+            if (this.fpsTimer < gameTime.GetTotalTimeElapsed())
             {
                 this.Gui.Get<Label>("labelFps").Text = "Fps: " + this.fpsCounter;
                 this.fpsCounter = 0;
-                this.fpsTimer = (int)Client.GameTime.GetTotalTimeElapsed() + 1000;
+                this.fpsTimer = (int)gameTime.GetTotalTimeElapsed() + 1000;
             }
 
             this.fpsCounter++;
+
+            #endregion Fps Logic
         }
 
         public void AddChatMessage(string message, Color color)
@@ -132,6 +92,63 @@ namespace CEngineSharp_Client.Graphics
             messageBoxAlert.Get<Label>("labelAlert").Text = alertMessage;
             messageBoxAlert.Get<Label>("labelAlert").TextSize = 20;
             messageBoxAlert.Get<Label>("labelAlert").Position = new Vector2f(40, 50);
+        }
+
+        protected override void LoadInterface()
+        {
+            this.Gui.RemoveAllWidgets();
+
+            ChatBox textChat = this.Gui.Add(new ChatBox(themeConfigurationPath), "textChat");
+            textChat.Position = new Vector2f(5, 350);
+            textChat.Size = new Vector2f(400, 200);
+            textChat.Transparency = 150;
+
+            EditBox textMyChat = this.Gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
+            textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
+            textMyChat.Size = new Vector2f(textChat.Size.X, 40);
+            textMyChat.ReturnKeyPressedCallback += textMyChat_ReturnKeyPressedCallback;
+            textMyChat.Transparency = 150;
+
+            MessageBox messageBoxAlert = this.Gui.Add(new MessageBox(themeConfigurationPath), "messageBoxAlert");
+            messageBoxAlert.Visible = false;
+            messageBoxAlert.ClosedCallback += messageBoxAlert_ClosedCallback;
+            messageBoxAlert.Add(new Label(), "labelAlert");
+            messageBoxAlert.Size = new Vector2f(400, 100);
+
+            Label labelFps = this.Gui.Add(new Label(themeConfigurationPath), "labelFps");
+            labelFps.TextSize = 30;
+            labelFps.TextColor = Color.Red;
+            labelFps.Position = new Vector2f(10, 10);
+
+            Button buttonInventory = this.Gui.Add(new Button(themeConfigurationPath), "buttonInventory");
+            buttonInventory.Text = "Inventory";
+            buttonInventory.Position = new Vector2f(550, 600);
+            buttonInventory.Size = new Vector2f(100, 25);
+            buttonInventory.Visible = true;
+
+            Button buttonLogout = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogout");
+            buttonLogout.Text = "Logout";
+            buttonLogout.Position = new Vector2f(700, 600);
+            buttonLogout.Size = new Vector2f(100, 25);
+            buttonLogout.Visible = true;
+            buttonLogout.LeftMouseClickedCallback += buttonLogout_LeftMouseClickedCallback;
+
+            Picture picInventory = this.Gui.Add(new Picture(Constants.FILEPATH_GRAPHICS + "/Gui/Inventory.png"), "picInventory");
+            picInventory.Position = new Vector2f(500, 400);
+            picInventory.LeftMouseClickedCallback += picInventory_LeftMouseClickedCallback;
+
+            AnimatedPicture picLoadingOrb = this.Gui.Add(new AnimatedPicture(), "picLoadingOrb");
+            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle.png", 2);
+            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle2.png", 2);
+            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle3.png", 2);
+            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle4.png", 2);
+            picLoadingOrb.Position = new Vector2f(_window.Position.X / 2, _window.Position.Y / 2);
+            picLoadingOrb.Visible = false;
+        }
+
+        private void picInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            GameWorld.GetPlayer(Globals.MyIndex).TryDropInventoryItem((int)e.Position.X, (int)e.Position.Y);
         }
 
         private void _window_KeyReleased(object sender, KeyEventArgs e)
@@ -165,6 +182,13 @@ namespace CEngineSharp_Client.Graphics
                         Globals.KeyDirection = Directions.None;
                     }
                     break;
+
+                case Keyboard.Key.Space:
+                    if (Globals.InGame)
+                    {
+                        MapManager.Map.TryPickupItem();
+                    }
+                    break;
             }
         }
 
@@ -195,6 +219,11 @@ namespace CEngineSharp_Client.Graphics
         private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
         {
             RenderManager.SetRenderState(RenderStates.Render_Menu);
+            Networking.Disconnect();
+        }
+
+        private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
             Networking.Disconnect();
         }
 

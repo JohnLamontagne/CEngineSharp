@@ -6,7 +6,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class AlertMessagePacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             string alertTitle = this.DataBuffer.ReadString();
             string alertMessage = this.DataBuffer.ReadString();
@@ -24,9 +24,9 @@ namespace CEngineSharp_Client.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "AlertMessage"; }
+            get { return 0; }
         }
     }
 }

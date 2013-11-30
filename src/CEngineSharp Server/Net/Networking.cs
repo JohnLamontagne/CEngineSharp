@@ -26,28 +26,45 @@ namespace CEngineSharp_Server.Net
 
         private static void Handle_NewConnection(int socketIndex)
         {
-            // Check to make sure that the remote ip isn't already connected.
-            foreach (var player in PlayerManager.GetPlayers())
+            try
             {
-                if (player.Connection.Socket != null && (player.Connection.Socket.RemoteEndPoint as IPEndPoint).Address == (_nettyServer.GetConnection(socketIndex).Socket.RemoteEndPoint as IPEndPoint).Address)
+                // Check to make sure that the remote ip isn't already connected.
+                foreach (var player in PlayerManager.GetPlayers())
                 {
-                    _nettyServer.RemoveConnection(socketIndex);
-                    return;
+                    if (player.Connection.Socket != null)
+                    {
+                        if ((player.Connection.Socket.RemoteEndPoint as IPEndPoint).Address == (_nettyServer.GetConnection(socketIndex).Socket.RemoteEndPoint as IPEndPoint).Address)
+                        {
+                            _nettyServer.RemoveConnection(socketIndex);
+                            return;
+                        }
+                    }
                 }
-            }
 
-            PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex), socketIndex));
+                PlayerManager.AddPlayer(socketIndex, new Player(_nettyServer.GetConnection(socketIndex), socketIndex));
+            }
+            catch (Exception)
+            {
+                _nettyServer.RemoveConnection(socketIndex);
+            }
         }
 
         private static void Handle_LostConnection(int socketIndex)
         {
-            if (PlayerManager.PlayerCount > socketIndex)
+            Player player = PlayerManager.GetPlayer(socketIndex);
+
+            Console.WriteLine("Lost a connection with " + player.IP);
+
+            if (player != null && player.LoggedIn)
             {
-                if (PlayerManager.GetPlayer(socketIndex).LoggedIn)
-                {
-                    PlayerManager.GetPlayer(socketIndex).LeaveGame();
-                    Server.ServerWindow.RemovePlayerFromGrid(socketIndex);
-                }
+                PlayerManager.GetPlayer(socketIndex).LeaveGame();
+
+                Server.ServerWindow.RemovePlayerFromGrid(socketIndex);
+            }
+
+            else
+            {
+                PlayerManager.RemovePlayer(socketIndex);
             }
         }
 

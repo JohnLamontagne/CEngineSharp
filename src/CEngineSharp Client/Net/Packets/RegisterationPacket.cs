@@ -7,7 +7,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class RegisterationPacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             // Alright, so when the player rec. the go ahead to get into the game, this code will go through
             if (this.DataBuffer.ReadByte() == 1)
@@ -16,6 +16,7 @@ namespace CEngineSharp_Client.Net.Packets
 
                 RenderManager.SetRenderState(RenderStates.Render_Game);
             }
+
             else
             {
                 MenuRenderer menuRenderer = RenderManager.CurrentRenderer as MenuRenderer;
@@ -30,9 +31,9 @@ namespace CEngineSharp_Client.Net.Packets
             this.DataBuffer.WriteString(pass);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "Registeration"; }
+            get { return 9; }
         }
     }
 }

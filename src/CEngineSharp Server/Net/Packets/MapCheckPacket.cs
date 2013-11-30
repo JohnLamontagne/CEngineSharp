@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.World.Content_Managers;
+﻿using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -20,30 +21,52 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             try
             {
+                Player player = PlayerManager.GetPlayer(this.SocketIndex);
+
                 bool response = this.DataBuffer.ReadBool();
 
                 if (response == false)
                 {
                     MapDataPacket mapDataPacket = new MapDataPacket();
-                    mapDataPacket.WriteData(PlayerManager.GetPlayer(socketIndex).Map);
-                    PlayerManager.GetPlayer(socketIndex).SendPacket(mapDataPacket);
+                    mapDataPacket.WriteData(PlayerManager.GetPlayer(this.SocketIndex).Map);
+
+                    PlayerManager.GetPlayer(this.SocketIndex).SendPacket(mapDataPacket);
+
+                    return;
                 }
 
-                PlayerManager.GetPlayer(socketIndex).SendPlayerData();
+                // The player is now in the map.
+                // Set their inMap variable to true.
+                // This is to make sure they're able to actually see the map before any map updates occur.
+                player.SetInMap(true);
+
+                player.SendPlayerData();
 
                 // Send all of the players...
-                foreach (var player in PlayerManager.GetPlayer(socketIndex).Map.GetPlayers())
+                foreach (var mapPlayer in PlayerManager.GetPlayer(this.SocketIndex).Map.GetPlayers())
                 {
-                    if (player == PlayerManager.GetPlayer(socketIndex)) continue;
+                    if (mapPlayer == PlayerManager.GetPlayer(this.SocketIndex)) continue;
 
                     var playerDataPacket = new PlayerDataPacket();
-                    playerDataPacket.WriteData(player);
-                    PlayerManager.GetPlayer(socketIndex).SendPacket(playerDataPacket);
+                    playerDataPacket.WriteData(mapPlayer);
+                    player.SendPacket(playerDataPacket);
                 }
+
+                // Send all of the items currently spawned in the map.
+                foreach (var mapItem in PlayerManager.GetPlayer(this.SocketIndex).Map.GetMapItems())
+                {
+                    var spawnMapItemPacket = new SpawnMapItemPacket();
+                    spawnMapItemPacket.WriteData(mapItem);
+                    player.SendPacket(spawnMapItemPacket);
+                }
+
+                InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
+                invenUpdatePacket.WriteData(player);
+                player.SendPacket(invenUpdatePacket);
             }
             catch (Exception ex)
             {
@@ -51,9 +74,9 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "MapCheckPacket"; }
+            get { return 5; }
         }
     }
 }

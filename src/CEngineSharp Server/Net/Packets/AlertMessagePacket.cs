@@ -16,14 +16,14 @@ namespace CEngineSharp_Server.Net.Packets
             this.DataBuffer.WriteByte(color.B);
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             // This should never be invoked.
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "AlertMessage"; }
+            get { return 0; }
         }
     }
 }

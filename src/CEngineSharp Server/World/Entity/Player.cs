@@ -47,6 +47,8 @@ namespace CEngineSharp_Server.World
 
         public byte Direction { get; set; }
 
+        private bool inMap;
+
         public SharpNetty.NettyServer.Connection Connection { get { return _connection; } }
 
         public int MapNum
@@ -71,6 +73,16 @@ namespace CEngineSharp_Server.World
         public Item[] GetInventory()
         {
             return _inventory.ToArray();
+        }
+
+        public void SetInMap(bool value)
+        {
+            this.inMap = value;
+        }
+
+        public bool GetInMap()
+        {
+            return this.inMap;
         }
 
         public ushort GetVital(Vitals vital)
@@ -131,6 +143,38 @@ namespace CEngineSharp_Server.World
             this.Map.SendPacket(movementPacket);
         }
 
+        public void GiveItem(Item item)
+        {
+            if (_inventory.Count < Constants.MAX_INVENTORY_ITEMS)
+            {
+                _inventory.Add(item);
+
+                if (this.inMap)
+                {
+                    InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
+                    invenUpdatePacket.WriteData(this);
+                    this.SendPacket(invenUpdatePacket);
+                }
+
+                this.SendMessage("You have received " + item.Name);
+            }
+            else
+            {
+                this.SendMessage("Your inventory is full!");
+            }
+        }
+
+        public void TryPickupItem(Vector2i mapItemPos)
+        {
+            Map.MapItem mapItem = this.Map.GetMapItem(mapItemPos);
+
+            if (mapItem == null) return;
+
+            this.Map.RemoveMapItem(mapItem);
+
+            this.GiveItem(mapItem.Item);
+        }
+
         public void EnterGame()
         {
             this.JoinMap(MapManager.GetMap(0));
@@ -145,22 +189,9 @@ namespace CEngineSharp_Server.World
             messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
             this.SendPacket(messagePacket);
 
-            Item item = new Item();
-            item.Name = "Bla";
-            item.TextureNumber = 1;
+            this.GiveItem(ItemManager.GetItem(0));
 
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
-            _inventory.Add(item);
+            this.Map.SpawnItem(ItemManager.GetItem(0), 4, 4, 5000);
         }
 
         public void SendPlayerData()
@@ -176,15 +207,15 @@ namespace CEngineSharp_Server.World
 
         public void LeaveGame()
         {
-            this.LeaveMap();
+            this.LeaveMap(true);
 
             PlayerManager.SavePlayer(this);
             PlayerManager.RemovePlayer(this.PlayerIndex);
         }
 
-        public void LeaveMap()
+        public void LeaveMap(bool leftGame)
         {
-            this.Map.RemovePlayer(this);
+            this.Map.RemovePlayer(this, leftGame);
         }
 
         private void Respawn()
@@ -211,10 +242,12 @@ namespace CEngineSharp_Server.World
         public void JoinMap(Map map)
         {
             if (this.Map != null)
-                this.LeaveMap();
+                this.LeaveMap(false);
 
             map.AddPlayer(this);
             this.Map = map;
+
+            this.inMap = false;
 
             MapCheckPacket mapCheckPacket = new MapCheckPacket();
             mapCheckPacket.WriteData(this.Map.Name, this.Map.Version);

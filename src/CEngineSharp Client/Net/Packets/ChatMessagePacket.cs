@@ -7,7 +7,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class ChatMessagePacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             try
             {
@@ -18,6 +18,7 @@ namespace CEngineSharp_Client.Net.Packets
                     gameRenderer.AddChatMessage(message, Color.White);
                 }
             }
+
             catch (Exception ex)
             {
                 throw ex;
@@ -29,9 +30,9 @@ namespace CEngineSharp_Client.Net.Packets
             this.DataBuffer.WriteString(message);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "ChatMessage"; }
+            get { return 1; }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace CEngineSharp_Client.Net.Packets
 {
     public class MovementPacket : Packet
     {
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             int playerIndex = this.DataBuffer.ReadInteger();
             int x = this.DataBuffer.ReadInteger();
@@ -23,9 +23,9 @@ namespace CEngineSharp_Client.Net.Packets
             this.DataBuffer.WriteByte((byte)direction);
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "MovementPacket"; }
+            get { return 7; }
         }
     }
 }

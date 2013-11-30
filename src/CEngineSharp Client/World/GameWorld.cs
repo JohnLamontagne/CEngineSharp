@@ -11,6 +11,9 @@ namespace CEngineSharp_Client.World
 
         public static Player GetPlayer(int index)
         {
+            if (index >= _players.Count || index < 0)
+                return null;
+
             return _players[index];
         }
 
@@ -37,7 +40,5 @@ namespace CEngineSharp_Client.World
 
             return players;
         }
-
-        public static Map CurrentMap { get; set; }
     }
 }

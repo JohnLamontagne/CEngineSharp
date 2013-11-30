@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.Net.Packets;
+﻿using CEngineSharp_Server.GameLogic;
+using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
 using SharpNetty;
 using System;
@@ -39,7 +40,29 @@ namespace CEngineSharp_Server.World
             }
         }
 
+        public class MapItem
+        {
+            public int X { get; set; }
+
+            public int Y { get; set; }
+
+            public Item Item { get; set; }
+
+            public int SpawnDuration { get; set; }
+
+            public MapItem(Item item, int x, int y, int spawnDuration = -1)
+            {
+                this.Item = item;
+                this.X = x;
+                this.Y = y;
+
+                this.SpawnDuration = spawnDuration;
+            }
+        }
+
         private List<Player> players;
+
+        private List<MapItem> items;
 
         public string Name { get; set; }
 
@@ -60,7 +83,10 @@ namespace CEngineSharp_Server.World
         public Map()
         {
             this.tiles = new Tile[0, 0];
+
             this.players = new List<Player>();
+
+            this.items = new List<MapItem>();
         }
 
         public Tile GetTile(Vector2i position)
@@ -83,6 +109,31 @@ namespace CEngineSharp_Server.World
             this.tiles[x, y] = tile;
         }
 
+        public MapItem[] GetMapItems()
+        {
+            return this.items.ToArray();
+        }
+
+        public MapItem GetMapItem(Vector2i mapItemPos)
+        {
+            foreach (var mapItem in this.items)
+            {
+                if (mapItem.X == mapItemPos.X && mapItem.Y == mapItemPos.Y)
+                    return mapItem;
+            }
+
+            return null;
+        }
+
+        public void RemoveMapItem(MapItem mapItem)
+        {
+            var despawnMapItemPacket = new DespawnMapItemPacket();
+            despawnMapItemPacket.WriteData(mapItem);
+            this.SendPacket(despawnMapItemPacket, true);
+
+            this.items.Remove(mapItem);
+        }
+
         public void ResizeMap(int newWidth, int newHeight)
         {
             var newArray = new Tile[newWidth, newHeight];
@@ -95,13 +146,21 @@ namespace CEngineSharp_Server.World
             this.tiles = newArray;
         }
 
-        public void SendPacket(Packet packet)
+        public void SendPacket(Packet packet, bool checkPlayerLoaded = false)
         {
             foreach (var player in this.players)
+            {
+                if (checkPlayerLoaded)
+                {
+                    if (!player.GetInMap())
+                        continue;
+                }
+
                 player.SendPacket(packet);
+            }
         }
 
-        public void RemovePlayer(Player player)
+        public void RemovePlayer(Player player, bool leftGame)
         {
             // Free up the tile.
             this.GetTile(player.Position).IsOccupied = false;
@@ -113,15 +172,38 @@ namespace CEngineSharp_Server.World
             logoutPacket.WriteData(player.PlayerIndex);
             this.SendPacket(logoutPacket);
 
-            foreach (var mPlayer in this.players)
+            if (leftGame)
             {
-                mPlayer.SendMessage(player.Name + " has left " + ServerConfiguration.GameName + ".");
+                foreach (var mPlayer in this.players)
+                {
+                    mPlayer.SendMessage(player.Name + " has left " + ServerConfiguration.GameName + ".");
+                }
             }
+        }
+
+        public void SpawnItem(Item item, int x, int y, int spawnTime)
+        {
+            MapItem mapItem = new MapItem(item, x, y, spawnTime);
+
+            this.items.Add(mapItem);
+
+            var spawnMapItemPacket = new SpawnMapItemPacket();
+            spawnMapItemPacket.WriteData(mapItem);
+            this.SendPacket(spawnMapItemPacket, true);
         }
 
         public void AddPlayer(Player player)
         {
             this.players.Add(player);
+
+            var playerDataPacket = new PlayerDataPacket();
+            playerDataPacket.WriteData(player);
+
+            foreach (var mPlayer in this.players)
+            {
+                if (mPlayer != player)
+                    mPlayer.SendPacket(playerDataPacket);
+            }
         }
 
         public Player GetPlayer(int playerIndex)

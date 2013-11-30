@@ -139,7 +139,7 @@ namespace CEngineSharp_Client.Graphics
             #endregion Back Button
         }
 
-        public override void Render()
+        public override void Render(GameLoop.GameTimer gameTime)
         {
             _window.DispatchEvents();
 

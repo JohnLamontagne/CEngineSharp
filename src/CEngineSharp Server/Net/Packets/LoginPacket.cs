@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.World.Content_Managers;
+﻿using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -26,32 +27,44 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
-            string username = this.DataBuffer.ReadString();
-            string password = this.DataBuffer.ReadString();
-            bool loginOkay = PlayerManager.Authenticate(username, password);
-
-            this.WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", socketIndex);
-            PlayerManager.GetPlayer(socketIndex).SendPacket(this);
-
-            if (loginOkay)
+            try
             {
-                PlayerManager.LoadPlayer(username, socketIndex);
+                string username = this.DataBuffer.ReadString();
+                string password = this.DataBuffer.ReadString();
+                bool loginOkay = PlayerManager.Authenticate(username, password);
 
-                Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(socketIndex));
+                this.WriteData(loginOkay, loginOkay ? "Login success!" : "Login failure!", this.SocketIndex);
 
-                PlayerManager.GetPlayer(socketIndex).EnterGame();
+                Player player = PlayerManager.GetPlayer(this.SocketIndex);
+
+                player.SendPacket(this);
+
+                if (loginOkay)
+                {
+                    PlayerManager.LoadPlayer(username, this.SocketIndex);
+
+                    Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(this.SocketIndex));
+
+                    player.EnterGame();
+                }
+
+                else
+                {
+                    Networking.RemoveConnection(this.SocketIndex);
+                }
             }
-            else
+
+            catch (Exception)
             {
-                Networking.RemoveConnection(socketIndex);
+                Networking.RemoveConnection(this.SocketIndex);
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "Login"; }
+            get { return 3; }
         }
     }
 }

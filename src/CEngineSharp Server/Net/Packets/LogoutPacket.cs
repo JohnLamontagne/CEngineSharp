@@ -9,14 +9,14 @@ namespace CEngineSharp_Server.Net.Packets
             this.DataBuffer.WriteInteger(playerIndex);
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             // Server->Client only.
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "LogoutPacket"; }
+            get { return 4; }
         }
     }
 }

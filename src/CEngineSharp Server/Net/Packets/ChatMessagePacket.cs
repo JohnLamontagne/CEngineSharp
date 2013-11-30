@@ -13,25 +13,26 @@ namespace CEngineSharp_Server.Net.Packets
             this.DataBuffer.WriteString(message);
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             try
             {
-                string chatMessage = PlayerManager.GetPlayer(socketIndex).Name + " says: " + this.DataBuffer.ReadString();
+                string chatMessage = PlayerManager.GetPlayer(this.SocketIndex).Name + " says: " + this.DataBuffer.ReadString();
 
                 this.WriteData(chatMessage);
 
-                PlayerManager.GetPlayer(socketIndex).Map.SendPacket(this);
+                PlayerManager.GetPlayer(this.SocketIndex).Map.SendPacket(this);
             }
+
             catch (Exception ex)
             {
                 Console.WriteLine("Chat Message Error: " + ex.StackTrace);
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "ChatMessage"; }
+            get { return 1; }
         }
     }
 }

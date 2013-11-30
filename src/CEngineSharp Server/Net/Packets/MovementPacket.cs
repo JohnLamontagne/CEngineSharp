@@ -23,7 +23,7 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace CEngineSharp_Server.Net.Packets
                 int y = this.DataBuffer.ReadInteger();
                 byte direction = this.DataBuffer.ReadByte();
 
-                PlayerManager.GetPlayer(socketIndex).MoveTo(new Vector2i(x, y), direction);
+                PlayerManager.GetPlayer(this.SocketIndex).MoveTo(new Vector2i(x, y), direction);
             }
             catch (Exception ex)
             {
@@ -39,9 +39,9 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "MovementPacket"; }
+            get { return 7; }
         }
     }
 }

@@ -24,14 +24,14 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             // Server->Client packet only.
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "PlayerDataPacket"; }
+            get { return 8; }
         }
     }
 }

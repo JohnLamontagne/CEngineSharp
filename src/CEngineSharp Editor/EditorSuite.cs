@@ -5,7 +5,8 @@ namespace CEngineSharp_Editor
 {
     public partial class EditorSuite : Form
     {
-        private MapEditor _mapEditor;
+        private MapEditor mapEditor;
+        private ItemEditor itemEditor;
 
         private string dataPath;
 
@@ -18,20 +19,25 @@ namespace CEngineSharp_Editor
 
         private void _mapEditor_Disposed(object sender, EventArgs e)
         {
-            _mapEditor = null;
+            this.mapEditor = null;
+        }
+
+        private void itemEditor_Disposed(object sender, EventArgs e)
+        {
+            this.itemEditor = null;
         }
 
         private void mapEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_mapEditor == null)
+            if (this.mapEditor == null)
             {
-                if (dataPath == null || dataPath == "")
+                if (string.IsNullOrEmpty(this.dataPath))
                     LoadDataPath();
 
-                _mapEditor = new MapEditor(this.dataPath);
-                _mapEditor.Disposed += _mapEditor_Disposed;
-                _mapEditor.MdiParent = this;
-                _mapEditor.Show();
+                this.mapEditor = new MapEditor(this.dataPath);
+                this.mapEditor.Disposed += _mapEditor_Disposed;
+                this.mapEditor.MdiParent = this;
+                this.mapEditor.Show();
             }
         }
 
@@ -52,6 +58,20 @@ namespace CEngineSharp_Editor
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             dialog.ShowDialog();
             this.dataPath = dialog.SelectedPath;
+        }
+
+        private void itemEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.itemEditor == null)
+            {
+                if (string.IsNullOrEmpty(this.dataPath))
+                    LoadDataPath();
+
+                this.itemEditor = new ItemEditor(this.dataPath);
+                this.itemEditor.Disposed += itemEditor_Disposed;
+                this.itemEditor.MdiParent = this;
+                this.itemEditor.Show();
+            }
         }
     }
 }

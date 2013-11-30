@@ -16,5 +16,7 @@ namespace CEngineSharp_Server
         public const string SERVER_MESSAGE_HELLO = "Hello";
 
         public const int SERVER_STARTER_MAP = 0;
+
+        public const int MAX_INVENTORY_ITEMS = 20;
     }
 }

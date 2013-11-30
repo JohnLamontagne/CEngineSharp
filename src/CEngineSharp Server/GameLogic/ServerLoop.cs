@@ -62,7 +62,7 @@ namespace CEngineSharp_Server.GameLogic
                         }
                     }
 
-                    lastDisconnectCheck = GameTime.GetTotalTimeElapsed() + 15000;
+                    lastDisconnectCheck = GameTime.GetTotalTimeElapsed() + 500;
                 }
 
                 if (lastCpsCheck <= GameTime.GetTotalTimeElapsed())

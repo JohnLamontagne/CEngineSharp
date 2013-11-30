@@ -26,27 +26,27 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override void Execute(Netty netty, int socketIndex)
+        public override void Execute(Netty netty)
         {
             try
             {
                 var chatMessagePacket = new ChatMessagePacket();
                 string username = this.DataBuffer.ReadString();
                 string password = this.DataBuffer.ReadString();
-                bool registrationOkay = PlayerManager.RegisterPlayer(PlayerManager.GetPlayer(socketIndex), username, password);
+                bool registrationOkay = PlayerManager.RegisterPlayer(PlayerManager.GetPlayer(this.SocketIndex), username, password);
 
-                this.WriteData(registrationOkay, registrationOkay ? "Your account has been registered, logging in now..." : "Your account has failed to register...", socketIndex);
-                PlayerManager.GetPlayer(socketIndex).SendPacket(this);
+                this.WriteData(registrationOkay, registrationOkay ? "Your account has been registered, logging in now..." : "Your account has failed to register...", this.SocketIndex);
+                PlayerManager.GetPlayer(this.SocketIndex).SendPacket(this);
 
                 if (registrationOkay)
                 {
-                    Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(socketIndex));
+                    Server.ServerWindow.AddPlayerToGrid(PlayerManager.GetPlayer(this.SocketIndex));
 
-                    PlayerManager.GetPlayer(socketIndex).EnterGame();
+                    PlayerManager.GetPlayer(this.SocketIndex).EnterGame();
                 }
                 else
                 {
-                    Networking.RemoveConnection(socketIndex);
+                    Networking.RemoveConnection(this.SocketIndex);
                 }
             }
             catch (Exception ex)
@@ -55,9 +55,9 @@ namespace CEngineSharp_Server.Net.Packets
             }
         }
 
-        public override string PacketID
+        public override int PacketID
         {
-            get { return "Registeration"; }
+            get { return 9; }
         }
     }
 }
