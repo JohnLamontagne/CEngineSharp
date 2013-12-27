@@ -4,7 +4,6 @@ using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.World;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
-
 using SFML.Graphics;
 using SFML.Window;
 using TGUI;
@@ -15,8 +14,10 @@ namespace CEngineSharp_Client.Graphics
     {
         private int fpsCounter;
         private int fpsTimer;
+        private bool inventoryVisible;
 
         public GameTextureManager TextureManager { get; private set; }
+
 
         public GameRenderer(RenderWindow window)
             : base(window)
@@ -35,7 +36,7 @@ namespace CEngineSharp_Client.Graphics
             this.CanRender = true;
         }
 
-        public override void Render(GameLoop.GameTimer gameTime)
+        public override void Render(GameTime gameTime)
         {
             _window.DispatchEvents();
 
@@ -48,21 +49,19 @@ namespace CEngineSharp_Client.Graphics
 
                 this.Gui.Draw();
 
-                Player player = GameWorld.GetPlayer(Globals.MyIndex);
-
-                if (player != null)
-                    player.DrawInventory(_window);
+                if (this.inventoryVisible)
+                    GameWorld.GetPlayer(Globals.MyIndex).DrawInventory(_window);
             }
 
             _window.Display();
 
             #region Fps Logic
 
-            if (this.fpsTimer < gameTime.GetTotalTimeElapsed())
+            if (this.fpsTimer < gameTime.TotalElapsedTime)
             {
                 this.Gui.Get<Label>("labelFps").Text = "Fps: " + this.fpsCounter;
                 this.fpsCounter = 0;
-                this.fpsTimer = (int)gameTime.GetTotalTimeElapsed() + 1000;
+                this.fpsTimer = (int)gameTime.TotalElapsedTime + 1000;
             }
 
             this.fpsCounter++;
@@ -74,7 +73,12 @@ namespace CEngineSharp_Client.Graphics
         {
             try
             {
-                this.Gui.Get<ChatBox>("textChat").AddLine(message, color);
+                ChatBox chatBox = this.Gui.Get<ChatBox>("textChat");
+
+                // if (chatBox.GetLineAmount() > Constants.MAX_CHAT_LINES)
+                //  chatBox.RemoveLine(0);
+
+                chatBox.AddLine(message, color);
             }
             catch (Exception)
             {
@@ -98,10 +102,14 @@ namespace CEngineSharp_Client.Graphics
         {
             this.Gui.RemoveAllWidgets();
 
+            Color color = Color.Black;
+            color.A = 100;
             ChatBox textChat = this.Gui.Add(new ChatBox(themeConfigurationPath), "textChat");
             textChat.Position = new Vector2f(5, 350);
             textChat.Size = new Vector2f(400, 200);
-            textChat.Transparency = 150;
+            textChat.BackgroundColor = color;
+
+
 
             EditBox textMyChat = this.Gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
             textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
@@ -117,7 +125,7 @@ namespace CEngineSharp_Client.Graphics
 
             Label labelFps = this.Gui.Add(new Label(themeConfigurationPath), "labelFps");
             labelFps.TextSize = 30;
-            labelFps.TextColor = Color.Red;
+            labelFps.TextColor = Color.Black;
             labelFps.Position = new Vector2f(10, 10);
 
             Button buttonInventory = this.Gui.Add(new Button(themeConfigurationPath), "buttonInventory");
@@ -125,6 +133,8 @@ namespace CEngineSharp_Client.Graphics
             buttonInventory.Position = new Vector2f(550, 600);
             buttonInventory.Size = new Vector2f(100, 25);
             buttonInventory.Visible = true;
+            buttonInventory.LeftMouseClickedCallback += buttonInventory_LeftMouseClickedCallback;
+
 
             Button buttonLogout = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogout");
             buttonLogout.Text = "Logout";
@@ -136,19 +146,23 @@ namespace CEngineSharp_Client.Graphics
             Picture picInventory = this.Gui.Add(new Picture(Constants.FILEPATH_GRAPHICS + "/Gui/Inventory.png"), "picInventory");
             picInventory.Position = new Vector2f(500, 400);
             picInventory.LeftMouseClickedCallback += picInventory_LeftMouseClickedCallback;
+            picInventory.Visible = false;
 
-            AnimatedPicture picLoadingOrb = this.Gui.Add(new AnimatedPicture(), "picLoadingOrb");
-            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle.png", 2);
-            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle2.png", 2);
-            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle3.png", 2);
-            picLoadingOrb.AddFrame(Constants.FILEPATH_GRAPHICS + "/Gui/LoadingCircle4.png", 2);
-            picLoadingOrb.Position = new Vector2f(_window.Position.X / 2, _window.Position.Y / 2);
-            picLoadingOrb.Visible = false;
+
+
+        }
+
+        private void buttonInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
+        {
+            this.inventoryVisible = !this.inventoryVisible;
+
+            this.Gui.Get<Picture>("picInventory").Visible = this.inventoryVisible;
+
         }
 
         private void picInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            GameWorld.GetPlayer(Globals.MyIndex).TryDropInventoryItem((int)e.Position.X, (int)e.Position.Y);
+            GameWorld.GetPlayer(Globals.MyIndex).TryDropInventoryItem((int)e.Mouse.X, (int)e.Mouse.Y);
         }
 
         private void _window_KeyReleased(object sender, KeyEventArgs e)
@@ -182,13 +196,6 @@ namespace CEngineSharp_Client.Graphics
                         Globals.KeyDirection = Directions.None;
                     }
                     break;
-
-                case Keyboard.Key.Space:
-                    if (Globals.InGame)
-                    {
-                        MapManager.Map.TryPickupItem();
-                    }
-                    break;
             }
         }
 
@@ -213,6 +220,11 @@ namespace CEngineSharp_Client.Graphics
                 case Keyboard.Key.Left:
                     Globals.KeyDirection = Directions.Left;
                     break;
+
+                case Keyboard.Key.Space:
+                    if (Globals.InGame)
+                        MapManager.Map.TryPickupItem();
+                    break;
             }
         }
 
@@ -224,6 +236,7 @@ namespace CEngineSharp_Client.Graphics
 
         private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
+
             Networking.Disconnect();
         }
 

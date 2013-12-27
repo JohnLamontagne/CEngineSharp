@@ -11,6 +11,7 @@
     <AssemblyName>CEngineSharp Server</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -53,6 +56,7 @@
     <Compile Include="Net\Packets\AlertMessagePacket.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\DespawnMapItemPacket.cs" />
+    <Compile Include="Net\Packets\DropItemPacket.cs" />
     <Compile Include="Net\Packets\InventoryUpdatePacket.cs" />
     <Compile Include="Net\Packets\LoginPacket.cs" />
     <Compile Include="Net\Packets\LogoutPacket.cs" />

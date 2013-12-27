@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Client.World;
 using CEngineSharp_Client.World.Entity;
 using SharpNetty;
+using System;
 
 namespace CEngineSharp_Client.Net.Packets
 {
@@ -8,12 +9,19 @@ namespace CEngineSharp_Client.Net.Packets
     {
         public override void Execute(Netty netty)
         {
-            int playerIndex = this.DataBuffer.ReadInteger();
-            int x = this.DataBuffer.ReadInteger();
-            int y = this.DataBuffer.ReadInteger();
-            Directions direction = (Directions)this.DataBuffer.ReadByte();
+            try
+            {
+                int playerIndex = this.DataBuffer.ReadInteger();
+                int x = this.DataBuffer.ReadInteger();
+                int y = this.DataBuffer.ReadInteger();
+                Directions direction = (Directions)this.DataBuffer.ReadByte();
 
-            GameWorld.GetPlayer(playerIndex).Move(x, y, direction);
+                GameWorld.GetPlayer(playerIndex).Move(x, y, direction);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Error: A player moved wrongly!");
+            }
         }
 
         public void WriteData(int x, int y, Directions direction)

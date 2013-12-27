@@ -123,6 +123,7 @@ namespace CEngineSharp_Server.World
 
         public void MoveTo(Vector2i vector, byte direction)
         {
+
             this.Direction = direction;
 
             //// If the tile is blocked, we obviously can't move to it.
@@ -150,17 +151,42 @@ namespace CEngineSharp_Server.World
                 _inventory.Add(item);
 
                 if (this.inMap)
-                {
-                    InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
-                    invenUpdatePacket.WriteData(this);
-                    this.SendPacket(invenUpdatePacket);
-                }
+                    this.SendInventory();
 
                 this.SendMessage("You have received " + item.Name);
             }
             else
             {
                 this.SendMessage("Your inventory is full!");
+            }
+        }
+
+        public void RemoveItem(Item item)
+        {
+            if (_inventory.Remove(item))
+                this.SendInventory();
+        }
+
+        public void RemoveItem(int slotNum)
+        {
+            if (slotNum < _inventory.Count && slotNum >= 0)
+            {
+                _inventory.RemoveAt(slotNum);
+                this.SendInventory();
+            }
+        }
+
+        public void DropItem(int slotNum)
+        {
+            if (slotNum >= 0 || slotNum < _inventory.Count)
+            {
+                Item item = _inventory[slotNum];
+
+                if (item != null)
+                {
+                    this.Map.SpawnItem(item, this.Position.X, this.Position.Y, 50000);
+                    this.RemoveItem(item);
+                }
             }
         }
 
@@ -200,9 +226,14 @@ namespace CEngineSharp_Server.World
             playerDataPacket.WriteData(this);
             this.SendPacket(playerDataPacket);
 
-            var inventoryUpdatePacket = new InventoryUpdatePacket();
-            inventoryUpdatePacket.WriteData(this);
-            this.SendPacket(inventoryUpdatePacket);
+            this.SendInventory();
+        }
+
+        public void SendInventory()
+        {
+            InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
+            invenUpdatePacket.WriteData(this);
+            this.SendPacket(invenUpdatePacket);
         }
 
         public void LeaveGame()

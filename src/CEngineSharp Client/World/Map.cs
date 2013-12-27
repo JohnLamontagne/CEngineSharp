@@ -39,6 +39,7 @@ namespace CEngineSharp_Client.World
 
             public bool Blocked { get; set; }
 
+
             public bool IsOccupied { get; set; }
 
             public Tile()
@@ -138,6 +139,8 @@ namespace CEngineSharp_Client.World
                     {
                         for (int y = 0; y < this.tiles.GetLength(1); y++)
                         {
+                            binaryWriter.Write(this.GetTile(x, y).Blocked);
+
                             foreach (Layers layer in Enum.GetValues(typeof(Map.Layers)))
                             {
                                 if (this.tiles[x, y].GetLayer(layer) == null)
@@ -184,6 +187,8 @@ namespace CEngineSharp_Client.World
                         {
                             this.SetTile(x, y, new Map.Tile());
 
+                            this.GetTile(x, y).Blocked = binaryReader.ReadBoolean();
+
                             foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
                             {
                                 if (binaryReader.ReadBoolean() == false) continue;
@@ -208,10 +213,11 @@ namespace CEngineSharp_Client.World
         {
             Camera camera = GameWorld.GetPlayer(Globals.MyIndex).Camera;
 
-            int left = camera.ViewLeft / 32;
-            int top = camera.ViewTop / 32;
-            int width = left + (Globals.CurrentResolutionWidth / 32) + 1;
-            int height = top + (Globals.CurrentResolutionHeight / 32) + 1;
+            int left = (int)(camera.ViewLeft / 32);
+            int top = (int)(camera.ViewTop / 32);
+
+            int width = left + (int)(camera.ViewWidth / 32) + 1;
+            int height = top + (int)(camera.ViewHeight / 32) + 1;
 
             if (width > this.Width)
                 width = this.Width;

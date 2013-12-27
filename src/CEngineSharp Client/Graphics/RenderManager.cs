@@ -24,7 +24,7 @@ namespace CEngineSharp_Client.Graphics
 
         private static bool _renderStateChanged = false;
 
-        public static void Render(GameLoop.GameTimer gameTime)
+        public static void Render(GameTime gameTime)
         {
             if (_renderStateChanged)
             {

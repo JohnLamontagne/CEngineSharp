@@ -63,10 +63,6 @@ namespace CEngineSharp_Server.Net.Packets
                     spawnMapItemPacket.WriteData(mapItem);
                     player.SendPacket(spawnMapItemPacket);
                 }
-
-                InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
-                invenUpdatePacket.WriteData(player);
-                player.SendPacket(invenUpdatePacket);
             }
             catch (Exception ex)
             {

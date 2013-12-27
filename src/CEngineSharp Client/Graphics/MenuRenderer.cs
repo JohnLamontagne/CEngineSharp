@@ -4,6 +4,7 @@ using SFML.Graphics;
 using SFML.Window;
 using System;
 using System.IO;
+using System.Threading;
 using TGUI;
 
 namespace CEngineSharp_Client.Graphics
@@ -137,9 +138,10 @@ namespace CEngineSharp_Client.Graphics
             buttonBack.LeftMouseClickedCallback += buttonBack_LeftMouseClickedCallback;
 
             #endregion Back Button
+
         }
 
-        public override void Render(GameLoop.GameTimer gameTime)
+        public override void Render(GameTime gameTime)
         {
             _window.DispatchEvents();
 
@@ -150,6 +152,8 @@ namespace CEngineSharp_Client.Graphics
             this.Gui.Draw();
 
             _window.Display();
+
+            Thread.Sleep(1);
         }
 
         private void LoadNews(Label labelNews)

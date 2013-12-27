@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using CEngineSharp_Client.Net;
+using SFML.Graphics;
 using SFML.Window;
 using System;
 using TGUI;
@@ -25,6 +26,7 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Closed(object sender, EventArgs e)
         {
+            Networking.Disconnect();
             Environment.Exit(0);
         }
 
@@ -44,7 +46,7 @@ namespace CEngineSharp_Client.Graphics
 
         protected abstract void LoadInterface();
 
-        public abstract void Render(GameLoop.GameTimer gameTime);
+        public abstract void Render(GameTime gameTime);
 
         public void Unload()
         {

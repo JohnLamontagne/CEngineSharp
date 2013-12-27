@@ -19,6 +19,8 @@ namespace CEngineSharp_Server.Net.Packets
             {
                 for (int y = 0; y < map.MapHeight; y++)
                 {
+                    this.DataBuffer.WriteBool(map.GetTile(x, y).Blocked);
+
                     foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
                     {
                         if (map.GetTile(x, y).Layers[(int)layer] == null)

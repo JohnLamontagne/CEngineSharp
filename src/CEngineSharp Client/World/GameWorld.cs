@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.World.Entity;
+using System;
 using System.Collections.Generic;
 
 namespace CEngineSharp_Client.World
@@ -11,10 +12,15 @@ namespace CEngineSharp_Client.World
 
         public static Player GetPlayer(int index)
         {
-            if (index >= _players.Count || index < 0)
-                return null;
+            try
+            {
 
-            return _players[index];
+                return _players[index];
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public static void AddPlayer(int index, Player player)

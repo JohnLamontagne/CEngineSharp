@@ -31,10 +31,6 @@ namespace CEngineSharp_Client.World.Entity
 
         public Camera Camera { get; set; }
 
-        private bool SpriteCenteredX { get; set; }
-
-        private bool SpriteCenteredY { get; set; }
-
         private List<Item> _inventory;
 
         private byte previousStep;
@@ -71,7 +67,7 @@ namespace CEngineSharp_Client.World.Entity
             this.Direction = Directions.Down;
             this.Step = 0;
             this.CanMove = true;
-            this.PlayerSpeed = 2f;
+            this.PlayerSpeed = .2f;
             this.Camera = new Camera(this);
         }
 
@@ -82,12 +78,8 @@ namespace CEngineSharp_Client.World.Entity
             int invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
             int invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
 
-            int x = (invenPosX - invenX) / 32;
-            int y = (invenPosY - invenY) / 32;
-
-            // slotnum = (x + (y * 5))
-            // slotnum = x + (y * 5)
-            //
+            int x = (invenX - invenPosX) / 32;
+            int y = (invenY - invenPosY) / 32;
 
             return (x + (y * 5));
         }
@@ -102,9 +94,6 @@ namespace CEngineSharp_Client.World.Entity
 
         public Item GetInventoryItem(int invenX, int invenY)
         {
-            invenX *= 32;
-            invenY *= 32;
-
             return this.GetInventoryItem(this.InvenCordToSlot(invenX, invenY));
         }
 
@@ -133,12 +122,12 @@ namespace CEngineSharp_Client.World.Entity
 
         public void TryDropInventoryItem(int invenX, int invenY)
         {
-            Item item = this.GetInventoryItem(invenX, invenY);
+            int slotNum = this.InvenCordToSlot(invenX, invenY);
 
-            if (item != null)
+            if (this.GetInventoryItem(slotNum) != null)
             {
                 DropItemPacket dropItemPacket = new DropItemPacket();
-                dropItemPacket.WriteData(item);
+                dropItemPacket.WriteData(slotNum);
                 Networking.SendPacket(dropItemPacket);
             }
         }
@@ -156,36 +145,31 @@ namespace CEngineSharp_Client.World.Entity
         public void Move(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
+            int oldX = this.X;
+            int oldY = this.Y;
 
-            int prevX = this.X * 32;
-            int prevY = this.Y * 32;
+            this.X = newX;
+            this.Y = newY;
 
-            if (this.X == newX && this.Y == newY)
+            MapManager.Map.GetTile(oldX, oldY).IsOccupied = false;
+            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
+
+            if (this.Step == 0)
             {
-                this.Step = 0;
+                this.previousStep = 0;
+                this.Step++;
             }
-            else
+            else if (this.Step == 2)
             {
-                this.X = newX;
-                this.Y = newY;
-
-                if (this.Step == 0)
-                {
-                    this.previousStep = 0;
-                    this.Step++;
-                }
-                else if (this.Step == 2)
-                {
-                    this.previousStep = 2;
+                this.previousStep = 2;
+                this.Step--;
+            }
+            else if (this.Step == 1)
+            {
+                if (this.previousStep == 2)
                     this.Step--;
-                }
-                else if (this.Step == 1)
-                {
-                    if (this.previousStep == 2)
-                        this.Step--;
-                    else
-                        this.Step++;
-                }
+                else
+                    this.Step++;
             }
         }
 
@@ -209,59 +193,124 @@ namespace CEngineSharp_Client.World.Entity
                 switch (this.Direction)
                 {
                     case Directions.Down:
-                        movementPacket.WriteData(GameWorld.GetPlayer(Globals.MyIndex).X, GameWorld.GetPlayer(Globals.MyIndex).Y + 1, this.Direction);
+
+                        // Client side check to see if the tile is blocked.
+                        if (this.Y < (MapManager.Map.Height - 1) && !MapManager.Map.GetTile(this.X, this.Y + 1).Blocked && !MapManager.Map.GetTile(this.X, this.Y + 1).IsOccupied)
+                        {
+                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+                            this.Y += 1;
+                            movementPacket.WriteData(this.X, this.Y, this.Direction);
+                            Networking.SendPacket(movementPacket);
+                            this.CanMove = false;
+                        }
+
                         break;
 
                     case Directions.Up:
-                        movementPacket.WriteData(GameWorld.GetPlayer(Globals.MyIndex).X, GameWorld.GetPlayer(Globals.MyIndex).Y - 1, this.Direction);
+                        // Client side check to see if the tile is blocked.
+                        if (this.Y > 0 && !MapManager.Map.GetTile(this.X, this.Y - 1).Blocked && !MapManager.Map.GetTile(this.X, this.Y - 1).IsOccupied)
+                        {
+                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+                            this.Y -= 1;
+                            movementPacket.WriteData(this.X, this.Y, this.Direction);
+                            Networking.SendPacket(movementPacket);
+                            this.CanMove = false;
+                        }
+
                         break;
 
                     case Directions.Right:
-                        movementPacket.WriteData(GameWorld.GetPlayer(Globals.MyIndex).X + 1, GameWorld.GetPlayer(Globals.MyIndex).Y, this.Direction);
+                        // Client side check to see if the tile is blocked.
+                        if (this.X < (MapManager.Map.Width - 1) && !MapManager.Map.GetTile(this.X + 1, this.Y).Blocked && !MapManager.Map.GetTile(this.X + 1, this.Y).IsOccupied)
+                        {
+                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+                            this.X += 1;
+                            movementPacket.WriteData(this.X, this.Y, this.Direction);
+                            Networking.SendPacket(movementPacket);
+                            this.CanMove = false;
+                        }
+
                         break;
 
                     case Directions.Left:
-                        movementPacket.WriteData(GameWorld.GetPlayer(Globals.MyIndex).X - 1, GameWorld.GetPlayer(Globals.MyIndex).Y, this.Direction);
+                        // Client side check to see if the tile is blocked.
+                        if (this.X > 0 && !MapManager.Map.GetTile(this.X - 1, this.Y).Blocked && !MapManager.Map.GetTile(this.X - 1, this.Y).IsOccupied)
+                        {
+                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+                            this.X -= 1;
+                            movementPacket.WriteData(this.X, this.Y, this.Direction);
+                            Networking.SendPacket(movementPacket);
+                            this.CanMove = false;
+                        }
+
                         break;
                 }
-
-                Networking.SendPacket(movementPacket);
-                this.CanMove = false;
             }
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             int x = this.X * 32;
             int y = this.Y * 32;
-            Vector2f position = this.PlayerSprite.Position;
 
-            this.Camera.Update();
+            if (x == this.PlayerSprite.Position.X && y == this.PlayerSprite.Position.Y)
+            {
+                this.CanMove = true;
+
+                this.Camera.SnapToTarget();
+
+                this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
+
+                return;
+            }
+
+            Vector2f position = this.PlayerSprite.Position;
 
             if (x < this.PlayerSprite.Position.X)
             {
-                position.X = this.PlayerSprite.Position.X - this.PlayerSpeed;
+                position.X = this.PlayerSprite.Position.X - (this.PlayerSpeed * gameTime.UpdateTime);
+
+                if (x >= position.X)
+                {
+                    this.CanMove = true;
+                    position.X = x;
+                }
             }
             else if (x > this.PlayerSprite.Position.X)
             {
-                position.X = this.PlayerSprite.Position.X + this.PlayerSpeed;
+                position.X = this.PlayerSprite.Position.X + (this.PlayerSpeed * gameTime.UpdateTime);
+
+                if (x <= position.X)
+                {
+                    this.CanMove = true;
+                    position.X = x;
+                }
             }
 
             if (y < this.PlayerSprite.Position.Y)
             {
-                position.Y = this.PlayerSprite.Position.Y - this.PlayerSpeed;
+                position.Y = this.PlayerSprite.Position.Y - (this.PlayerSpeed * gameTime.UpdateTime);
+
+                if (y >= position.Y)
+                {
+                    this.CanMove = true;
+                    position.Y = y;
+                }
             }
             else if (y > this.PlayerSprite.Position.Y)
             {
-                position.Y = this.PlayerSprite.Position.Y + this.PlayerSpeed;
+                position.Y = this.PlayerSprite.Position.Y + (this.PlayerSpeed * gameTime.UpdateTime);
+
+                if (y <= position.Y)
+                {
+                    this.CanMove = true;
+                    position.Y = y;
+                }
             }
 
             this.PlayerSprite.Position = position;
 
-            if (this.PlayerSprite.Position.X == x && this.PlayerSprite.Position.Y == y)
-            {
-                this.CanMove = true;
-            }
+            this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
         }
 
         public void Draw(RenderWindow window)

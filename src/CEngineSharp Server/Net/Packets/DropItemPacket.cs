@@ -1,19 +1,16 @@
-﻿using CEngineSharp_Client.World;
+﻿using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
-namespace CEngineSharp_Client.Net.Packets
+namespace CEngineSharp_Server.Net.Packets
 {
     public class DropItemPacket : Packet
     {
-        public void WriteData(int slotNum)
-        {
-            this.DataBuffer.WriteInteger(slotNum);
-        }
-
         public override void Execute(Netty netty)
         {
-            // Client->Server only packet.
+            int slotNum = this.DataBuffer.ReadInteger();
+
+            PlayerManager.GetPlayer(this.SocketIndex).DropItem(slotNum);
         }
 
         public override int PacketID

@@ -53,10 +53,10 @@ namespace CEngineSharp_Server.Net
         {
             Player player = PlayerManager.GetPlayer(socketIndex);
 
-            Console.WriteLine("Lost a connection with " + player.IP);
-
             if (player != null && player.LoggedIn)
             {
+                Console.WriteLine(player.Name + " has logged out!");
+
                 PlayerManager.GetPlayer(socketIndex).LeaveGame();
 
                 Server.ServerWindow.RemovePlayerFromGrid(socketIndex);

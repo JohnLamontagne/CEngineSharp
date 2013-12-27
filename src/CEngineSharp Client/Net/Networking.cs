@@ -29,6 +29,15 @@ namespace CEngineSharp_Client.Net
 
         public static void Disconnect()
         {
+            if (Globals.InGame)
+            {
+                Globals.InGame = false;
+
+                RenderManager.SetRenderState(RenderStates.Render_Menu);
+
+                GameWorld.ClearPlayers();
+            }
+
             nettyClient.Disconnect();
         }
 
@@ -51,12 +60,21 @@ namespace CEngineSharp_Client.Net
 
         public static void ExecuteQueue()
         {
-            if (Networking.PacketExecutionQueue == null) return;
-
-            for (int i = 0; i < Networking.PacketExecutionQueue.Count; i++)
+            try
             {
-                Networking.PacketExecutionQueue[i].Execute(nettyClient);
-                Networking.PacketExecutionQueue.RemoveAt(i);
+                if (Networking.PacketExecutionQueue == null) return;
+
+                for (int i = 0; i < Networking.PacketExecutionQueue.Count; i++)
+                {
+                    if (Networking.PacketExecutionQueue[i] != null)
+                    {
+                        Networking.PacketExecutionQueue[i].Execute(nettyClient);
+                        Networking.PacketExecutionQueue.RemoveAt(i);
+                    }
+                }
+            }
+            catch (NullReferenceException)
+            {
             }
         }
 

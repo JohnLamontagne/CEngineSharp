@@ -61,6 +61,8 @@ namespace CEngineSharp_Server.Utilities
         {
             try
             {
+                if (!Directory.Exists(Constants.FILEPATH_DATA)) Directory.CreateDirectory(Constants.FILEPATH_DATA.TrimEnd('/'));
+
                 string filePath = Constants.FILEPATH_DATA + "Config.configuration";
 
                 if (!File.Exists(filePath))

@@ -13,13 +13,13 @@ namespace CEngineSharp_Client.Graphics
 
         public Player Target { get; set; }
 
-        public int ViewWidth { get { return (int)_view.Size.X; } }
+        public float ViewWidth { get { return _view.Size.X; } }
 
-        public int ViewHeight { get { return (int)_view.Size.Y; } }
+        public float ViewHeight { get { return _view.Size.Y; } }
 
-        public int ViewLeft { get; set; }
+        public float ViewLeft { get; set; }
 
-        public int ViewTop { get; set; }
+        public float ViewTop { get; set; }
 
         public Camera(Player target)
         {
@@ -39,8 +39,8 @@ namespace CEngineSharp_Client.Graphics
 
         public void SetCenter(Vector2f center)
         {
-            this.ViewLeft += (int)(center.X - this._view.Center.X);
-            this.ViewTop += (int)(center.Y - this._view.Center.Y);
+            this.ViewLeft += center.X - this._view.Center.X;
+            this.ViewTop += center.Y - this._view.Center.Y;
             this._view.Center = center;
         }
 
@@ -92,10 +92,12 @@ namespace CEngineSharp_Client.Graphics
             this.SetCenter(center);
         }
 
-        public void Update()
+        public void Update(float playerSpeed)
         {
-            int x = this.Target.X * 32;
-            int y = this.Target.Y * 32;
+            this.SetCenter(this.Target.PlayerSprite.Position);
+
+            float x = this.Target.PlayerSprite.Position.X;
+            float y = this.Target.PlayerSprite.Position.Y;
 
             Vector2f center = this.GetCenter();
 
@@ -103,11 +105,11 @@ namespace CEngineSharp_Client.Graphics
             {
                 if (x < _view.Center.X)
                 {
-                    center.X = _view.Center.X - this.Target.PlayerSpeed;
+                    center.X = _view.Center.X - playerSpeed;
                 }
                 else if (x > _view.Center.X)
                 {
-                    center.X = _view.Center.X + this.Target.PlayerSpeed;
+                    center.X = _view.Center.X + playerSpeed;
                 }
             }
 
@@ -115,13 +117,25 @@ namespace CEngineSharp_Client.Graphics
             {
                 if (y < _view.Center.Y)
                 {
-                    center.Y = _view.Center.Y - this.Target.PlayerSpeed;
+                    center.Y = _view.Center.Y - playerSpeed;
                 }
                 else if (y > _view.Center.Y)
                 {
-                    center.Y = _view.Center.Y + this.Target.PlayerSpeed;
+                    center.Y = _view.Center.Y + playerSpeed;
                 }
             }
+
+            if (center.X < (Globals.CurrentResolutionWidth / 2))
+                center.X = Globals.CurrentResolutionWidth / 2;
+
+            if (x >= (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2))
+                center.X = (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2);
+
+            if (center.Y < (Globals.CurrentResolutionHeight / 2))
+                center.Y = Globals.CurrentResolutionHeight / 2;
+
+            if (y >= (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2))
+                center.Y = (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2);
 
             this.SetCenter(center);
         }

@@ -97,13 +97,14 @@ namespace CEngineSharp_Server
         {
             Console.WriteLine("Checking world integrity...");
             // Check to make sure our files containing the world exist.
-            if (!Directory.Exists(Constants.FILEPATH_ACCOUNTS)) Directory.CreateDirectory(Constants.FILEPATH_ACCOUNTS);
+            if (!Directory.Exists(Constants.FILEPATH_ACCOUNTS)) Directory.CreateDirectory(Constants.FILEPATH_ACCOUNTS.TrimEnd('/'));
             if (!Directory.Exists(Constants.FILEPATH_NPCS)) Directory.CreateDirectory(Constants.FILEPATH_NPCS.TrimEnd('/'));
             if (!Directory.Exists(Constants.FILEPATH_MAPS)) Directory.CreateDirectory(Constants.FILEPATH_MAPS.TrimEnd('/'));
             if (!Directory.Exists(Constants.FILEPATH_ITEMS)) Directory.CreateDirectory(Constants.FILEPATH_ITEMS.TrimEnd('/'));
 
             // Check to make sure the file for storing players name is there.
-            if (!File.Exists(Constants.FILEPATH_DATA + "names.txt")) File.Create(Constants.FILEPATH_DATA + "names.txt");
+            if (!File.Exists(Constants.FILEPATH_DATA + "names.txt")) File.Create(Constants.FILEPATH_DATA + "names.txt").Close();
+            
 
             MapManager.LoadMaps();
             ItemManager.LoadItems();

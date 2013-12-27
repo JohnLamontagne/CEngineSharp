@@ -7,59 +7,65 @@ namespace CEngineSharp_Client
 {
     public static class GameLoop
     {
-        public class GameTimer
+        public static void Start(GameTime gameTime)
         {
-            private Stopwatch stopWatch;
-
-            public GameTimer()
-            {
-                stopWatch = new Stopwatch();
-                stopWatch.Start();
-            }
-
-            public GameTimer Start()
-            {
-                stopWatch.Start();
-                return this;
-            }
-
-            public GameTimer Restart()
-            {
-                stopWatch.Restart();
-                return this;
-            }
-
-            public long GetTotalTimeElapsed()
-            {
-                return stopWatch.ElapsedMilliseconds;
-            }
-        }
-
-        public static void Start(GameTimer gameTime)
-        {
-            long playerUpdateTmr = 0;
-
             while (!Globals.ShuttingDown)
             {
+                gameTime.Update();
+
                 Networking.ExecuteQueue();
 
-                if (Globals.MyIndex < GameWorld.PlayerCount && GameWorld.GetPlayer(Globals.MyIndex) != null)
+                if (Globals.InGame && GameWorld.GetPlayer(Globals.MyIndex) != null)
                 {
                     GameWorld.GetPlayer(Globals.MyIndex).TryMove();
 
-                    if (playerUpdateTmr < gameTime.GetTotalTimeElapsed())
+                    foreach (var player in GameWorld.GetPlayers())
                     {
-                        foreach (var player in GameWorld.GetPlayers())
-                        {
-                            player.Update();
-                        }
-
-                        playerUpdateTmr = gameTime.GetTotalTimeElapsed() + 9;
+                        player.Update(gameTime);
                     }
                 }
 
                 RenderManager.Render(gameTime);
             }
+        }
+    }
+
+    public class GameTime
+    {
+        private Stopwatch stopWatch;
+
+        private long startUpdateTime;
+
+        public long TotalElapsedTime
+        {
+            get { return stopWatch.ElapsedMilliseconds; }
+        }
+
+        public long UpdateTime { get; private set; }
+
+        public GameTime()
+        {
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
+        }
+
+        public GameTime Start()
+        {
+            stopWatch.Start();
+            return this;
+        }
+
+        public GameTime Restart()
+        {
+            stopWatch.Restart();
+            return this;
+        }
+
+        public void Update()
+        {
+            this.UpdateTime = this.TotalElapsedTime - this.startUpdateTime;
+
+            startUpdateTime = this.TotalElapsedTime;
         }
     }
 }

@@ -39,7 +39,6 @@ namespace CEngineSharp_Server.GameLogic
             long lastCpsCheck = 0;
             int cps = 0;
             int cpsCount = 0;
-            long lastDisconnectCheck = 0;
 
             // Continue processing the server-logic until it's time to shut things down.
             while (!Globals.ShuttingDown)
@@ -50,19 +49,6 @@ namespace CEngineSharp_Server.GameLogic
                         " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off") + " - Cps: " + cps + "/sec");
 
                     lastConsoleTitleUpdateTime = GameTime.GetTotalTimeElapsed() + 500;
-                }
-
-                if (lastDisconnectCheck <= GameTime.GetTotalTimeElapsed())
-                {
-                    foreach (var player in PlayerManager.GetPlayers())
-                    {
-                        if (!player.Connection.Connected)
-                        {
-                            Networking.RemoveConnection(player.PlayerIndex);
-                        }
-                    }
-
-                    lastDisconnectCheck = GameTime.GetTotalTimeElapsed() + 500;
                 }
 
                 if (lastCpsCheck <= GameTime.GetTotalTimeElapsed())

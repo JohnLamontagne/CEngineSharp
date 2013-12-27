@@ -26,6 +26,8 @@ namespace CEngineSharp_Client.Net.Packets
                 MenuRenderer menuRenderer = RenderManager.CurrentRenderer as MenuRenderer;
 
                 menuRenderer.SetMenuStatus(this.DataBuffer.ReadString());
+
+                Networking.Disconnect();
             }
         }
 

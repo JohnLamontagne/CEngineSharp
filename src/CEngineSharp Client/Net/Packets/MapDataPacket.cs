@@ -27,6 +27,8 @@ namespace CEngineSharp_Client.Net.Packets
                 {
                     map.SetTile(x, y, new Map.Tile());
 
+                    map.GetTile(x, y).Blocked = this.DataBuffer.ReadBool();
+
                     foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
                     {
                         if (this.DataBuffer.ReadBool())

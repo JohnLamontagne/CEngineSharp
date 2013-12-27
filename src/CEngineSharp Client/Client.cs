@@ -12,10 +12,11 @@ namespace CEngineSharp_Client
         [STAThread]
         private static void Main()
         {
-            GameLoop.GameTimer gameTime = new GameLoop.GameTimer();
+            GameTime gameTime = new GameTime();
 
             Globals.ShuttingDown = false;
             Globals.KeyDirection = World.Entity.Directions.None;
+
 
             AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 
