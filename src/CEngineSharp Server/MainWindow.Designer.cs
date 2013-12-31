@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.textCommandInput = new System.Windows.Forms.TextBox();
             this.textServerOutput = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dataGridPlayers = new System.Windows.Forms.DataGridView();
+            this.playersDataGrid = new System.Windows.Forms.DataGridView();
+            this.dataGridContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PlayerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PlayerLevel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.IP = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -43,7 +46,7 @@
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridPlayers)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playersDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -84,12 +87,11 @@
             this.textServerOutput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textServerOutput.Size = new System.Drawing.Size(649, 417);
             this.textServerOutput.TabIndex = 1;
-
             // 
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage2.Controls.Add(this.dataGridPlayers);
+            this.tabPage2.Controls.Add(this.playersDataGrid);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -97,21 +99,34 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Players";
             // 
-            // dataGridPlayers
+            // playersDataGrid
             // 
-            this.dataGridPlayers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridPlayers.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.playersDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.playersDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Index,
             this.PlayerName,
             this.PlayerLevel,
             this.IP,
             this.AccessLevel,
             this.HP,
             this.MP});
-            this.dataGridPlayers.Location = new System.Drawing.Point(6, 6);
-            this.dataGridPlayers.Name = "dataGridPlayers";
-            this.dataGridPlayers.ReadOnly = true;
-            this.dataGridPlayers.Size = new System.Drawing.Size(644, 443);
-            this.dataGridPlayers.TabIndex = 0;
+            this.playersDataGrid.Location = new System.Drawing.Point(6, 6);
+            this.playersDataGrid.Name = "playersDataGrid";
+            this.playersDataGrid.ReadOnly = true;
+            this.playersDataGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.playersDataGrid.Size = new System.Drawing.Size(644, 443);
+            this.playersDataGrid.TabIndex = 0;
+            // 
+            // dataGridContextMenu
+            // 
+            this.dataGridContextMenu.Name = "dataGridContextMenu";
+            this.dataGridContextMenu.Size = new System.Drawing.Size(61, 4);
+            // 
+            // Index
+            // 
+            this.Index.HeaderText = "Index";
+            this.Index.Name = "Index";
+            this.Index.ReadOnly = true;
             // 
             // PlayerName
             // 
@@ -153,7 +168,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 501);
+            this.ClientSize = new System.Drawing.Size(688, 500);
             this.Controls.Add(this.tabControl1);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(704, 539);
@@ -166,7 +181,7 @@
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridPlayers)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playersDataGrid)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -178,7 +193,9 @@
         private System.Windows.Forms.TextBox textServerOutput;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TextBox textCommandInput;
-        private System.Windows.Forms.DataGridView dataGridPlayers;
+        private System.Windows.Forms.DataGridView playersDataGrid;
+        private System.Windows.Forms.ContextMenuStrip dataGridContextMenu;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Index;
         private System.Windows.Forms.DataGridViewTextBoxColumn PlayerName;
         private System.Windows.Forms.DataGridViewTextBoxColumn PlayerLevel;
         private System.Windows.Forms.DataGridViewTextBoxColumn IP;

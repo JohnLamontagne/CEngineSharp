@@ -3,8 +3,8 @@ using CEngineSharp_Server.Net;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
-using SharedGameData;
-using SharedGameData.World;
+using CEngineSharp_Server;
+using CEngineSharp_Server.World;
 using System;
 using System.IO;
 using System.Threading;
@@ -42,6 +42,11 @@ namespace CEngineSharp_Server
         {
             _textWriter = new TextBoxStreamWriter(this.textServerOutput);
 
+            this.dataGridContextMenu = new ContextMenuStrip();
+            this.dataGridContextMenu.Items.Add("Kick", null, new EventHandler(this.HandleMenuKick));
+            this.playersDataGrid.ContextMenuStrip = this.dataGridContextMenu;
+            this.playersDataGrid.AllowUserToAddRows = false;
+
             Console.SetOut(_textWriter);
 
             ServerConfiguration.LoadConfig();
@@ -62,6 +67,17 @@ namespace CEngineSharp_Server
             this.textCommandInput.Select();
         }
 
+        private void HandleMenuKick(object sender, EventArgs e)
+        {
+            for (int i = 0; i < this.playersDataGrid.RowCount; i++)
+            {
+                if (this.playersDataGrid[0, i].Selected)
+                {
+                    Networking.KickPlayer((int)this.playersDataGrid[0, i].Value);
+                }
+            }
+        }
+
         public void SetTitle(string text)
         {
             if (this.InvokeRequired)
@@ -76,7 +92,7 @@ namespace CEngineSharp_Server
                 this.Invoke(new AddPlayerToTableDelegate(this.AddPlayerToGrid), player);
             else
             {
-                this.dataGridPlayers.Rows.Add(player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Vitals.HitPoints), player.GetVital(Vitals.ManaPoints));
+                this.playersDataGrid.Rows.Add(player.PlayerIndex, player.Name, player.Level, player.IP, player.AccessLevel, player.GetVital(Vitals.HitPoints), player.GetVital(Vitals.ManaPoints));
             }
         }
 
@@ -86,7 +102,14 @@ namespace CEngineSharp_Server
                 this.Invoke(new RemovePlayerFromTableDelegate(this.RemovePlayerFromGrid), playerIndex);
             else
             {
-                this.dataGridPlayers.Rows.RemoveAt(playerIndex);
+                foreach (DataGridViewRow row in this.playersDataGrid.Rows)
+                {
+                    if ((int)row.Cells[0].Value == playerIndex)
+                    {
+                        this.playersDataGrid.Rows.Remove(row);
+                        return;
+                    }
+                }
             }
         }
 

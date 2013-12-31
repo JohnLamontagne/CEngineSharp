@@ -1,10 +1,10 @@
-﻿using CEngineSharp_Server.Net;
+﻿using CEngineSharp_Server;
+using CEngineSharp_Server.Net;
 using CEngineSharp_Server.Net.Packets;
 using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
-using SharedGameData;
-using SharedGameData.World;
-using SharedGameData.World.Entities;
+using CEngineSharp_Server.World.Entities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -74,6 +74,8 @@ namespace CEngineSharp_Server.World
         {
             return _inventory.ToArray();
         }
+
+        public int InventoryCount { get { return _inventory.Count; } }
 
         public void SetInMap(bool value)
         {
@@ -203,6 +205,10 @@ namespace CEngineSharp_Server.World
 
         public void EnterGame()
         {
+            this.LoggedIn = true;
+
+            this.SetVital(Vitals.HitPoints, 100);
+
             this.JoinMap(MapManager.GetMap(0));
 
             Console.WriteLine(this.Name + " has logged in!");
@@ -227,6 +233,7 @@ namespace CEngineSharp_Server.World
             this.SendPacket(playerDataPacket);
 
             this.SendInventory();
+            this.SendVitals();
         }
 
         public void SendInventory()
@@ -234,6 +241,13 @@ namespace CEngineSharp_Server.World
             InventoryUpdatePacket invenUpdatePacket = new InventoryUpdatePacket();
             invenUpdatePacket.WriteData(this);
             this.SendPacket(invenUpdatePacket);
+        }
+
+        public void SendVitals()
+        {
+            var vitalUpdatePacket = new PlayerVitalUpdatePacket();
+            vitalUpdatePacket.WriteData(this);
+            this.SendPacket(vitalUpdatePacket);
         }
 
         public void LeaveGame()

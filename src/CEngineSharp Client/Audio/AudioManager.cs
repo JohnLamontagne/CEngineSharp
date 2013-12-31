@@ -21,7 +21,10 @@ namespace CEngineSharp_Client.Audio
         {
             DirectoryInfo dI = new DirectoryInfo(soundFilePath);
 
-            sounds = new Dictionary<string, SoundBuffer>();
+            if (sounds == null)
+                sounds = new Dictionary<string, SoundBuffer>();
+            else
+                sounds.Clear();
 
             foreach (var file in dI.GetFiles("*.ogg", SearchOption.AllDirectories))
             {

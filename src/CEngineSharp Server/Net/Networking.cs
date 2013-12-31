@@ -61,7 +61,6 @@ namespace CEngineSharp_Server.Net
 
                 Server.ServerWindow.RemovePlayerFromGrid(socketIndex);
             }
-
             else
             {
                 PlayerManager.RemovePlayer(socketIndex);

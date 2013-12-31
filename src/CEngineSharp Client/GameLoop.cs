@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.World;
+using System;
 using System.Diagnostics;
 
 namespace CEngineSharp_Client
@@ -9,6 +10,7 @@ namespace CEngineSharp_Client
     {
         public static void Start(GameTime gameTime)
         {
+
             while (!Globals.ShuttingDown)
             {
                 gameTime.Update();
@@ -25,7 +27,9 @@ namespace CEngineSharp_Client
                     }
                 }
 
+
                 RenderManager.Render(gameTime);
+
             }
         }
     }

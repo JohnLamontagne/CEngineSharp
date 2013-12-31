@@ -1,7 +1,7 @@
 ﻿using CEngineSharp_Server.Utilities;
 using System;
 
-namespace SharedGameData.World.Entities
+namespace CEngineSharp_Server.World.Entities
 {
     public interface IEntity
     {

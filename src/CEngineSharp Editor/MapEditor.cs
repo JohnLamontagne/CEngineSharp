@@ -177,6 +177,7 @@ namespace CEngineSharp_Editor
         {
             this.mapRenderer.Running = false;
             this.SaveData();
+            this.mapRenderer = null;
         }
 
         private void mapList_SelectedIndexChanged(object sender, EventArgs e)

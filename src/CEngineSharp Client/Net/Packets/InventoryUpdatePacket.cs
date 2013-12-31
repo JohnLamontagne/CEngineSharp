@@ -10,6 +10,9 @@ namespace CEngineSharp_Client.Net.Packets
     {
         public override void Execute(Netty netty)
         {
+            Console.WriteLine("Inventory update packet...");
+
+
             int inventoryItemCount = this.DataBuffer.ReadInteger();
 
             Player player = GameWorld.GetPlayer(Globals.MyIndex);

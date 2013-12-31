@@ -31,6 +31,8 @@ namespace CEngineSharp_Client.World.Entity
 
         public Camera Camera { get; set; }
 
+        public int HP { get; set; }
+
         private List<Item> _inventory;
 
         private byte previousStep;

@@ -1,4 +1,4 @@
-﻿namespace SharedGameData.World
+﻿namespace CEngineSharp_Server.World
 {
     public enum Vitals
     {

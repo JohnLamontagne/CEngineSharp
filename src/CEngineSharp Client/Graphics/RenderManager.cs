@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CEngineSharp_Client.Audio;
+using System;
 
 namespace CEngineSharp_Client.Graphics
 {
@@ -9,6 +10,10 @@ namespace CEngineSharp_Client.Graphics
         public static Renderer CurrentRenderer { get { return _renderer; } private set { _renderer = value; } }
 
         private static RenderStates _renderstate;
+
+        public static long FrameTime { get; set; }
+
+        private static long nextRenderTime;
 
         public static void Init()
         {
@@ -45,8 +50,13 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (_renderer.CanRender)
+            if (_renderer.CanRender)// && gameTime.TotalElapsedTime >= RenderManager.nextRenderTime)
+            {
+                long startTime = gameTime.TotalElapsedTime;
                 _renderer.Render(gameTime);
+                RenderManager.FrameTime = gameTime.TotalElapsedTime - startTime;
+                RenderManager.nextRenderTime = gameTime.TotalElapsedTime + ((1000 / 61) - RenderManager.FrameTime);
+            }
         }
     }
 }

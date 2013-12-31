@@ -51,6 +51,13 @@ namespace CEngineSharp_Client.Graphics
 
                 if (this.inventoryVisible)
                     GameWorld.GetPlayer(Globals.MyIndex).DrawInventory(_window);
+
+                var healthBar = this.Gui.Get<LoadingBar>("healthBar");
+                if (GameWorld.GetPlayer(Globals.MyIndex).HP != healthBar.Value)
+                {
+                    healthBar.Value = GameWorld.GetPlayer(Globals.MyIndex).HP;
+                    healthBar.Text = "HP: " + healthBar.Value + "/" + healthBar.Maximum;
+                }
             }
 
             _window.Display();
@@ -109,8 +116,6 @@ namespace CEngineSharp_Client.Graphics
             textChat.Size = new Vector2f(400, 200);
             textChat.BackgroundColor = color;
 
-
-
             EditBox textMyChat = this.Gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
             textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
             textMyChat.Size = new Vector2f(textChat.Size.X, 40);
@@ -126,7 +131,7 @@ namespace CEngineSharp_Client.Graphics
             Label labelFps = this.Gui.Add(new Label(themeConfigurationPath), "labelFps");
             labelFps.TextSize = 30;
             labelFps.TextColor = Color.Black;
-            labelFps.Position = new Vector2f(10, 10);
+            labelFps.Position = new Vector2f(700, 10);
 
             Button buttonInventory = this.Gui.Add(new Button(themeConfigurationPath), "buttonInventory");
             buttonInventory.Text = "Inventory";
@@ -148,8 +153,11 @@ namespace CEngineSharp_Client.Graphics
             picInventory.LeftMouseClickedCallback += picInventory_LeftMouseClickedCallback;
             picInventory.Visible = false;
 
-
-
+            LoadingBar healthBar = this.Gui.Add(new LoadingBar(themeConfigurationPath), "healthBar");
+            healthBar.Text = "HP";
+            healthBar.Size = new Vector2f(300, 20);
+            healthBar.Position = new Vector2f(0, 10);
+            healthBar.Maximum = 100;
         }
 
         private void buttonInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)

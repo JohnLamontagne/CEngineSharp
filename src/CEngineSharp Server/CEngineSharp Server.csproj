@@ -63,6 +63,7 @@
     <Compile Include="Net\Packets\MapCheckPacket.cs" />
     <Compile Include="Net\Packets\MapDataPacket.cs" />
     <Compile Include="Net\Packets\PickupItemPacket.cs" />
+    <Compile Include="Net\Packets\PlayerVitalUpdatePacket.cs" />
     <Compile Include="Net\Packets\SpawnMapItemPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
     <Compile Include="Net\Packets\PlayerDataPacket.cs" />
