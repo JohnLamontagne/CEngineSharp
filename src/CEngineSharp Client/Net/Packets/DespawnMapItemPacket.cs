@@ -11,7 +11,7 @@ namespace CEngineSharp_Client.Net.Packets
             int mapItemX = this.DataBuffer.ReadInteger();
             int mapItemY = this.DataBuffer.ReadInteger();
 
-            if (Globals.InGame)
+            if (Client.InGame)
             {
                 MapManager.Map.RemoveMapItem(mapItemX, mapItemY);
             }

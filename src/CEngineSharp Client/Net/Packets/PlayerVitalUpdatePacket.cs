@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -11,7 +12,7 @@ namespace CEngineSharp_Client.Net.Packets
             int playerHP = this.DataBuffer.ReadInteger();
             int playerMP = this.DataBuffer.ReadInteger();
 
-            GameWorld.GetPlayer(Globals.MyIndex).HP = playerHP;
+            PlayerManager.GetPlayer(PlayerManager.MyIndex).HP = playerHP;
         }
 
         public override int PacketID

@@ -81,7 +81,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="GameLoop.cs" />
-    <Compile Include="Globals.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\GameRenderer.cs" />
     <Compile Include="Graphics\MenuRenderer.cs" />
@@ -110,8 +109,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Net\Packets\RegisterationPacket.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
+    <Compile Include="World\Content Managers\PlayerManager.cs" />
     <Compile Include="World\Entity\Directions.cs" />
-    <Compile Include="World\GameWorld.cs" />
     <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Entity\Player.cs" />

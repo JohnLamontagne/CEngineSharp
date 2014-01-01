@@ -73,15 +73,15 @@ namespace CEngineSharp_Client.World.Entity
             this.Camera = new Camera(this);
         }
 
-        public int InvenCordToSlot(int invenX, int invenY)
+        public int MouseCordToSlotNum(int mouseX, int mouseY)
         {
             GameRenderer gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
 
             int invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
             int invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
 
-            int x = (invenX - invenPosX) / 32;
-            int y = (invenY - invenPosY) / 32;
+            int x = (mouseX - invenPosX) / 32;
+            int y = (mouseY - invenPosY) / 32;
 
             return (x + (y * 5));
         }
@@ -96,7 +96,7 @@ namespace CEngineSharp_Client.World.Entity
 
         public Item GetInventoryItem(int invenX, int invenY)
         {
-            return this.GetInventoryItem(this.InvenCordToSlot(invenX, invenY));
+            return this.GetInventoryItem(this.MouseCordToSlotNum(invenX, invenY));
         }
 
         public void ClearInventory()
@@ -122,9 +122,11 @@ namespace CEngineSharp_Client.World.Entity
             item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
         }
 
-        public void TryDropInventoryItem(int invenX, int invenY)
+        public void TryDropInventoryItem(int mouseX, int mouseY)
         {
-            int slotNum = this.InvenCordToSlot(invenX, invenY);
+            int slotNum = this.MouseCordToSlotNum(mouseX, mouseY);
+
+            Console.WriteLine("Slot Num: " + slotNum);
 
             if (this.GetInventoryItem(slotNum) != null)
             {
@@ -177,20 +179,9 @@ namespace CEngineSharp_Client.World.Entity
 
         public void TryMove()
         {
-            if (Globals.KeyDirection != Directions.None)
-            {
-                this.IsMoving = true;
-            }
-            else
-            {
-                this.IsMoving = false;
-            }
-
             if (this.IsMoving && this.CanMove)
             {
                 var movementPacket = new MovementPacket();
-
-                this.Direction = Globals.KeyDirection;
 
                 switch (this.Direction)
                 {

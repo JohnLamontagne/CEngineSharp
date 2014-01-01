@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SharpNetty;
 using System;
@@ -19,15 +20,15 @@ namespace CEngineSharp_Client.Net.Packets
 
             GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
 
-            Player player = new Player(gameRenderer.TextureManager.GetCharacterTexture("Bob"));
+            Player player = new Player(RenderManager.TextureManager.GetTexture("character0"));
             player.Warp(positionX, positionY, (Directions)direction);
-            GameWorld.AddPlayer(playerIndex, player);
+            PlayerManager.AddPlayer(playerIndex, player);
 
-            if (playerIndex == Globals.MyIndex)
+            if (playerIndex == PlayerManager.MyIndex)
             {
                 player.Camera.SnapToTarget();
 
-                Globals.InGame = true;
+                Client.InGame = true;
             }
         }
 

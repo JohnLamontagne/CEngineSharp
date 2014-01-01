@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -29,13 +30,13 @@ namespace CEngineSharp_Client.Net
 
         public static void Disconnect()
         {
-            if (Globals.InGame)
+            if (Client.InGame)
             {
-                Globals.InGame = false;
+                Client.InGame = false;
 
-                RenderManager.SetRenderState(RenderStates.Render_Menu);
+                RenderManager.RenderState = RenderStates.Render_Menu;
 
-                GameWorld.ClearPlayers();
+                PlayerManager.ClearPlayers();
             }
 
             nettyClient.Disconnect();
@@ -48,13 +49,13 @@ namespace CEngineSharp_Client.Net
 
         private static void Handle_ConnectionLost()
         {
-            if (Globals.InGame)
+            if (Client.InGame)
             {
-                Globals.InGame = false;
+                Client.InGame = false;
 
-                RenderManager.SetRenderState(RenderStates.Render_Menu);
+                RenderManager.RenderState = RenderStates.Render_Menu;
 
-                GameWorld.ClearPlayers();
+                PlayerManager.ClearPlayers();
             }
         }
 

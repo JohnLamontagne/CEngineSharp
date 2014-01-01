@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
+using CEngineSharp_Client.World.Content_Managers;
 using SFML.Graphics;
 using SFML.Window;
 using System;
@@ -150,9 +151,7 @@ namespace CEngineSharp_Client.World
                                 }
 
                                 binaryWriter.Write(true);
-
-                                binaryWriter.Write((RenderManager.CurrentRenderer as GameRenderer).TextureManager.GetTileSetTextureIndex(this.tiles[x, y].GetLayer(layer).Sprite.Texture));
-
+                                binaryWriter.Write(RenderManager.TextureManager.GetTextureName(this.tiles[x, y].GetLayer(layer).Sprite.Texture));
                                 binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Left);
                                 binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Top);
                                 binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Width);
@@ -193,7 +192,7 @@ namespace CEngineSharp_Client.World
                             {
                                 if (binaryReader.ReadBoolean() == false) continue;
 
-                                int tileSetTextureIndex = binaryReader.ReadInt32();
+                                string tileSetTextureName = binaryReader.ReadString();
                                 int tileLeft = binaryReader.ReadInt32();
                                 int tileTop = binaryReader.ReadInt32();
                                 int tileWidth = binaryReader.ReadInt32();
@@ -201,7 +200,7 @@ namespace CEngineSharp_Client.World
 
                                 IntRect tileRect = new IntRect(tileLeft, tileTop, tileWidth, tileHeight);
 
-                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite((RenderManager.CurrentRenderer as GameRenderer).TextureManager.GetTileSetTexture(tileSetTextureIndex), tileRect), x, y));
+                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(RenderManager.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
                             }
                         }
                     }
@@ -211,7 +210,7 @@ namespace CEngineSharp_Client.World
 
         public void Draw(RenderWindow window)
         {
-            Camera camera = GameWorld.GetPlayer(Globals.MyIndex).Camera;
+            Camera camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
 
             int left = (int)(camera.ViewLeft / 32);
             int top = (int)(camera.ViewTop / 32);
@@ -225,7 +224,7 @@ namespace CEngineSharp_Client.World
             if (height > this.Height)
                 height = this.Height;
 
-            window.SetView(GameWorld.GetPlayer(Globals.MyIndex).Camera.GetView());
+            window.SetView(PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView());
 
             this.DrawLowerTiles(window, left, top, width, height);
 
@@ -250,8 +249,8 @@ namespace CEngineSharp_Client.World
 
         public void TryPickupItem()
         {
-            int x = GameWorld.GetPlayer(Globals.MyIndex).X * 32;
-            int y = GameWorld.GetPlayer(Globals.MyIndex).Y * 32;
+            int x = PlayerManager.GetPlayer(PlayerManager.MyIndex).X * 32;
+            int y = PlayerManager.GetPlayer(PlayerManager.MyIndex).Y * 32;
 
             MapItem mapItem = this.FindMapItem(new Vector2f(x, y));
 
@@ -276,7 +275,7 @@ namespace CEngineSharp_Client.World
 
         private void DrawPlayers(RenderWindow window, int left, int top, int width, int height)
         {
-            foreach (var player in GameWorld.GetPlayers())
+            foreach (var player in PlayerManager.GetPlayers())
             {
                 if (player.X >= left && player.X <= (left + width))
                 {

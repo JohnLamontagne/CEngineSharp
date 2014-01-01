@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SharpNetty;
 using System;
@@ -16,7 +17,7 @@ namespace CEngineSharp_Client.Net.Packets
                 int y = this.DataBuffer.ReadInteger();
                 Directions direction = (Directions)this.DataBuffer.ReadByte();
 
-                GameWorld.GetPlayer(playerIndex).Move(x, y, direction);
+                PlayerManager.GetPlayer(playerIndex).Move(x, y, direction);
             }
             catch (Exception)
             {

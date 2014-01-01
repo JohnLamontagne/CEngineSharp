@@ -41,7 +41,7 @@ namespace CEngineSharp_Client.Net.Packets
 
                             IntRect textureRect = new IntRect(left, top, width, height);
 
-                            Sprite tileSprite = new Sprite((RenderManager.CurrentRenderer as GameRenderer).TextureManager.GetTileSetTexture(textureNumber));
+                            Sprite tileSprite = new Sprite(RenderManager.TextureManager.GetTexture("tileset" + textureNumber.ToString()));
                             tileSprite.TextureRect = textureRect;
 
                             map.GetTile(x, y).SetLayer(layer, new Map.Tile.Layer(tileSprite, x, y));

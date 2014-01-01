@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SharpNetty;
 
@@ -17,9 +18,9 @@ namespace CEngineSharp_Client.Net.Packets
         {
             if (this.DataBuffer.ReadByte() == 1)
             {
-                Globals.MyIndex = this.DataBuffer.ReadInteger();
+                PlayerManager.MyIndex = this.DataBuffer.ReadInteger();
 
-                RenderManager.SetRenderState(RenderStates.Render_Game);
+                RenderManager.RenderState = RenderStates.Render_Game;
             }
             else
             {

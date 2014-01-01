@@ -180,6 +180,7 @@ namespace CEngineSharp_Server.World
 
         public void DropItem(int slotNum)
         {
+
             if (slotNum >= 0 || slotNum < _inventory.Count)
             {
                 Item item = _inventory[slotNum];
@@ -224,6 +225,7 @@ namespace CEngineSharp_Server.World
             this.GiveItem(ItemManager.GetItem(0));
 
             this.Map.SpawnItem(ItemManager.GetItem(0), 4, 4, 5000);
+            this.Map.SpawnItem(ItemManager.GetItem(1), 5, 5, 4000);
         }
 
         public void SendPlayerData()

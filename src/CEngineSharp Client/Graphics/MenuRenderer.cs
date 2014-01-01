@@ -1,7 +1,9 @@
 ﻿using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using SFML.Graphics;
+
 using SFML.Window;
+
 using System;
 using System.IO;
 using System.Threading;
@@ -11,33 +13,23 @@ namespace CEngineSharp_Client.Graphics
 {
     public class MenuRenderer : Renderer
     {
-        public MenuTextureManager TextureManager { get; private set; }
-
         private Sprite menuBackground;
 
         public MenuRenderer(RenderWindow window)
             : base(window)
         {
-            this.TextureManager = new MenuTextureManager();
-            this.TextureManager.LoadTextures();
-
-            this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
-
             this.CanRender = true;
         }
 
         public MenuRenderer()
         {
-            this.TextureManager = new MenuTextureManager();
-            this.TextureManager.LoadTextures();
-
-            this.menuBackground = new Sprite(this.TextureManager.MenuBackgroundTexture);
-
             this.CanRender = true;
         }
 
         protected override void LoadInterface()
         {
+            this.menuBackground = new Sprite(RenderManager.TextureManager.GetTexture("MenuBackground"));
+
             #region Status Label
 
             Label labelStatus = this.Gui.Add(new Label(), "labelStatus");
@@ -138,7 +130,6 @@ namespace CEngineSharp_Client.Graphics
             buttonBack.LeftMouseClickedCallback += buttonBack_LeftMouseClickedCallback;
 
             #endregion Back Button
-
         }
 
         public override void Render(GameTime gameTime)

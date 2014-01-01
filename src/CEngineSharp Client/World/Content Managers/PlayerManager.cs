@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace CEngineSharp_Client.World
+namespace CEngineSharp_Client.World.Content_Managers
 {
-    public static class GameWorld
+    public static class PlayerManager
     {
+        public static int MyIndex { get; set; }
+
         private static Dictionary<int, Player> _players = new Dictionary<int, Player>();
 
         public static int PlayerCount { get { return _players.Count; } }

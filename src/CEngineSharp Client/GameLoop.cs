@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using System;
 using System.Diagnostics;
 
@@ -10,18 +11,17 @@ namespace CEngineSharp_Client
     {
         public static void Start(GameTime gameTime)
         {
-
-            while (!Globals.ShuttingDown)
+            while (!Client.ShuttingDown)
             {
                 gameTime.Update();
 
                 Networking.ExecuteQueue();
 
-                if (Globals.InGame && GameWorld.GetPlayer(Globals.MyIndex) != null)
+                if (Client.InGame && PlayerManager.GetPlayer(PlayerManager.MyIndex) != null)
                 {
-                    GameWorld.GetPlayer(Globals.MyIndex).TryMove();
+                    PlayerManager.GetPlayer(PlayerManager.MyIndex).TryMove();
 
-                    foreach (var player in GameWorld.GetPlayers())
+                    foreach (var player in PlayerManager.GetPlayers())
                     {
                         player.Update(gameTime);
                     }

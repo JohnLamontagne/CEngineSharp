@@ -7,37 +7,29 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 {
     public class GameTextureManager : ITextureManager
     {
-        private Dictionary<string, Texture> characterTextures;
+        private Dictionary<string, Texture> _textures;
 
-        private List<Texture> tileSetTextures;
-
-        private List<Texture> itemTextures;
-
-        public Texture GetCharacterTexture(string textureName)
+        public Dictionary<string, Texture> GetTextures()
         {
-            return this.characterTextures[textureName];
+            return _textures;
         }
 
-        public Texture GetTileSetTexture(int index)
+        public Texture GetTexture(string textureName)
         {
-            return tileSetTextures[index];
+            return _textures[textureName];
         }
 
-        public Texture GetItemTexture(int index)
+        public string GetTextureName(Texture texture)
         {
-            return this.itemTextures[index];
-        }
+            foreach (KeyValuePair<string, Texture> value in _textures)
+                if (value.Value == texture) return value.Key;
 
-        public int GetTileSetTextureIndex(Texture texture)
-        {
-            return tileSetTextures.IndexOf(texture);
+            return null;
         }
 
         public void LoadTextures()
         {
-            this.characterTextures = new Dictionary<string, Texture>();
-            this.tileSetTextures = new List<Texture>();
-            this.itemTextures = new List<Texture>();
+            _textures = new Dictionary<string, Texture>();
 
             this.LoadCharacterTextures();
             this.LoadTileSetTextures();
@@ -50,7 +42,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
             foreach (var file in dI.GetFiles("*.png"))
             {
-                this.characterTextures.Add(file.Name.Remove(file.Name.Length - 4, 4), new Texture(file.FullName));
+                _textures.Add("character" + file.Name.Remove(file.Name.Length - 4, 4), new Texture(file.FullName));
             }
         }
 
@@ -60,7 +52,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
             foreach (var file in dI.GetFiles("*.png"))
             {
-                this.tileSetTextures.Add(new Texture(file.FullName));
+                _textures.Add("tileset" + file.Name.Remove(file.Name.Length - 4, 4), new Texture(file.FullName));
             }
         }
 
@@ -68,14 +60,22 @@ namespace CEngineSharp_Client.Graphics.TextureManager
         {
             DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Items/");
 
-            for (int i = 1; i < dI.GetFiles("*.png").Length; i++)
+            foreach (var file in dI.GetFiles("*.png"))
             {
-                this.itemTextures.Add(new Texture(dI.FullName + i + ".png"));
+                _textures.Add("item" + file.Name.Remove(file.Name.Length - 4, 4), new Texture(file.FullName));
             }
         }
 
         public void UnloadTextures()
         {
         }
+
+
+
+
+
+
+
+
     }
 }

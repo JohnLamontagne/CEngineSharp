@@ -8,8 +8,6 @@ namespace CEngineSharp_Server.Net.Packets
     {
         public void WriteData(Player player)
         {
-            //Console.WriteLine("BDLD");
-
             this.DataBuffer.WriteInteger(player.InventoryCount);
 
             foreach (var item in player.GetInventory())

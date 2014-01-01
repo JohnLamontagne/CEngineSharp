@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.Audio;
+using CEngineSharp_Client.Graphics.TextureManager;
 using System;
 
 namespace CEngineSharp_Client.Graphics
@@ -9,25 +10,37 @@ namespace CEngineSharp_Client.Graphics
 
         public static Renderer CurrentRenderer { get { return _renderer; } private set { _renderer = value; } }
 
+        public static int CurrentResolutionWidth { get; set; }
+
+        public static int CurrentResolutionHeight { get; set; }
+
+        public static ITextureManager TextureManager { get; private set; }
+
         private static RenderStates _renderstate;
+
+        private static bool _renderStateChanged = false;
+
+        public static RenderStates RenderState
+        {
+            get
+            {
+                return _renderstate;
+            }
+            set
+            {
+                _renderstate = value;
+                _renderStateChanged = true;
+            }
+        }
 
         public static long FrameTime { get; set; }
 
         private static long nextRenderTime;
 
-        public static void Init()
+        public static void Initiate()
         {
-            _renderer = new MenuRenderer();
-            _renderstate = RenderStates.Render_Menu;
+            RenderManager.RenderState = RenderStates.Render_Menu;
         }
-
-        public static void SetRenderState(RenderStates renderstate)
-        {
-            _renderstate = renderstate;
-            _renderStateChanged = true;
-        }
-
-        private static bool _renderStateChanged = false;
 
         public static void Render(GameTime gameTime)
         {
@@ -36,15 +49,32 @@ namespace CEngineSharp_Client.Graphics
                 switch (_renderstate)
                 {
                     case RenderStates.Render_Game:
-                        _renderer.Unload();
-                        RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
 
+                        if (_renderer != null)
+                            _renderer.Unload();
+
+                        RenderManager.TextureManager = new GameTextureManager();
+                        RenderManager.TextureManager.LoadTextures();
+                        RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
                         _renderStateChanged = false;
                         break;
 
                     case RenderStates.Render_Menu:
-                        _renderer.Unload();
-                        RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+
+                        if (_renderer != null)
+                        {
+                            _renderer.Unload();
+                            RenderManager.TextureManager = new MenuTextureManager();
+                            RenderManager.TextureManager.LoadTextures();
+                            RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+                        }
+                        else
+                        {
+                            RenderManager.TextureManager = new MenuTextureManager();
+                            RenderManager.TextureManager.LoadTextures();
+                            RenderManager.CurrentRenderer = new MenuRenderer();
+                        }
+
                         _renderStateChanged = false;
                         break;
                 }

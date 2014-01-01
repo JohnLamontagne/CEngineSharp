@@ -6,6 +6,11 @@ namespace CEngineSharp_Client
 {
     internal static class Client
     {
+        public static bool ShuttingDown { get; set; }
+
+        public static bool InGame { get; set; }
+
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -14,13 +19,11 @@ namespace CEngineSharp_Client
         {
             GameTime gameTime = new GameTime();
 
-            Globals.ShuttingDown = false;
-            Globals.KeyDirection = World.Entity.Directions.None;
-
+            Client.ShuttingDown = false;
 
             AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 
-            RenderManager.Init();
+            RenderManager.Initiate();
 
             GameLoop.Start(gameTime);
         }

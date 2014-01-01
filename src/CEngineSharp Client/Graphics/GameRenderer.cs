@@ -16,8 +16,6 @@ namespace CEngineSharp_Client.Graphics
         private int fpsTimer;
         private bool inventoryVisible;
 
-        public GameTextureManager TextureManager { get; private set; }
-
 
         public GameRenderer(RenderWindow window)
             : base(window)
@@ -27,11 +25,8 @@ namespace CEngineSharp_Client.Graphics
             _window.Resized += _window_Resized;
             _window.MouseButtonPressed += _window_MouseButtonPressed;
 
-            this.TextureManager = new GameTextureManager();
-            this.TextureManager.LoadTextures();
-
-            Globals.CurrentResolutionWidth = (int)_window.GetView().Size.X;
-            Globals.CurrentResolutionHeight = (int)_window.GetView().Size.Y;
+            RenderManager.CurrentResolutionWidth = (int)_window.GetView().Size.X;
+            RenderManager.CurrentResolutionHeight = (int)_window.GetView().Size.Y;
 
             this.CanRender = true;
         }
@@ -42,7 +37,7 @@ namespace CEngineSharp_Client.Graphics
 
             _window.Clear();
 
-            if (Globals.InGame)
+            if (Client.InGame)
             {
                 if (MapManager.Map != null)
                     MapManager.Map.Draw(_window);
@@ -50,12 +45,12 @@ namespace CEngineSharp_Client.Graphics
                 this.Gui.Draw();
 
                 if (this.inventoryVisible)
-                    GameWorld.GetPlayer(Globals.MyIndex).DrawInventory(_window);
+                    PlayerManager.GetPlayer(PlayerManager.MyIndex).DrawInventory(_window);
 
                 var healthBar = this.Gui.Get<LoadingBar>("healthBar");
-                if (GameWorld.GetPlayer(Globals.MyIndex).HP != healthBar.Value)
+                if (PlayerManager.GetPlayer(PlayerManager.MyIndex).HP != healthBar.Value)
                 {
-                    healthBar.Value = GameWorld.GetPlayer(Globals.MyIndex).HP;
+                    healthBar.Value = PlayerManager.GetPlayer(PlayerManager.MyIndex).HP;
                     healthBar.Text = "HP: " + healthBar.Value + "/" + healthBar.Maximum;
                 }
             }
@@ -158,6 +153,8 @@ namespace CEngineSharp_Client.Graphics
             healthBar.Size = new Vector2f(300, 20);
             healthBar.Position = new Vector2f(0, 10);
             healthBar.Maximum = 100;
+
+
         }
 
         private void buttonInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
@@ -170,67 +167,66 @@ namespace CEngineSharp_Client.Graphics
 
         private void picInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            GameWorld.GetPlayer(Globals.MyIndex).TryDropInventoryItem((int)e.Mouse.X, (int)e.Mouse.Y);
+            PlayerManager.GetPlayer(PlayerManager.MyIndex).TryDropInventoryItem((int)e.Mouse.X, (int)e.Mouse.Y);
         }
 
         private void _window_KeyReleased(object sender, KeyEventArgs e)
         {
+            Player player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
+
             switch (e.Code)
             {
                 case Keyboard.Key.Up:
-                    if (Globals.KeyDirection == Directions.Up)
-                    {
-                        Globals.KeyDirection = Directions.None;
-                    }
+                    if (player != null && player.Direction == Directions.Up)
+                        player.IsMoving = false;
                     break;
 
                 case Keyboard.Key.Down:
-                    if (Globals.KeyDirection == Directions.Down)
-                    {
-                        Globals.KeyDirection = Directions.None;
-                    }
+                    if (player != null && player.Direction == Directions.Down)
+                        player.IsMoving = false;
                     break;
 
                 case Keyboard.Key.Right:
-                    if (Globals.KeyDirection == Directions.Right)
-                    {
-                        Globals.KeyDirection = Directions.None;
-                    }
+                    if (player != null && player.Direction == Directions.Right)
+                        player.IsMoving = false;
                     break;
 
                 case Keyboard.Key.Left:
-                    if (Globals.KeyDirection == Directions.Left)
-                    {
-                        Globals.KeyDirection = Directions.None;
-                    }
+                    if (player != null && player.Direction == Directions.Left)
+                        player.IsMoving = false;
                     break;
             }
         }
 
         private void _window_KeyPressed(object sender, KeyEventArgs e)
         {
+            Player player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
+
             switch (e.Code)
             {
                 case Keyboard.Key.Up:
-                    Globals.KeyDirection = Directions.Up;
+
+                    player.Direction = Directions.Up;
+                    player.IsMoving = true;
                     break;
 
                 case Keyboard.Key.Down:
-                    Globals.KeyDirection = Directions.Down;
-
+                    player.Direction = Directions.Down;
+                    player.IsMoving = true;
                     break;
 
                 case Keyboard.Key.Right:
-                    Globals.KeyDirection = Directions.Right;
-
+                    player.Direction = Directions.Right;
+                    player.IsMoving = true;
                     break;
 
                 case Keyboard.Key.Left:
-                    Globals.KeyDirection = Directions.Left;
+                    player.Direction = Directions.Left;
+                    player.IsMoving = true;
                     break;
 
                 case Keyboard.Key.Space:
-                    if (Globals.InGame)
+                    if (Client.InGame)
                         MapManager.Map.TryPickupItem();
                     break;
             }
@@ -238,7 +234,7 @@ namespace CEngineSharp_Client.Graphics
 
         private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
         {
-            RenderManager.SetRenderState(RenderStates.Render_Menu);
+            RenderManager.RenderState = RenderStates.Render_Menu;
             Networking.Disconnect();
         }
 
@@ -264,11 +260,11 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Resized(object sender, SizeEventArgs e)
         {
-            //Globals.CurrentResolutionHeight = (int)e.Height;
-            //Globals.CurrentResolutionWidth = (int)e.Width;
+            //RenderManager.CurrentResolutionHeight = (int)e.Height;
+            //RenderManager.CurrentResolutionWidth = (int)e.Width;
 
-            //int offsetX = (int)(e.Width - GameWorld.GetPlayer(Globals.MyIndex).Camera.ViewWidth);
-            //int offsetY = (int)(e.Height - GameWorld.GetPlayer(Globals.MyIndex).Camera.ViewHeight);
+            //int offsetX = (int)(e.Width - PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.ViewWidth);
+            //int offsetY = (int)(e.Height - PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.ViewHeight);
         }
     }
 }

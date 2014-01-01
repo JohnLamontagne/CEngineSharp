@@ -13,7 +13,7 @@ namespace CEngineSharp_Client.World
         public Item(string name, int itemTextureNumber)
         {
             this.Name = name;
-            this.Sprite = new Sprite((RenderManager.CurrentRenderer as GameRenderer).TextureManager.GetItemTexture(itemTextureNumber));
+            this.Sprite = new Sprite(RenderManager.TextureManager.GetTexture("item" + itemTextureNumber));
         }
     }
 }

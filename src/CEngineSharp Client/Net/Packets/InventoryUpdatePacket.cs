@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SharpNetty;
 using System;
@@ -10,12 +11,9 @@ namespace CEngineSharp_Client.Net.Packets
     {
         public override void Execute(Netty netty)
         {
-            Console.WriteLine("Inventory update packet...");
-
-
             int inventoryItemCount = this.DataBuffer.ReadInteger();
 
-            Player player = GameWorld.GetPlayer(Globals.MyIndex);
+            Player player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
 
             player.ClearInventory();
 

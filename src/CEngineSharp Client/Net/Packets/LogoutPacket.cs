@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -11,16 +12,16 @@ namespace CEngineSharp_Client.Net.Packets
         {
             int playerIndex = this.DataBuffer.ReadInteger();
 
-            if (Globals.MyIndex == playerIndex)
+            if (PlayerManager.MyIndex == playerIndex)
             {
-                RenderManager.SetRenderState(RenderStates.Render_Menu);
+                RenderManager.RenderState = RenderStates.Render_Menu;
 
-                GameWorld.ClearPlayers();
+                PlayerManager.ClearPlayers();
 
                 return;
             }
 
-            GameWorld.RemovePlayer(playerIndex);
+            PlayerManager.RemovePlayer(playerIndex);
         }
 
         public override int PacketID

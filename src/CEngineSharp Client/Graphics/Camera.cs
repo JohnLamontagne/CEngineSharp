@@ -71,22 +71,22 @@ namespace CEngineSharp_Client.Graphics
 
             Vector2f center = this.GetCenter();
 
-            if (x >= (Globals.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2))
+            if (x >= (RenderManager.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
             {
                 center.X = x;
             }
-            else if (x > ((MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2)))
+            else if (x > ((MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2)))
             {
-                center.X = (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2);
+                center.X = (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2);
             }
 
-            if (y >= (Globals.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2))
+            if (y >= (RenderManager.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
             {
                 center.Y = y;
             }
-            else if (y > ((MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2)))
+            else if (y > ((MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2)))
             {
-                center.Y = (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2);
+                center.Y = (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2);
             }
 
             this.SetCenter(center);
@@ -101,7 +101,7 @@ namespace CEngineSharp_Client.Graphics
 
             Vector2f center = this.GetCenter();
 
-            if (x >= (Globals.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2))
+            if (x >= (RenderManager.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
             {
                 if (x < _view.Center.X)
                 {
@@ -113,7 +113,7 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (y >= (Globals.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2))
+            if (y >= (RenderManager.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
             {
                 if (y < _view.Center.Y)
                 {
@@ -125,17 +125,17 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (center.X < (Globals.CurrentResolutionWidth / 2))
-                center.X = Globals.CurrentResolutionWidth / 2;
+            if (center.X < (RenderManager.CurrentResolutionWidth / 2))
+                center.X = RenderManager.CurrentResolutionWidth / 2;
 
-            if (x >= (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2))
-                center.X = (MapManager.Map.Width * 32) - (Globals.CurrentResolutionWidth / 2);
+            if (x >= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
+                center.X = (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2);
 
-            if (center.Y < (Globals.CurrentResolutionHeight / 2))
-                center.Y = Globals.CurrentResolutionHeight / 2;
+            if (center.Y < (RenderManager.CurrentResolutionHeight / 2))
+                center.Y = RenderManager.CurrentResolutionHeight / 2;
 
-            if (y >= (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2))
-                center.Y = (MapManager.Map.Height * 32) - (Globals.CurrentResolutionHeight / 2);
+            if (y >= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
+                center.Y = (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2);
 
             this.SetCenter(center);
         }
