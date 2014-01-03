@@ -202,6 +202,9 @@ namespace CEngineSharp_Client.Graphics
         {
             Player player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
 
+            if (player == null)
+                return;
+
             switch (e.Code)
             {
                 case Keyboard.Key.Up:
@@ -260,11 +263,10 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Resized(object sender, SizeEventArgs e)
         {
-            //RenderManager.CurrentResolutionHeight = (int)e.Height;
-            //RenderManager.CurrentResolutionWidth = (int)e.Width;
+            RenderManager.CurrentResolutionHeight = (int)e.Height;
+            RenderManager.CurrentResolutionWidth = (int)e.Width;
 
-            //int offsetX = (int)(e.Width - PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.ViewWidth);
-            //int offsetY = (int)(e.Height - PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.ViewHeight);
+            PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView().Size = new Vector2f(RenderManager.CurrentResolutionWidth, RenderManager.CurrentResolutionHeight);
         }
     }
 }

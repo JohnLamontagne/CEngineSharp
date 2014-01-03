@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Server;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Entities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;

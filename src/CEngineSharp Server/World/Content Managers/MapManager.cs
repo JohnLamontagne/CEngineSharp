@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World.Maps;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace CEngineSharp_Server.World.Content_Managers
 
             foreach (var mapFile in fileInfo)
             {
-                _maps.Add(MapManager.LoadMap(mapFile.Name));
+                _maps.Add(MapManager.LoadMap(mapFile.FullName));
             }
 
             Console.WriteLine("Loaded {0} maps", fileInfo.Count());
@@ -44,7 +45,7 @@ namespace CEngineSharp_Server.World.Content_Managers
         {
             Map map = new Map();
 
-            using (FileStream fileStream = new FileStream(Constants.FILEPATH_MAPS + fileName, FileMode.Open))
+            using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
             {
                 using (BinaryReader binaryReader = new BinaryReader(fileStream))
                 {
@@ -65,7 +66,7 @@ namespace CEngineSharp_Server.World.Content_Managers
 
                             map.GetTile(x, y).Blocked = binaryReader.ReadBoolean();
 
-                            foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
+                            foreach (Layers layer in Enum.GetValues(typeof(Layers)))
                             {
                                 if (binaryReader.ReadBoolean() == false) continue;
 
@@ -75,9 +76,10 @@ namespace CEngineSharp_Server.World.Content_Managers
                                 int tileWidth = binaryReader.ReadInt32();
                                 int tileHeight = binaryReader.ReadInt32();
 
-                                map.GetTile(x, y).Layers[(int)layer] = new Map.Tile.Layer();
-                                map.GetTile(x, y).Layers[(int)layer].SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth);
-                                map.GetTile(x, y).Layers[(int)layer].TextureNumber = tileSetTextureIndex;
+                                var tileLayer = map.GetTile(x, y).GetLayer(layer);
+                                tileLayer = new Map.Tile.Layer();
+                                tileLayer.SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth);
+                                tileLayer.TextureNumber = tileSetTextureIndex;
                             }
                         }
                     }

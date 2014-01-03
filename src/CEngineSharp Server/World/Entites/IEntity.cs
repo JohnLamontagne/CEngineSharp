@@ -17,6 +17,12 @@ namespace CEngineSharp_Server.World.Entities
             set;
         }
 
+        int TextureNumber
+        {
+            get;
+            set;
+        }
+
         ushort GetVital(Vitals vital);
 
         void SetVital(Vitals vital, ushort value);

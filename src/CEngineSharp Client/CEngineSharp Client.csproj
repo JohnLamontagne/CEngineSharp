@@ -73,7 +73,7 @@
     </Reference>
     <Reference Include="tguinet, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Downloads\TGUI.Net-master\TGUI.Net-master\lib\x86\tguinet.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\Program. related files\TGUI.Net-master\TGUI.Net-master\lib\x86\tguinet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

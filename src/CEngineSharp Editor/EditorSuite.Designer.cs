@@ -35,6 +35,7 @@
             this.editorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.itemEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.npcEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -76,7 +77,8 @@
             // 
             this.editorsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mapEditorToolStripMenuItem,
-            this.itemEditorToolStripMenuItem});
+            this.itemEditorToolStripMenuItem,
+            this.npcEditorToolStripMenuItem});
             this.editorsToolStripMenuItem.Name = "editorsToolStripMenuItem";
             this.editorsToolStripMenuItem.Size = new System.Drawing.Size(55, 20);
             this.editorsToolStripMenuItem.Text = "Editors";
@@ -94,6 +96,13 @@
             this.itemEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.itemEditorToolStripMenuItem.Text = "Item Editor";
             this.itemEditorToolStripMenuItem.Click += new System.EventHandler(this.itemEditorToolStripMenuItem_Click);
+            // 
+            // npcEditorToolStripMenuItem
+            // 
+            this.npcEditorToolStripMenuItem.Name = "npcEditorToolStripMenuItem";
+            this.npcEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.npcEditorToolStripMenuItem.Text = "Npc Editor";
+            this.npcEditorToolStripMenuItem.Click += new System.EventHandler(this.npcEditorToolStripMenuItem_Click);
             // 
             // EditorSuite
             // 
@@ -120,6 +129,7 @@
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem itemEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem npcEditorToolStripMenuItem;
     }
 }
 

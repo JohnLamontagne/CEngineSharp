@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Maps;
 using SharpNetty;
 using System;
 
@@ -21,20 +22,20 @@ namespace CEngineSharp_Server.Net.Packets
                 {
                     this.DataBuffer.WriteBool(map.GetTile(x, y).Blocked);
 
-                    foreach (Map.Layers layer in Enum.GetValues(typeof(Map.Layers)))
+                    foreach (Layers layer in Enum.GetValues(typeof(Layers)))
                     {
-                        if (map.GetTile(x, y).Layers[(int)layer] == null)
+                        if (map.GetTile(x, y).GetLayer(layer) == null)
                         {
                             this.DataBuffer.WriteBool(false);
                             continue;
                         }
 
                         this.DataBuffer.WriteBool(true);
-                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].TextureNumber);
-                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Left);
-                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Top);
-                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Width);
-                        this.DataBuffer.WriteInteger(map.GetTile(x, y).Layers[(int)layer].SpriteRect.Height);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).TextureNumber);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Left);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Top);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Width);
+                        this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Height);
                     }
                 }
             }

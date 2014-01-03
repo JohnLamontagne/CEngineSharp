@@ -5,11 +5,12 @@ using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using CEngineSharp_Server.World.Entities;
+using CEngineSharp_Server.World.Maps;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
 
-namespace CEngineSharp_Server.World
+namespace CEngineSharp_Server.World.Entities
 {
     public class Player : IEntity
     {
@@ -195,7 +196,7 @@ namespace CEngineSharp_Server.World
 
         public void TryPickupItem(Vector2i mapItemPos)
         {
-            Map.MapItem mapItem = this.Map.GetMapItem(mapItemPos);
+            MapItem mapItem = this.Map.GetMapItem(mapItemPos);
 
             if (mapItem == null) return;
 
@@ -269,17 +270,9 @@ namespace CEngineSharp_Server.World
         {
         }
 
-        public int GetDamage()
-        {
-            Random random = new Random();
 
-            return (int)((this.GetStat(Stats.Strength) * random.NextDouble()) + random.Next(1, 10));
-        }
 
-        public void Interact(IEntity interactor)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public void SendPacket(Packet packet)
         {
@@ -307,5 +300,34 @@ namespace CEngineSharp_Server.World
             chatMessagePacket.WriteData(message);
             this.SendPacket(chatMessagePacket);
         }
+
+
+        public int TextureNumber
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+
+
+        public void Interact(IEntity interactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetDamage()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
     }
 }

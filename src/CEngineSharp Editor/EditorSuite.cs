@@ -7,6 +7,7 @@ namespace CEngineSharp_Editor
     {
         private MapEditor mapEditor;
         private ItemEditor itemEditor;
+        private NpcEditor npcEditor;
 
         private string dataPath;
 
@@ -27,9 +28,14 @@ namespace CEngineSharp_Editor
             this.itemEditor = null;
         }
 
+        private void npcEditor_Disposed(object sender, EventArgs e)
+        {
+            this.npcEditor = null;
+        }
+
         private void mapEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.mapEditor == null)
+            if (mapEditor == null)
             {
                 if (string.IsNullOrEmpty(this.dataPath))
                     LoadDataPath();
@@ -73,5 +79,21 @@ namespace CEngineSharp_Editor
                 this.itemEditor.Show();
             }
         }
+
+        private void npcEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.npcEditor == null)
+            {
+                if (string.IsNullOrEmpty(this.dataPath))
+                    LoadDataPath();
+
+                this.npcEditor = new NpcEditor(this.dataPath);
+                this.npcEditor.Disposed += npcEditor_Disposed;
+                this.npcEditor.MdiParent = this;
+                this.npcEditor.Show();
+            }
+        }
+
+
     }
 }

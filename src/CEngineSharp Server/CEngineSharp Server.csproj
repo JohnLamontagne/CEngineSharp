@@ -77,13 +77,18 @@
     <Compile Include="Utilities\Vector2i.cs" />
     <Compile Include="World\Content Managers\ItemManager.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
-    <Compile Include="World\Entity\IEntity.cs" />
-    <Compile Include="World\Entity\Player.cs" />
+    <Compile Include="World\Content Managers\NpcManager.cs" />
+    <Compile Include="World\Entites\IEntity.cs" />
+    <Compile Include="World\Entites\MapNpc.cs" />
+    <Compile Include="World\Entites\Npc.cs" />
+    <Compile Include="World\Entites\Player.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
     <Compile Include="World\Item.cs" />
-    <Compile Include="World\Map.cs" />
-    <Compile Include="World\Stats.cs" />
-    <Compile Include="World\Vitals.cs" />
+    <Compile Include="World\Maps\Layers.cs" />
+    <Compile Include="World\Maps\Map.cs" />
+    <Compile Include="World\Maps\MapItem.cs" />
+    <Compile Include="World\Entites\Stats.cs" />
+    <Compile Include="World\Entites\Vitals.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

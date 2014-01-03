@@ -9,7 +9,6 @@ namespace CEngineSharp_Client.Graphics
     public class Camera
     {
         private View _view;
-        private Player _target;
 
         public Player Target { get; set; }
 
@@ -25,16 +24,6 @@ namespace CEngineSharp_Client.Graphics
         {
             this._view = new View((RenderManager.CurrentRenderer as GameRenderer).GetWindow().DefaultView);
             this.Target = target;
-        }
-
-        public void SetTarget(Player target)
-        {
-            _target = target;
-        }
-
-        public Player GetTarget()
-        {
-            return _target;
         }
 
         public void SetCenter(Vector2f center)

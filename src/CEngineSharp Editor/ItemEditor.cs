@@ -64,7 +64,7 @@ namespace CEngineSharp_Editor
             {
                 Item item = new Item();
                 item.Name = "Untitled";
-                item.TextureNumber = 1;
+                item.TextureNumber = 0;
                 this.items.Add(item);
                 this.itemListBox.Items.Add(item.Name);
             }

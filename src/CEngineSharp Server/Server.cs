@@ -104,10 +104,11 @@ namespace CEngineSharp_Server
 
             // Check to make sure the file for storing players name is there.
             if (!File.Exists(Constants.FILEPATH_DATA + "names.txt")) File.Create(Constants.FILEPATH_DATA + "names.txt").Close();
-            
+
 
             MapManager.LoadMaps();
             ItemManager.LoadItems();
+            NpcManager.LoadNpcs();
         }
 
         public static void SaveWorld()

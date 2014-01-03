@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Maps;
 using SharpNetty;
 using System;
 
@@ -6,7 +7,7 @@ namespace CEngineSharp_Server.Net.Packets
 {
     public class SpawnMapItemPacket : Packet
     {
-        public void WriteData(Map.MapItem mapItem)
+        public void WriteData(MapItem mapItem)
         {
             this.DataBuffer.WriteString(mapItem.Item.Name);
             this.DataBuffer.WriteInteger(mapItem.Item.TextureNumber);

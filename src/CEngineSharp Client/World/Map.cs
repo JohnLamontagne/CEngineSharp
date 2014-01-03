@@ -223,7 +223,6 @@ namespace CEngineSharp_Client.World
 
             if (height > this.Height)
                 height = this.Height;
-
             window.SetView(PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView());
 
             this.DrawLowerTiles(window, left, top, width, height);

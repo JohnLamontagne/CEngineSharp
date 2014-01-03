@@ -1,4 +1,4 @@
-﻿namespace CEngineSharp_Server.World
+﻿namespace CEngineSharp_Server.World.Entities
 {
     public enum Stats
     {
