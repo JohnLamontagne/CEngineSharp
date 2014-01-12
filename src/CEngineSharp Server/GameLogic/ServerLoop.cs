@@ -46,7 +46,7 @@ namespace CEngineSharp_Server.GameLogic
                 if (lastConsoleTitleUpdateTime <= GameTime.GetTotalTimeElapsed())
                 {
                     Server.ServerWindow.SetTitle(ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" + ServerConfiguration.ServerPort + " - Player Count: " + PlayerManager.PlayerCount +
-                        " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Low ? "On" : "Off") + " - Cps: " + cps + "/sec");
+                        " - Debug Mode: " + (ServerConfiguration.SupressionLevel == ErrorHandler.ErrorLevels.Debug ? "On" : "Off") + " - Cps: " + cps + "/sec");
 
                     lastConsoleTitleUpdateTime = GameTime.GetTotalTimeElapsed() + 500;
                 }

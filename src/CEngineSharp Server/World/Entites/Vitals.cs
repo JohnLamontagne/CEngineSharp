@@ -3,7 +3,6 @@
     public enum Vitals
     {
         HitPoints,
-        ManaPoints,
-        Energy
+        ManaPoints
     }
 }

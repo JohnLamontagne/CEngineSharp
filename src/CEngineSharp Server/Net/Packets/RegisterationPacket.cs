@@ -46,12 +46,13 @@ namespace CEngineSharp_Server.Net.Packets
                 }
                 else
                 {
-                    Networking.RemoveConnection(this.SocketIndex);
+                    Networking.KickPlayer(this.SocketIndex);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
+                Networking.KickPlayer(this.SocketIndex);
             }
         }
 

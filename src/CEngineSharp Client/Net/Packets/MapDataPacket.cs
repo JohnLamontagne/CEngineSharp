@@ -17,7 +17,7 @@ namespace CEngineSharp_Client.Net.Packets
 
             map.Version = this.DataBuffer.ReadInteger();
 
-            map.ResizeMap(DataBuffer.ReadInteger(), DataBuffer.ReadInteger());
+            map.ResizeMap(this.DataBuffer.ReadInteger(), this.DataBuffer.ReadInteger());
 
             while (RenderManager.CurrentRenderer is MenuRenderer) ;
 

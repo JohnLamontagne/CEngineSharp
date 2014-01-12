@@ -38,6 +38,7 @@ namespace CEngineSharp_Editor
             [Browsable(false)]
             public int MapEditorHeight { get { return _mapEditor.mapDisplayPicture.Height / 32; } }
 
+            [CategoryAttribute("Tile Settings")]
             public bool TileBlockedAttribute { get; set; }
 
             [CategoryAttribute("Map Properties")]
@@ -268,9 +269,5 @@ namespace CEngineSharp_Editor
             }
         }
 
-        private void blockedTileCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            this.mapEditorProperties.TileBlockedAttribute = blockedTileCheckBox.Checked;
-        }
     }
 }

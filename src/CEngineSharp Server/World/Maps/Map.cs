@@ -36,6 +36,11 @@ namespace CEngineSharp_Server.World.Maps
             {
                 return this.layers[(int)layer];
             }
+
+            public void SetLayer(Layer layerValue, Layers layer)
+            {
+                this.layers[(int)layer] = layerValue;
+            }
         }
 
         private List<Player> players;
@@ -182,9 +187,10 @@ namespace CEngineSharp_Server.World.Maps
             return this.mapNpcs.ToArray();
         }
 
-        public void SpawnMapNpc(Npc npc)
+        public void SpawnMapNpc(Npc npc, Vector2i position)
         {
-            this.mapNpcs.Add(new MapNpc(npc));
+
+            this.mapNpcs.Add(new MapNpc(npc, position));
 
             // TODO: send the spawn packet.
         }
@@ -217,7 +223,7 @@ namespace CEngineSharp_Server.World.Maps
             {
                 if (checkPlayerLoaded)
                 {
-                    if (!player.GetInMap())
+                    if (!player.InMap)
                         continue;
                 }
 

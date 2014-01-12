@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace CEngineSharp_Editor
@@ -8,6 +9,7 @@ namespace CEngineSharp_Editor
         private MapEditor mapEditor;
         private ItemEditor itemEditor;
         private NpcEditor npcEditor;
+        private PlayerEditor playerEditor;
 
         private string dataPath;
 
@@ -64,6 +66,11 @@ namespace CEngineSharp_Editor
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             dialog.ShowDialog();
             this.dataPath = dialog.SelectedPath;
+
+            if (!Directory.Exists(this.dataPath + "/Characters/")) Directory.CreateDirectory(this.dataPath + "/Npcs/");
+            if (!Directory.Exists(this.dataPath + "/Characters/")) Directory.CreateDirectory(this.dataPath + "/Items/");
+            if (!Directory.Exists(this.dataPath + "/Characters/")) Directory.CreateDirectory(this.dataPath + "/Maps/");
+            if (!Directory.Exists(this.dataPath + "/Characters/")) Directory.CreateDirectory(this.dataPath + "/Accounts/");
         }
 
         private void itemEditorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -91,6 +98,20 @@ namespace CEngineSharp_Editor
                 this.npcEditor.Disposed += npcEditor_Disposed;
                 this.npcEditor.MdiParent = this;
                 this.npcEditor.Show();
+            }
+        }
+
+        private void playerEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.playerEditor == null)
+            {
+                if (string.IsNullOrEmpty(this.dataPath))
+                    LoadDataPath();
+
+                this.playerEditor = new PlayerEditor(this.dataPath);
+                this.playerEditor.Disposed += npcEditor_Disposed;
+                this.playerEditor.MdiParent = this;
+                this.playerEditor.Show();
             }
         }
 

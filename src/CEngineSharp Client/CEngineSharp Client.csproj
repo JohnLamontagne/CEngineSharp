@@ -100,6 +100,7 @@
     <Compile Include="Net\Packets\LogoutPacket.cs" />
     <Compile Include="Net\Packets\MapCheckPacket.cs" />
     <Compile Include="Net\Packets\MapDataPacket.cs" />
+    <Compile Include="Net\Packets\MapNpcsPacket.cs" />
     <Compile Include="Net\Packets\MovementPacket.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="Net\Packets\PlayerDataPacket.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
     <Compile Include="World\Entity\Directions.cs" />
+    <Compile Include="World\Entity\Npc.cs" />
     <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Entity\Player.cs" />

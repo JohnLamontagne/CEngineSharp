@@ -23,14 +23,14 @@ namespace CEngineSharp_Server.World.Entities
         }
 
         private SharpNetty.NettyServer.Connection _connection;
-        private ushort[] _vitals = new ushort[(int)Vitals.Energy + 1];
-        private ushort[] _stats = new ushort[(int)Stats.Strength + 1];
+        private int[] _vitals = new int[(int)Vitals.ManaPoints + 1];
+        private int[] _stats = new int[(int)Stats.Strength + 1];
         private readonly int _playerIndex;
         private List<Item> _inventory = new List<Item>();
 
         public string Name { get; set; }
 
-        public ushort Level { get; set; }
+        public int Level { get; set; }
 
         public bool LoggedIn { get; set; }
 
@@ -48,7 +48,9 @@ namespace CEngineSharp_Server.World.Entities
 
         public byte Direction { get; set; }
 
-        private bool inMap;
+        public bool InMap { get; set; }
+
+        public int TextureNumber { get; set; }
 
         public SharpNetty.NettyServer.Connection Connection { get { return _connection; } }
 
@@ -78,32 +80,22 @@ namespace CEngineSharp_Server.World.Entities
 
         public int InventoryCount { get { return _inventory.Count; } }
 
-        public void SetInMap(bool value)
-        {
-            this.inMap = value;
-        }
-
-        public bool GetInMap()
-        {
-            return this.inMap;
-        }
-
-        public ushort GetVital(Vitals vital)
+        public int GetVital(Vitals vital)
         {
             return _vitals[(int)vital];
         }
 
-        public void SetVital(Vitals vital, ushort value)
+        public void SetVital(Vitals vital, int value)
         {
             _vitals[(int)vital] = value;
         }
 
-        public ushort GetStat(Stats stat)
+        public int GetStat(Stats stat)
         {
             return _stats[(int)stat];
         }
 
-        public void SetStat(Stats stat, ushort value)
+        public void SetStat(Stats stat, int value)
         {
             _stats[(int)stat] = value;
         }
@@ -122,6 +114,16 @@ namespace CEngineSharp_Server.World.Entities
 
             // Respawn the player.
             this.Respawn();
+        }
+
+        public void Interact(IEntity interactor)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetDamage()
+        {
+            throw new NotImplementedException();
         }
 
         public void MoveTo(Vector2i vector, byte direction)
@@ -153,7 +155,7 @@ namespace CEngineSharp_Server.World.Entities
             {
                 _inventory.Add(item);
 
-                if (this.inMap)
+                if (this.InMap)
                     this.SendInventory();
 
                 this.SendMessage("You have received " + item.Name);
@@ -270,10 +272,6 @@ namespace CEngineSharp_Server.World.Entities
         {
         }
 
-
-
-
-
         public void SendPacket(Packet packet)
         {
             _connection.SendPacket(packet);
@@ -287,7 +285,9 @@ namespace CEngineSharp_Server.World.Entities
             map.AddPlayer(this);
             this.Map = map;
 
-            this.inMap = false;
+            this.Map.SpawnMapNpc(NpcManager.GetNpc(0), new Vector2i(5, 5));
+
+            this.InMap = false;
 
             MapCheckPacket mapCheckPacket = new MapCheckPacket();
             mapCheckPacket.WriteData(this.Map.Name, this.Map.Version);
@@ -301,33 +301,11 @@ namespace CEngineSharp_Server.World.Entities
             this.SendPacket(chatMessagePacket);
         }
 
-
-        public int TextureNumber
+        public void SendMapNpcs()
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            var mapNpcsPacket = new MapNpcsPacket();
+            mapNpcsPacket.WriteData(this.Map);
+            this.SendPacket(mapNpcsPacket);
         }
-
-
-
-
-        public void Interact(IEntity interactor)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetDamage()
-        {
-            throw new NotImplementedException();
-        }
-
-
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.World.Content_Managers;
+﻿using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World.Content_Managers;
 using SharpNetty;
 using System;
 
@@ -8,9 +9,16 @@ namespace CEngineSharp_Server.Net.Packets
     {
         public void WriteData(string message)
         {
-            this.DataBuffer.Flush();
+            try
+            {
+                this.DataBuffer.Flush();
 
-            this.DataBuffer.WriteString(message);
+                this.DataBuffer.WriteString(message);
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
+            }
         }
 
         public override void Execute(Netty netty)
@@ -26,7 +34,7 @@ namespace CEngineSharp_Server.Net.Packets
 
             catch (Exception ex)
             {
-                Console.WriteLine("Chat Message Error: " + ex.StackTrace);
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
             }
         }
 

@@ -200,10 +200,9 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_KeyPressed(object sender, KeyEventArgs e)
         {
-            Player player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
+            if (!Client.InGame) return;
 
-            if (player == null)
-                return;
+            var player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
 
             switch (e.Code)
             {
@@ -229,8 +228,12 @@ namespace CEngineSharp_Client.Graphics
                     break;
 
                 case Keyboard.Key.Space:
-                    if (Client.InGame)
-                        MapManager.Map.TryPickupItem();
+                    MapManager.Map.TryPickupItem();
+                    break;
+
+                case Keyboard.Key.LShift:
+                    var mapNpc = MapManager.Map.GetMapNpc(0);
+                    mapNpc.Move(mapNpc.X + 1, mapNpc.Y, Directions.Right);
                     break;
             }
         }

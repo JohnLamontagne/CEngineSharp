@@ -76,10 +76,10 @@ namespace CEngineSharp_Server.World.Content_Managers
                                 int tileWidth = binaryReader.ReadInt32();
                                 int tileHeight = binaryReader.ReadInt32();
 
-                                var tileLayer = map.GetTile(x, y).GetLayer(layer);
-                                tileLayer = new Map.Tile.Layer();
+                                var tileLayer = new Map.Tile.Layer();
                                 tileLayer.SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth);
                                 tileLayer.TextureNumber = tileSetTextureIndex;
+                                map.GetTile(new Vector2i(x, y)).SetLayer(tileLayer, layer);
                             }
                         }
                     }

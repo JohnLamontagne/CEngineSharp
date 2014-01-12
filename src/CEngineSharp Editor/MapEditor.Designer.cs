@@ -42,11 +42,8 @@
             this.clearMapButton = new System.Windows.Forms.Button();
             this.mapScrollX = new System.Windows.Forms.HScrollBar();
             this.mapScrollY = new System.Windows.Forms.VScrollBar();
-            this.attributesGroup = new System.Windows.Forms.GroupBox();
-            this.blockedTileCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.mapDisplayPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tileSetPicture)).BeginInit();
-            this.attributesGroup.SuspendLayout();
             this.SuspendLayout();
             // 
             // mapPropertyGrid
@@ -173,33 +170,11 @@
             this.mapScrollY.TabIndex = 15;
             this.mapScrollY.Scroll += new System.Windows.Forms.ScrollEventHandler(this.mapScrollY_Scroll);
             // 
-            // attributesGroup
-            // 
-            this.attributesGroup.Controls.Add(this.blockedTileCheckBox);
-            this.attributesGroup.Location = new System.Drawing.Point(332, 548);
-            this.attributesGroup.Name = "attributesGroup";
-            this.attributesGroup.Size = new System.Drawing.Size(276, 117);
-            this.attributesGroup.TabIndex = 16;
-            this.attributesGroup.TabStop = false;
-            this.attributesGroup.Text = "Attributes";
-            // 
-            // blockedTileCheckBox
-            // 
-            this.blockedTileCheckBox.AutoSize = true;
-            this.blockedTileCheckBox.Location = new System.Drawing.Point(20, 29);
-            this.blockedTileCheckBox.Name = "blockedTileCheckBox";
-            this.blockedTileCheckBox.Size = new System.Drawing.Size(85, 17);
-            this.blockedTileCheckBox.TabIndex = 0;
-            this.blockedTileCheckBox.Text = "Blocked Tile";
-            this.blockedTileCheckBox.UseVisualStyleBackColor = true;
-            this.blockedTileCheckBox.CheckedChanged += new System.EventHandler(this.blockedTileCheckBox_CheckedChanged);
-            // 
             // MapEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1349, 677);
-            this.Controls.Add(this.attributesGroup);
             this.Controls.Add(this.mapScrollY);
             this.Controls.Add(this.mapScrollX);
             this.Controls.Add(this.clearMapButton);
@@ -220,8 +195,6 @@
             this.Load += new System.EventHandler(this.MapEditor_Load);
             ((System.ComponentModel.ISupportInitialize)(this.mapDisplayPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tileSetPicture)).EndInit();
-            this.attributesGroup.ResumeLayout(false);
-            this.attributesGroup.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -242,7 +215,5 @@
         private System.Windows.Forms.Button clearMapButton;
         private System.Windows.Forms.HScrollBar mapScrollX;
         private System.Windows.Forms.VScrollBar mapScrollY;
-        private System.Windows.Forms.GroupBox attributesGroup;
-        private System.Windows.Forms.CheckBox blockedTileCheckBox;
     }
 }

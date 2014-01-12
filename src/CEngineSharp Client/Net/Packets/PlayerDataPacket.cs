@@ -17,10 +17,11 @@ namespace CEngineSharp_Client.Net.Packets
             int positionX = this.DataBuffer.ReadInteger();
             int positionY = this.DataBuffer.ReadInteger();
             byte direction = this.DataBuffer.ReadByte();
+            int textureNumber = this.DataBuffer.ReadInteger();
 
             GameRenderer gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
 
-            Player player = new Player(RenderManager.TextureManager.GetTexture("character0"));
+            Player player = new Player(RenderManager.TextureManager.GetTexture("character" + textureNumber));
             player.Warp(positionX, positionY, (Directions)direction);
             PlayerManager.AddPlayer(playerIndex, player);
 

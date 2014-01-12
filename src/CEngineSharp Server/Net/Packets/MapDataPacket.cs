@@ -31,6 +31,7 @@ namespace CEngineSharp_Server.Net.Packets
                         }
 
                         this.DataBuffer.WriteBool(true);
+
                         this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).TextureNumber);
                         this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Left);
                         this.DataBuffer.WriteInteger(map.GetTile(x, y).GetLayer(layer).SpriteRect.Top);

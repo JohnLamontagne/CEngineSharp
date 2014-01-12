@@ -12,7 +12,7 @@ namespace CEngineSharp_Server.World.Entities
             set;
         }
 
-        public ushort Level
+        public int Level
         {
             get;
             set;
@@ -24,13 +24,19 @@ namespace CEngineSharp_Server.World.Entities
             set;
         }
 
+        public Vector2i Position
+        {
+            get;
+            set;
+        }
 
-        public ushort GetVital(Vitals vital)
+
+        public int GetVital(Vitals vital)
         {
             throw new NotImplementedException();
         }
 
-        public void SetVital(Vitals vital, ushort value)
+        public void SetVital(Vitals vital, int value)
         {
             throw new NotImplementedException();
         }
@@ -59,5 +65,8 @@ namespace CEngineSharp_Server.World.Entities
         {
             throw new NotImplementedException();
         }
+
+
+
     }
 }

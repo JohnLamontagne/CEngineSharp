@@ -1,13 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace CEngineSharp_Server.Utilities
 {
     public static class ErrorHandler
     {
+        public static bool DebugMode { get; set; }
+
         // Enum that will store the different ErrorLevels associated with exceptions.
         public enum ErrorLevels
         {
+            // Debug Mode: all errors are unhandled; this will jeopardize system stability.
+            Debug,
+
             // Signifies an error that will not jeopardize system stability.
             Low,
 
@@ -21,23 +28,38 @@ namespace CEngineSharp_Server.Utilities
         /// <summary>
         ///  Handles a server exception by logging it and, if neccessary, shutting down the server.
         /// </summary>
-        /// <param name="ex">The exception object that describes the error that has occured.</param>
+        /// <param name="exception">The exception object that describes the error that has occured.</param>
         /// <param name="errorLevel">The projected severity of the error that has occured.</param>
-        public static void HandleException(Exception ex, ErrorLevels errorLevel)
+        public static void HandleException(Exception exception, ErrorLevels errorLevel)
         {
-            // Invoke the method that will log our error in a log-file.
-            LogError(ex, errorLevel);
-
-            // If the error that has occured has an error level higher than what we're supressing,
-            // Notify the end user that the error is unrecoverable and shut everything down.
-            if ((int)errorLevel >= (int)ServerConfiguration.SupressionLevel)
+            try
             {
-                Console.WriteLine("An unrecoverable error has occured; please check the error log files for additional details.");
+                if (ServerConfiguration.SupressionLevel == ErrorLevels.Debug)
+                    throw new Exception("Debug Mode", exception);
 
-                // Set the ShuttingDown variable to true.
-                // This will notify the GameLoop that it is time to clean things up.
+                // Invoke the method that will log our error in a log-file.
+                LogError(exception, errorLevel);
+
+                // If the error that has occured has an error level higher than what we're supressing,
+                // Notify the end user that the error is unrecoverable and shut everything down.
+                if ((int)errorLevel >= (int)ServerConfiguration.SupressionLevel)
+                {
+                    Console.WriteLine("An unrecoverable error has occured; please check the error log files for additional details.");
+
+                    // Keep the program alive for 5 seconds.
+                    Thread.Sleep(5000);
+
+                    // Set the ShuttingDown variable to true.
+                    // This will notify the GameLoop that it is time to clean things up.
+                    Globals.ShuttingDown = true;
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(exception.StackTrace, "Fatal Error!");
                 Globals.ShuttingDown = true;
             }
+
         }
 
         private static void LogError(Exception ex, ErrorLevels errorLevel)

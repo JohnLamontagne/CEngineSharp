@@ -100,6 +100,9 @@ namespace CEngineSharp_Editor
         {
             this.textName.Text = this.selectedNpc.Name;
             this.npcSprite = new Sprite(new Texture(Constants.FILEPATH_GRAPHICS + "/Characters/" + this.selectedNpc.TextureNumber + ".png"));
+            this.textHP.Text = this.selectedNpc.HP.ToString();
+            this.textMP.Text = this.selectedNpc.MP.ToString();
+            this.textStrength.Text = this.selectedNpc.Strength.ToString();
         }
 
         public void SaveData()
@@ -188,6 +191,21 @@ namespace CEngineSharp_Editor
             this.selectedNpc = this.npcs[this.npcListBox.SelectedIndex];
 
             this.PopulateData();
+        }
+
+        private void textHP_TextChanged(object sender, EventArgs e)
+        {
+            this.selectedNpc.HP = int.Parse(textHP.Text);
+        }
+
+        private void textMP_TextChanged(object sender, EventArgs e)
+        {
+            this.selectedNpc.MP = int.Parse(textMP.Text);
+        }
+
+        private void textStrength_TextChanged(object sender, EventArgs e)
+        {
+            this.selectedNpc.Strength = int.Parse(textStrength.Text);
         }
     }
 }

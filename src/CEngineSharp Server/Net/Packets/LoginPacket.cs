@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.World;
+﻿using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using CEngineSharp_Server.World.Entities;
 using SharpNetty;
@@ -24,7 +25,8 @@ namespace CEngineSharp_Server.Net.Packets
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
+                Networking.KickPlayer(playerIndex);
             }
         }
 
@@ -56,10 +58,10 @@ namespace CEngineSharp_Server.Net.Packets
                     Networking.RemoveConnection(this.SocketIndex);
                 }
             }
-
-            catch (Exception)
+            catch (Exception ex)
             {
-                Networking.RemoveConnection(this.SocketIndex);
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
+                Networking.KickPlayer(this.SocketIndex);
             }
         }
 

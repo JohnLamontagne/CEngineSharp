@@ -18,6 +18,7 @@ namespace CEngineSharp_Server.Net.Packets
                 this.DataBuffer.WriteInteger(player.Position.X);
                 this.DataBuffer.WriteInteger(player.Position.Y);
                 this.DataBuffer.WriteByte(player.Direction);
+                this.DataBuffer.WriteInteger(player.TextureNumber);
             }
             catch (Exception ex)
             {

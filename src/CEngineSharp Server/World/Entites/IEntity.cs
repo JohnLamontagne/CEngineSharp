@@ -11,7 +11,7 @@ namespace CEngineSharp_Server.World.Entities
             set;
         }
 
-        ushort Level
+        int Level
         {
             get;
             set;
@@ -23,9 +23,15 @@ namespace CEngineSharp_Server.World.Entities
             set;
         }
 
-        ushort GetVital(Vitals vital);
+        Vector2i Position
+        {
+            get;
+            set;
+        }
 
-        void SetVital(Vitals vital, ushort value);
+        int GetVital(Vitals vital);
+
+        void SetVital(Vitals vital, int value);
 
         void Attack(IEntity attacker);
 

@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Server.World;
+﻿using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using CEngineSharp_Server.World.Entities;
 using SharpNetty;
@@ -43,7 +44,7 @@ namespace CEngineSharp_Server.Net.Packets
                 // The player is now in the map.
                 // Set their inMap variable to true.
                 // This is to make sure they're able to actually see the map before any map updates occur.
-                player.SetInMap(true);
+                player.InMap = true;
 
                 player.SendPlayerData();
 
@@ -57,6 +58,8 @@ namespace CEngineSharp_Server.Net.Packets
                     player.SendPacket(playerDataPacket);
                 }
 
+                player.SendMapNpcs();
+
                 // Send all of the items currently spawned in the map.
                 foreach (var mapItem in PlayerManager.GetPlayer(this.SocketIndex).Map.GetMapItems())
                 {
@@ -67,7 +70,7 @@ namespace CEngineSharp_Server.Net.Packets
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
             }
         }
 

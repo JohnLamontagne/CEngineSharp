@@ -18,8 +18,6 @@ namespace CEngineSharp_Server
 
         private ServerLoop _serverLoop;
 
-        private static Thread _serverLoopThread;
-
         private delegate void SetTitleDelegate(string value);
 
         private delegate void AddPlayerToTableDelegate(Player player);
@@ -61,8 +59,10 @@ namespace CEngineSharp_Server
             Networking.Start();
 
             _serverLoop = new ServerLoop();
-            _serverLoopThread = new Thread(_serverLoop.Start);
-            _serverLoopThread.Start();
+
+            Thread serverLoopThread = new Thread(_serverLoop.Start);
+            ThreadManager.AddThread(serverLoopThread, "serverLoopThread");
+            serverLoopThread.Start();
 
             this.textCommandInput.Select();
         }

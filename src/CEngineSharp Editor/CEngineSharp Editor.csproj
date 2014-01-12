@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Editor</RootNamespace>
     <AssemblyName>CEngineSharp Editor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -56,6 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PlayerEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerEditor.Designer.cs">
+      <DependentUpon>PlayerEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="EditorSuite.cs">
       <SubType>Form</SubType>
@@ -88,6 +94,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="World\Npc.cs" />
+    <Compile Include="World\Player.cs" />
+    <EmbeddedResource Include="PlayerEditor.resx">
+      <DependentUpon>PlayerEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorSuite.resx">
       <DependentUpon>EditorSuite.cs</DependentUpon>
     </EmbeddedResource>

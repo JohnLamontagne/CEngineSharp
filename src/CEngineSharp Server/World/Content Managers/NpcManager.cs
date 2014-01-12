@@ -12,12 +12,12 @@ namespace CEngineSharp_Server.World.Content_Managers
     {
         private static List<Npc> _npcs = new List<Npc>();
 
-        public Npc GetNpc(int npcIndex)
+        public static Npc GetNpc(int npcIndex)
         {
             return _npcs[npcIndex];
         }
 
-        public Npc GetNpc(string npcName)
+        public static Npc GetNpc(string npcName)
         {
             foreach (var npc in _npcs)
             {
@@ -28,7 +28,7 @@ namespace CEngineSharp_Server.World.Content_Managers
             return null;
         }
 
-        public Npc[] GetNpcs()
+        public static Npc[] GetNpcs()
         {
             return _npcs.ToArray();
         }

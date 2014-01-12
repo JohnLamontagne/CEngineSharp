@@ -49,7 +49,7 @@ namespace CEngineSharp_Client.Graphics
             #region Login Button
 
             Button loginButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogin");
-            loginButton.Position = new Vector2f(labelNews.Position.X, 500);
+            loginButton.Position = new Vector2f(100, 500);
             loginButton.Text = "Login";
             loginButton.LeftMouseClickedCallback += buttonLogin_LeftMouseClickedCallback;
 
@@ -58,7 +58,7 @@ namespace CEngineSharp_Client.Graphics
             #region Registration Button
 
             Button registrationButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonRegistration");
-            registrationButton.Position = new Vector2f(labelNews.Position.X + (labelNews.Size.X - registrationButton.Size.X), 500);
+            registrationButton.Position = new Vector2f(500, 500);
             registrationButton.Text = "Register";
             registrationButton.LeftMouseClickedCallback += buttonRegistration_LeftMouseClickedCallback;
 

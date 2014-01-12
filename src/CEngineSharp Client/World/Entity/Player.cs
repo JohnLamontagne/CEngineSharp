@@ -12,11 +12,11 @@ namespace CEngineSharp_Client.World.Entity
 {
     public class Player
     {
-        private readonly Sprite _sprite;
+        private readonly Sprite sprite;
 
         public Sprite PlayerSprite
         {
-            get { return _sprite; }
+            get { return this.sprite; }
         }
 
         public int X { get; private set; }
@@ -41,11 +41,11 @@ namespace CEngineSharp_Client.World.Entity
         {
             get
             {
-                return (byte)(_sprite.TextureRect.Left / 32);
+                return (byte)(this.sprite.TextureRect.Left / 32);
             }
             set
             {
-                _sprite.TextureRect = new IntRect(value * 32, (int)this.Direction * 32, 32, 32);
+                this.sprite.TextureRect = new IntRect(value * 32, (int)this.Direction * 32, 32, 32);
             }
         }
 
@@ -53,17 +53,17 @@ namespace CEngineSharp_Client.World.Entity
         {
             get
             {
-                return (Directions)(_sprite.TextureRect.Top / 32);
+                return (Directions)(sprite.TextureRect.Top / 32);
             }
             set
             {
-                _sprite.TextureRect = new IntRect(this.Step * 32, (int)value * 32, 32, 32);
+                this.sprite.TextureRect = new IntRect(this.Step * 32, (int)value * 32, 32, 32);
             }
         }
 
         public Player(Texture texture)
         {
-            _sprite = new Sprite(texture);
+            this.sprite = new Sprite(texture);
             _inventory = new List<Item>();
 
             this.Direction = Directions.Down;
@@ -140,8 +140,12 @@ namespace CEngineSharp_Client.World.Entity
         {
             this.Direction = direction;
 
+            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+
             this.X = newX;
             this.Y = newY;
+
+            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
 
             this.PlayerSprite.Position = new Vector2f(newX * 32, newY * 32);
         }
@@ -149,13 +153,12 @@ namespace CEngineSharp_Client.World.Entity
         public void Move(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
-            int oldX = this.X;
-            int oldY = this.Y;
+
+            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
 
             this.X = newX;
             this.Y = newY;
 
-            MapManager.Map.GetTile(oldX, oldY).IsOccupied = false;
             MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
 
             if (this.Step == 0)
@@ -308,7 +311,7 @@ namespace CEngineSharp_Client.World.Entity
 
         public void Draw(RenderWindow window)
         {
-            window.Draw(_sprite);
+            window.Draw(sprite);
         }
 
         public void DrawInventory(RenderWindow window)

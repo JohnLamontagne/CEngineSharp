@@ -2,6 +2,7 @@
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.World.Content_Managers;
+using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
 using SFML.Window;
 using System;
@@ -78,7 +79,10 @@ namespace CEngineSharp_Client.World
             }
         }
 
+
         private List<MapItem> items;
+
+        private List<Npc> mapNpcs;
 
         private Tile[,] tiles;
 
@@ -94,6 +98,7 @@ namespace CEngineSharp_Client.World
         {
             this.tiles = new Tile[0, 0];
             this.items = new List<MapItem>();
+            this.mapNpcs = new List<Npc>();
         }
 
         public Tile GetTile(int x, int y)
@@ -208,6 +213,11 @@ namespace CEngineSharp_Client.World
             }
         }
 
+        public Npc GetMapNpc(int index)
+        {
+            return this.mapNpcs[index];
+        }
+
         public void Draw(RenderWindow window)
         {
             Camera camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
@@ -223,6 +233,7 @@ namespace CEngineSharp_Client.World
 
             if (height > this.Height)
                 height = this.Height;
+
             window.SetView(PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView());
 
             this.DrawLowerTiles(window, left, top, width, height);
@@ -230,6 +241,8 @@ namespace CEngineSharp_Client.World
             this.DrawMapItems(window, left, top, width, height);
 
             this.DrawPlayers(window, left, top, width, height);
+
+            this.DrawNpcs(window, left, top, width, height);
 
             this.DrawUpperTiles(window, left, top, width, height);
 
@@ -270,6 +283,20 @@ namespace CEngineSharp_Client.World
             }
 
             return null;
+        }
+
+        private void DrawNpcs(RenderWindow window, int left, int top, int width, int height)
+        {
+            foreach (var npc in this.mapNpcs)
+            {
+                if (npc.X >= left && npc.X <= (left + width))
+                {
+                    if (npc.Y >= top && npc.Y <= (top + height))
+                    {
+                        npc.Draw(window);
+                    }
+                }
+            }
         }
 
         private void DrawPlayers(RenderWindow window, int left, int top, int width, int height)
@@ -336,6 +363,19 @@ namespace CEngineSharp_Client.World
                     if (this.tiles[x, y].GetLayer(Layers.Fringe2) != null)
                         window.Draw(this.tiles[x, y].GetLayer(Layers.Fringe2).Sprite);
                 }
+            }
+        }
+
+        public void SpawnMapNpc(Npc mapNpc)
+        {
+            this.mapNpcs.Add(mapNpc);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            foreach (var npc in this.mapNpcs)
+            {
+                npc.Update(gameTime);
             }
         }
     }

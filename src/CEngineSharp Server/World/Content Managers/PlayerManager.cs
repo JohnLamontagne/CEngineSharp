@@ -95,6 +95,7 @@ namespace CEngineSharp_Server.World.Content_Managers
             player.Name = name;
             player.Password = password;
             player.Level = 1;
+            player.TextureNumber = 0;
 
             foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
             {
@@ -123,11 +124,12 @@ namespace CEngineSharp_Server.World.Content_Managers
                     {
                         player.Name = br.ReadString();
                         player.Password = br.ReadString();
-                        player.Level = br.ReadUInt16();
+                        player.Level = br.ReadInt32();
+                        player.TextureNumber = br.ReadInt32();
 
                         foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
                         {
-                            player.SetVital(vital, br.ReadUInt16());
+                            player.SetVital(vital, br.ReadInt32());
                         }
 
                         player.Map = MapManager.GetMap(br.ReadInt32());
@@ -158,6 +160,7 @@ namespace CEngineSharp_Server.World.Content_Managers
                         bw.Write(player.Name);
                         bw.Write(player.Password);
                         bw.Write(player.Level);
+                        bw.Write(player.TextureNumber);
 
                         foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
                         {

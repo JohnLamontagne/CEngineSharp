@@ -25,8 +25,9 @@ namespace CEngineSharp_Client
                     {
                         player.Update(gameTime);
                     }
-                }
 
+                    MapManager.Map.Update(gameTime);
+                }
 
                 RenderManager.Render(gameTime);
 
