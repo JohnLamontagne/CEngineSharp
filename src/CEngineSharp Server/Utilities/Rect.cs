@@ -2,10 +2,10 @@
 {
     public class Rect
     {
-        private int _left;
-        private int _top;
-        private int _height;
-        private int _width;
+        private readonly int _left;
+        private readonly int _top;
+        private readonly int _height;
+        private readonly int _width;
 
         public int Left
         {

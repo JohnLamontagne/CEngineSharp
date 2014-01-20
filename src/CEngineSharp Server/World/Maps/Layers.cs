@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CEngineSharp_Server.World.Maps
+﻿namespace CEngineSharp_Server.World.Maps
 {
     public enum Layers
     {

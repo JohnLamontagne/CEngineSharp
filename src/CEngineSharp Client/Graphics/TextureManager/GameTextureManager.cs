@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CEngineSharp_Client.Graphics.TextureManager
 {
@@ -21,10 +22,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
         public string GetTextureName(Texture texture)
         {
-            foreach (KeyValuePair<string, Texture> value in _textures)
-                if (value.Value == texture) return value.Key;
-
-            return null;
+            return (from value in _textures where value.Value == texture select value.Key).FirstOrDefault();
         }
 
         public void LoadTextures()
@@ -38,7 +36,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
         private void LoadCharacterTextures()
         {
-            DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Characters/");
+            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Characters/");
 
             foreach (var file in dI.GetFiles("*.png"))
             {
@@ -48,7 +46,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
         private void LoadTileSetTextures()
         {
-            DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/TileSets/");
+            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/TileSets/");
 
             foreach (var file in dI.GetFiles("*.png"))
             {
@@ -58,7 +56,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
         private void LoadItemTextures()
         {
-            DirectoryInfo dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Items/");
+            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Items/");
 
             foreach (var file in dI.GetFiles("*.png"))
             {
@@ -69,13 +67,5 @@ namespace CEngineSharp_Client.Graphics.TextureManager
         public void UnloadTextures()
         {
         }
-
-
-
-
-
-
-
-
     }
 }

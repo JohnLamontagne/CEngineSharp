@@ -1,6 +1,7 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
+using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
@@ -8,6 +9,7 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CEngineSharp_Client.World
 {
@@ -80,9 +82,9 @@ namespace CEngineSharp_Client.World
         }
 
 
-        private List<MapItem> items;
+        private readonly List<MapItem> items;
 
-        private List<Npc> mapNpcs;
+        private readonly List<Npc> mapNpcs;
 
         private Tile[,] tiles;
 
@@ -170,16 +172,16 @@ namespace CEngineSharp_Client.World
 
         public void LoadCache(string mapName)
         {
-            using (FileStream fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + mapName + ".map", FileMode.OpenOrCreate))
+            using (var fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + mapName + ".map", FileMode.OpenOrCreate))
             {
-                using (BinaryReader binaryReader = new BinaryReader(fileStream))
+                using (var binaryReader = new BinaryReader(fileStream))
                 {
                     this.Name = binaryReader.ReadString();
 
                     this.Version = binaryReader.ReadInt32();
 
-                    int mapWidth = binaryReader.ReadInt32();
-                    int mapHeight = binaryReader.ReadInt32();
+                    var mapWidth = binaryReader.ReadInt32();
+                    var mapHeight = binaryReader.ReadInt32();
 
                     this.ResizeMap(mapWidth, mapHeight);
 
@@ -197,13 +199,13 @@ namespace CEngineSharp_Client.World
                             {
                                 if (binaryReader.ReadBoolean() == false) continue;
 
-                                string tileSetTextureName = binaryReader.ReadString();
-                                int tileLeft = binaryReader.ReadInt32();
-                                int tileTop = binaryReader.ReadInt32();
-                                int tileWidth = binaryReader.ReadInt32();
-                                int tileHeight = binaryReader.ReadInt32();
+                                var tileSetTextureName = binaryReader.ReadString();
+                                var tileLeft = binaryReader.ReadInt32();
+                                var tileTop = binaryReader.ReadInt32();
+                                var tileWidth = binaryReader.ReadInt32();
+                                var tileHeight = binaryReader.ReadInt32();
 
-                                IntRect tileRect = new IntRect(tileLeft, tileTop, tileWidth, tileHeight);
+                                var tileRect = new IntRect(tileLeft, tileTop, tileWidth, tileHeight);
 
                                 this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(RenderManager.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
                             }
@@ -220,13 +222,13 @@ namespace CEngineSharp_Client.World
 
         public void Draw(RenderWindow window)
         {
-            Camera camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
+            var camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
 
-            int left = (int)(camera.ViewLeft / 32);
-            int top = (int)(camera.ViewTop / 32);
+            var left = (int)(camera.ViewLeft / 32);
+            var top = (int)(camera.ViewTop / 32);
 
-            int width = left + (int)(camera.ViewWidth / 32) + 1;
-            int height = top + (int)(camera.ViewHeight / 32) + 1;
+            var width = left + (int)(camera.ViewWidth / 32) + 2;
+            var height = top + (int)(camera.ViewHeight / 32) + 1;
 
             if (width > this.Width)
                 width = this.Width;
@@ -261,59 +263,46 @@ namespace CEngineSharp_Client.World
 
         public void TryPickupItem()
         {
-            int x = PlayerManager.GetPlayer(PlayerManager.MyIndex).X * 32;
-            int y = PlayerManager.GetPlayer(PlayerManager.MyIndex).Y * 32;
+            var x = PlayerManager.GetPlayer(PlayerManager.MyIndex).Position.X * 32;
+            var y = PlayerManager.GetPlayer(PlayerManager.MyIndex).Position.Y * 32;
 
-            MapItem mapItem = this.FindMapItem(new Vector2f(x, y));
+            var mapItem = this.FindMapItem(new Vector2f(x, y));
 
-            if (mapItem != null)
-            {
-                PickupItemPacket pickupItemPacket = new PickupItemPacket();
-                pickupItemPacket.WriteData(mapItem);
-                Networking.SendPacket(pickupItemPacket);
-            }
+            if (mapItem == null) return;
+
+            var pickupItemPacket = new PickupItemPacket();
+            pickupItemPacket.WriteData(mapItem);
+            Networking.Instance.SendPacket(pickupItemPacket);
         }
 
         public MapItem FindMapItem(Vector2f position)
         {
-            foreach (var mapItem in this.items)
-            {
-                if (mapItem.Item.Sprite.Position.X == position.X && mapItem.Item.Sprite.Position.Y == position.Y)
-                    return mapItem;
-            }
-
-            return null;
+            return this.items.FirstOrDefault(mapItem => mapItem.Item.Sprite.Position.X == position.X && mapItem.Item.Sprite.Position.Y == position.Y);
         }
 
-        private void DrawNpcs(RenderWindow window, int left, int top, int width, int height)
+        private void DrawNpcs(RenderTarget window, int left, int top, int width, int height)
         {
             foreach (var npc in this.mapNpcs)
             {
-                if (npc.X >= left && npc.X <= (left + width))
-                {
-                    if (npc.Y >= top && npc.Y <= (top + height))
-                    {
-                        npc.Draw(window);
-                    }
-                }
+                if (npc.X < left || npc.X > (left + width)) continue;
+                if (npc.Y < top || npc.Y > (top + height)) continue;
+
+                npc.Draw(window);
             }
         }
 
-        private void DrawPlayers(RenderWindow window, int left, int top, int width, int height)
+        private void DrawPlayers(RenderTarget window, int left, int top, int width, int height)
         {
             foreach (var player in PlayerManager.GetPlayers())
             {
-                if (player.X >= left && player.X <= (left + width))
-                {
-                    if (player.Y >= top && player.Y <= (top + height))
-                    {
-                        player.Draw(window);
-                    }
-                }
+                if (player.Position.X < left || player.Position.X > (left + width)) continue;
+                if (player.Position.Y < top || player.Position.Y > (top + height)) continue;
+
+                player.Draw(window);
             }
         }
 
-        private void DrawMapItems(RenderWindow window, int left, int top, int width, int height)
+        private void DrawMapItems(RenderTarget window, int left, int top, int width, int height)
         {
             // Multiply the width, height, left, and top by 32 to bring it up to scale with the actual screen size (32x32 tiles).
             width *= 32;
@@ -333,7 +322,7 @@ namespace CEngineSharp_Client.World
             }
         }
 
-        private void DrawLowerTiles(RenderWindow window, int left, int top, int width, int height)
+        private void DrawLowerTiles(RenderTarget window, int left, int top, int width, int height)
         {
             for (int x = left; x < width; x++)
             {
@@ -351,7 +340,7 @@ namespace CEngineSharp_Client.World
             }
         }
 
-        private void DrawUpperTiles(RenderWindow window, int left, int top, int width, int height)
+        private void DrawUpperTiles(RenderTarget window, int left, int top, int width, int height)
         {
             for (int x = left; x < width; x++)
             {

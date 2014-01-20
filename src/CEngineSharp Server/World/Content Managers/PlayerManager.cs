@@ -1,226 +1,133 @@
-﻿using CEngineSharp_Server;
-using CEngineSharp_Server.Utilities;
-using CEngineSharp_Server.World;
+﻿using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Entities;
+using CEngineSharp_World;
+using CEngineSharp_World.Entities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CEngineSharp_Server.World.Content_Managers
 {
-    public static class PlayerManager
+    public sealed class PlayerManager
     {
-        private static Dictionary<int, Player> _players = new Dictionary<int, Player>();
+        private readonly Dictionary<int, Player> _players;
 
-        public static Player GetPlayer(int index)
+        public int PlayerCount { get { return _players.Count; } }
+
+        public PlayerManager()
         {
-            try
+            _players = new Dictionary<int, Player>();
+        }
+
+        public Player[] GetPlayers()
+        {
+            return _players.Values.ToArray();
+        }
+
+        public Player GetPlayer(string playerName)
+        {
+            return _players.Values.FirstOrDefault(player => playerName == player.Name);
+        }
+
+        public Player GetPlayer(int playerIndex)
+        {
+            return _players[playerIndex];
+        }
+
+        public void AddPlayer(Player player, int playerIndex)
+        {
+            _players.Add(playerIndex, player);
+        }
+
+        public void RemovePlayer(int playerIndex)
+        {
+            _players.Remove(playerIndex);
+        }
+
+        public void RemovePlayer(Player player)
+        {
+            _players.Remove(player.PlayerIndex);
+        }
+
+        public void SavePlayers()
+        {
+            foreach (var player in this.GetPlayers())
             {
-                return _players[index];
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public static Player[] GetPlayers()
-        {
-            Player[] players = new Player[_players.Count];
-            _players.Values.CopyTo(players, 0);
-            return players;
-        }
-
-        public static void AddPlayer(int socketIndex, Player player)
-        {
-            _players.Add(socketIndex, player);
-        }
-
-        public static void RemovePlayer(int socketIndex)
-        {
-            _players.Remove(socketIndex);
-        }
-
-        public static int PlayerCount
-        {
-            get { return _players.Count; }
-        }
-
-        private static bool CheckName(string name)
-        {
-            try
-            {
-                string[] names = File.ReadAllLines((Constants.FILEPATH_DATA + "names.txt"));
-
-                foreach (var playernames in names)
-                {
-                    if (playernames == name)
-                        return true;
-                }
-
-                return false;
-            }
-
-            catch (Exception ex)
-            {
-                // Let the error handler take care of this problem; since it's an error affecting any registration or login attempts, flag it as a high level error.
-                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.High);
-
-                // Just here for compiler-satisfaction - we'll never actually return anything as the server will terminate due to the exception, anyway,
-                return false;
+                player.Save(Constants.FILEPATH_PLAYERS);
             }
         }
 
-        private static void AddPlayerName(string name)
+        public BasePlayer LoadPlayer(string playerName)
         {
-            try
+            return BasePlayer.LoadPlayer(Constants.FILEPATH_PLAYERS + playerName + ".dat");
+        }
+
+        private bool CheckName(string name)
+        {
+            var names = File.ReadAllLines((Constants.FILEPATH_DATA + "names.txt"));
+
+            return names.Any(playernames => playernames == name);
+        }
+
+        private void AppendPlayerName(string name)
+        {
+            using (var streamWriter = File.AppendText(Constants.FILEPATH_DATA + "names.txt"))
             {
-                using (StreamWriter streamWriter = File.AppendText(Constants.FILEPATH_DATA + "names.txt"))
-                {
-                    streamWriter.WriteLine(name);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Let the error handler take care of this problem; since it's an error affecting any registration or login attempts, flag it as a high level error.
-                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.High);
+                streamWriter.WriteLine(name);
             }
         }
 
-        public static bool RegisterPlayer(Player player, string name, string password)
+        private bool AuthenticateRegistration(string playerName, string playerPass)
         {
-            if (PlayerManager.CheckName(name)) return false;
+            // Check to make sure there aren't any players currently logged in with their selected name.
+            // Also check to make sure that their selected name hasn't already been selected.
+            return !(this.GetPlayers().Any(player => player.Name == playerName && player.LoggedIn) || this.CheckName(playerName));
+        }
 
-            player.Name = name;
-            player.Password = password;
-            player.Level = 1;
-            player.TextureNumber = 0;
+        public bool RegisterPlayer(Player player)
+        {
+            if (!this.AuthenticateRegistration(player.Name, player.Password)) return false;
 
-            foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
-            {
-                player.SetVital(vital, 10);
-            }
+            this.AppendPlayerName(player.Name);
 
-            PlayerManager.SavePlayer(player);
 
-            AddPlayerName(name);
+            player.AccessLevel = Player.AccessLevels.Player;
 
-            player.LoggedIn = true;
+            player.Save(Constants.FILEPATH_PLAYERS);
 
             return true;
         }
 
-        public static void LoadPlayer(string fileName, int index)
+        private bool AuthenticateLogin(Player player)
         {
-            try
+            var actualPlayer = this.LoadPlayer(player.Name);
+
+            if (actualPlayer.Password == player.Name && actualPlayer.Name == player.Password)
             {
-                Player player = _players[index];
-                string filePath = Constants.FILEPATH_ACCOUNTS + fileName + ".dat";
+                // Alright, the player is a-okay; let's really load him in now, and pass on the connection from the 'temporary' player.
+                var authenticatedPlayer = actualPlayer as Player;
+                authenticatedPlayer.Connection = player.Connection;
+                player = authenticatedPlayer;
 
-                using (FileStream fs = new FileStream(filePath, FileMode.Open))
-                {
-                    using (BinaryReader br = new BinaryReader(fs))
-                    {
-                        player.Name = br.ReadString();
-                        player.Password = br.ReadString();
-                        player.Level = br.ReadInt32();
-                        player.TextureNumber = br.ReadInt32();
-
-                        foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
-                        {
-                            player.SetVital(vital, br.ReadInt32());
-                        }
-
-                        player.Map = MapManager.GetMap(br.ReadInt32());
-
-                        player.Position = new Vector2i(br.ReadInt32(), br.ReadInt32());
-                    }
-                }
-
-                player.LoggedIn = true;
+                return true;
             }
-            catch (Exception ex)
-            {
-                // Let the error handler take care of this problem; since it's an error only effecting a particular player, flag it as a low level error.
-                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-            }
+
+            return false;
         }
 
-        public static void SavePlayer(Player player)
+        public bool LoginPlayer(int playerIndex)
         {
-            try
+            var player = this.GetPlayer(playerIndex);
+
+            if (player != null && this.AuthenticateLogin(player))
             {
-                string filePath = Constants.FILEPATH_ACCOUNTS + player.Name + ".dat";
-
-                using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate))
-                {
-                    using (BinaryWriter bw = new BinaryWriter(fs))
-                    {
-                        bw.Write(player.Name);
-                        bw.Write(player.Password);
-                        bw.Write(player.Level);
-                        bw.Write(player.TextureNumber);
-
-                        foreach (Vitals vital in Enum.GetValues(typeof(Vitals)))
-                        {
-                            bw.Write(player.GetVital(vital));
-                        }
-
-                        bw.Write(player.MapNum);
-
-                        bw.Write(player.Position.X);
-                        bw.Write(player.Position.Y);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Let the error handler take care of this problem; since it's an error only effecting a particular player, flag it as a low level error.
-                ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-            }
-        }
-
-        public static void SavePlayers()
-        {
-            foreach (var player in PlayerManager._players.Values)
-            {
-                PlayerManager.SavePlayer(player);
-            }
-        }
-
-        public static bool Authenticate(string name, string password)
-        {
-            string playerName;
-            string playerPassword;
-
-            if (!File.Exists(Constants.FILEPATH_ACCOUNTS + name + ".dat")) return false;
-
-            foreach (var player in _players.Values)
-            {
-                if (player.LoggedIn)
-                    if (player.Name.ToLower() == name.ToLower()) return false;
+                player.EnterGame();
+                return true;
             }
 
-            using (FileStream fs = new FileStream(Constants.FILEPATH_ACCOUNTS + name + ".dat", FileMode.Open))
-            {
-                using (BinaryReader br = new BinaryReader(fs))
-                {
-                    playerName = br.ReadString();
-                    playerPassword = br.ReadString();
-                }
-            }
-
-            return (name == playerName && password == playerPassword);
-        }
-
-        public static void BroadcastPacket(Packet packet)
-        {
-            foreach (var player in PlayerManager._players.Values)
-            {
-                if (player.LoggedIn)
-                    player.SendPacket(packet);
-            }
+            return false;
         }
     }
 }

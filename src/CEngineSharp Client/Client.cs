@@ -17,9 +17,9 @@ namespace CEngineSharp_Client
         [STAThread]
         private static void Main()
         {
-            GameTime gameTime = new GameTime();
+            var gameTime = new GameTime();
 
-            Client.ShuttingDown = false;
+            ShuttingDown = false;
 
             AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 

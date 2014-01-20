@@ -1,87 +1,101 @@
 ﻿using CEngineSharp_Client.Graphics;
-using CEngineSharp_Client.World;
+using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
 using CEngineSharp_Client.World.Content_Managers;
+using CEngineSharp_Utilities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CEngineSharp_Client.Net
 {
-    public static class Networking
+    public class Networking
     {
-        private static NettyClient nettyClient;
+        private static Networking _networking;
 
-        private static List<Packet> PacketExecutionQueue;
-
-        public static bool Connect()
+        public static Networking Instance
         {
-            if (nettyClient == null)
+            get
             {
-                nettyClient = new NettyClient(true);
+                if (_networking == null) _networking = new Networking();
 
-                nettyClient.Handle_ConnectionLost = Handle_ConnectionLost;
-                nettyClient.Handle_Packet = Handle_Packet;
-
-                Networking.PacketExecutionQueue = new List<Packet>();
-            }
-
-            return nettyClient.Connect(Constants.IP, Constants.PORT, 1);
-        }
-
-        public static void Disconnect()
-        {
-            if (Client.InGame)
-            {
-                Client.InGame = false;
-
-                RenderManager.RenderState = RenderStates.Render_Menu;
-
-                PlayerManager.ClearPlayers();
-            }
-
-            nettyClient.Disconnect();
-        }
-
-        private static void Handle_Packet(Packet packet)
-        {
-            Networking.PacketExecutionQueue.Add(packet);
-        }
-
-        private static void Handle_ConnectionLost()
-        {
-            if (Client.InGame)
-            {
-                Client.InGame = false;
-
-                RenderManager.RenderState = RenderStates.Render_Menu;
-
-                PlayerManager.ClearPlayers();
+                return _networking;
             }
         }
 
-        public static void ExecuteQueue()
-        {
-            try
-            {
-                if (Networking.PacketExecutionQueue == null) return;
+        private NettyClient _nettyClient;
 
-                for (int i = 0; i < Networking.PacketExecutionQueue.Count; i++)
+        private List<Packet> _packetExecutionQueue;
+
+        public bool Connect()
+        {
+            if (_nettyClient == null)
+            {
+                _nettyClient = new NettyClient(true)
                 {
-                    if (Networking.PacketExecutionQueue[i] != null)
-                    {
-                        Networking.PacketExecutionQueue[i].Execute(nettyClient);
-                        Networking.PacketExecutionQueue.RemoveAt(i);
-                    }
-                }
+                    Handle_ConnectionLost = Handle_ConnectionLost,
+                    Handle_Packet = Handle_Packet
+                };
+
+                _packetExecutionQueue = new List<Packet>();
             }
-            catch (NullReferenceException)
+
+            return _nettyClient.Connect(Constants.IP, Constants.PORT, 1);
+        }
+
+        public void Disconnect()
+        {
+            if (Client.InGame)
             {
+                Client.InGame = false;
+
+                RenderManager.RenderState = RenderStates.RenderMenu;
+
+                PlayerManager.ClearPlayers();
+            }
+
+            _nettyClient.Disconnect();
+        }
+
+        private void Handle_Packet(Packet packet)
+        {
+            _packetExecutionQueue.Add(packet);
+        }
+
+        private void Handle_ConnectionLost()
+        {
+            if (Client.InGame)
+            {
+                Client.InGame = false;
+
+                RenderManager.RenderState = RenderStates.RenderMenu;
+
+                PlayerManager.ClearPlayers();
             }
         }
 
-        public static void SendPacket(Packet packet)
+        public void ExecuteQueue()
         {
-            nettyClient.SendPacket(packet);
+            if (_packetExecutionQueue == null) return;
+
+            int packetCount = _packetExecutionQueue.Count;
+
+            for (int i = 0; i < packetCount; i++)
+            {
+                _packetExecutionQueue[i].Execute(_nettyClient);
+            }
+
+            for (int i = packetCount - 1; i >= 0; i--)
+            {
+                _packetExecutionQueue.RemoveAt(i);
+            }
+
+        }
+
+        public void SendPacket(Packet packet)
+        {
+            _nettyClient.SendPacket(packet);
         }
     }
 }

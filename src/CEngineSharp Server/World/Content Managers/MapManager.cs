@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Maps;
+using CEngineSharp_World;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,41 +8,46 @@ using System.Linq;
 
 namespace CEngineSharp_Server.World.Content_Managers
 {
-    public static class MapManager
+    public sealed class MapManager
     {
-        private static List<Map> _maps = new List<Map>();
+        private readonly List<Map> _maps;
 
-        public static Map GetMap(int mapIndex)
+        public Map GetMap(int mapIndex)
         {
             return _maps[mapIndex];
         }
 
-        public static void AddMap(Map map)
+        public void AddMap(Map map)
         {
             _maps.Add(map);
         }
 
-        public static int GetMapIndex(Map map)
+        public int GetMapIndex(Map map)
         {
             return _maps.IndexOf(map);
         }
 
-        public static void LoadMaps()
+        public MapManager()
         {
-            DirectoryInfo dI = new DirectoryInfo(Constants.FILEPATH_MAPS);
+            _maps = new List<Map>();
+        }
+
+        public void LoadMaps()
+        {
+            var dI = new DirectoryInfo(Constants.FILEPATH_MAPS);
             FileInfo[] fileInfo = dI.GetFiles("*.map", SearchOption.TopDirectoryOnly);
 
             Console.WriteLine("Loading maps...");
 
             foreach (var mapFile in fileInfo)
             {
-                _maps.Add(MapManager.LoadMap(mapFile.FullName));
+                _maps.Add(ContentManager.Instance.MapManager.LoadMap(mapFile.FullName));
             }
 
             Console.WriteLine("Loaded {0} maps", fileInfo.Count());
         }
 
-        private static Map LoadMap(string fileName)
+        private Map LoadMap(string fileName)
         {
             Map map = new Map();
 
@@ -76,10 +82,12 @@ namespace CEngineSharp_Server.World.Content_Managers
                                 int tileWidth = binaryReader.ReadInt32();
                                 int tileHeight = binaryReader.ReadInt32();
 
-                                var tileLayer = new Map.Tile.Layer();
-                                tileLayer.SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth);
-                                tileLayer.TextureNumber = tileSetTextureIndex;
-                                map.GetTile(new Vector2i(x, y)).SetLayer(tileLayer, layer);
+                                var tileLayer = new Map.Tile.Layer
+                                {
+                                    SpriteRect = new Rect(tileLeft, tileTop, tileHeight, tileWidth),
+                                    TextureNumber = tileSetTextureIndex
+                                };
+                                map.GetTile(new Vector(x, y)).SetLayer(tileLayer, layer);
                             }
                         }
                     }

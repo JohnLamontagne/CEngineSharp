@@ -1,13 +1,8 @@
-﻿using CEngineSharp_Editor.World;
+﻿using CEngineSharp_World.Entities;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -19,8 +14,8 @@ namespace CEngineSharp_Editor
         private RenderWindow playerSpriteDisplay;
         private bool exiting;
         private string dataPath;
-        private List<Player> players;
-        private Player selectedPlayer;
+        private List<BasePlayer> players;
+        private BasePlayer selectedPlayer;
 
         public PlayerEditor(string dataPath)
         {
@@ -54,9 +49,7 @@ namespace CEngineSharp_Editor
                 this.playerSpriteDisplay.Clear();
 
                 var oldRect = this.playerSprite.TextureRect;
-                var newRect = new IntRect();
-                newRect.Width = 32;
-                newRect.Height = 32;
+                var newRect = new IntRect { Width = 32, Height = 32 };
 
                 if (oldRect.Left >= 64)
                 {
@@ -93,21 +86,21 @@ namespace CEngineSharp_Editor
             this.textName.Text = this.selectedPlayer.Name;
             this.textPassword.Text = this.selectedPlayer.Password;
             this.playerSprite = new Sprite(new Texture(Constants.FILEPATH_GRAPHICS + "/Characters/" + this.selectedPlayer.TextureNumber + ".png"));
-            this.textHP.Text = this.selectedPlayer.HP.ToString();
-            this.textMP.Text = this.selectedPlayer.MP.ToString();
+            this.textHP.Text = this.selectedPlayer.GetStat(Stats.Health).ToString();
+            this.textMP.Text = this.selectedPlayer.GetStat(Stats.Mana).ToString();
         }
 
         private void LoadPlayers()
         {
             this.playerListBox.Items.Clear();
 
-            this.players = new List<Player>();
+            this.players = new List<BasePlayer>();
 
-            DirectoryInfo dI = new DirectoryInfo(dataPath + "/Accounts/");
+            var dI = new DirectoryInfo(dataPath + "/Players/");
 
             foreach (var file in dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
             {
-                this.players.Add(Player.Load(file.FullName));
+                this.players.Add(BasePlayer.LoadPlayer(file.FullName));
                 this.playerListBox.Items.Add(this.players[this.players.Count - 1].Name);
             }
 
@@ -122,7 +115,7 @@ namespace CEngineSharp_Editor
 
         private void SavePlayers()
         {
-            DirectoryInfo dI = new DirectoryInfo(this.dataPath + "/Accounts/");
+            var dI = new DirectoryInfo(this.dataPath + "/Accounts/");
 
             // Delete all of the old files (they will be replaced). We must do this to insure that we don't keep any renamed items.
             foreach (var file in dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
@@ -142,6 +135,21 @@ namespace CEngineSharp_Editor
         public void LoadData()
         {
             this.LoadPlayers();
+        }
+
+        private void textHP_TextChanged(object sender, EventArgs e)
+        {
+            this.selectedPlayer.SetStat(Stats.Health, int.Parse(textHP.Text));
+        }
+
+        private void textMP_TextChanged(object sender, EventArgs e)
+        {
+            this.selectedPlayer.SetStat(Stats.Mana, int.Parse(textMP.Text));
+        }
+
+        private void playerTextureScrollBar_Scroll(object sender, ScrollEventArgs e)
+        {
+            this.selectedPlayer.TextureNumber = e.NewValue;
         }
     }
 }

@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace CEngineSharp_Server
+﻿namespace CEngineSharp_Server
 {
     public static class Constants
     {
         public static readonly string FILEPATH_DATA = @"C:\Users\John\Desktop/Data/";
         public static readonly string FILEPATH_MAPS = FILEPATH_DATA + "Maps/";
-        public static readonly string FILEPATH_ACCOUNTS = FILEPATH_DATA + "Accounts/";
+        public static readonly string FILEPATH_PLAYERS = FILEPATH_DATA + "Players/";
         public static readonly string FILEPATH_ITEMS = FILEPATH_DATA + "Items/";
         public static readonly string FILEPATH_NPCS = FILEPATH_DATA + "Npcs/";
 

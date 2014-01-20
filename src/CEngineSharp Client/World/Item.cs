@@ -1,6 +1,5 @@
 ﻿using CEngineSharp_Client.Graphics;
 using SFML.Graphics;
-using System;
 
 namespace CEngineSharp_Client.World
 {

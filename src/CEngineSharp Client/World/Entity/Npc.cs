@@ -6,9 +6,9 @@ using System;
 
 namespace CEngineSharp_Client.World.Entity
 {
-    public class Npc
+    public class Npc : IEntity
     {
-        private byte previousStep;
+        private byte _previousStep;
 
         public string Name { get; set; }
 
@@ -49,10 +49,10 @@ namespace CEngineSharp_Client.World.Entity
 
         public void Update(GameTime gameTime)
         {
-            Vector2f position = new Vector2f();
+            var position = new Vector2f();
 
-            int x = this.X * 32;
-            int y = this.Y * 32;
+            var x = this.X * 32;
+            var y = this.Y * 32;
 
             if (x < this.Sprite.Position.X)
             {
@@ -131,17 +131,17 @@ namespace CEngineSharp_Client.World.Entity
 
             if (this.Step == 0)
             {
-                this.previousStep = 0;
+                this._previousStep = 0;
                 this.Step++;
             }
             else if (this.Step == 2)
             {
-                this.previousStep = 2;
+                this._previousStep = 2;
                 this.Step--;
             }
             else if (this.Step == 1)
             {
-                if (this.previousStep == 2)
+                if (this._previousStep == 2)
                     this.Step--;
                 else
                     this.Step++;
@@ -150,9 +150,22 @@ namespace CEngineSharp_Client.World.Entity
             this.IsMoving = true;
         }
 
-        public void Draw(RenderWindow target)
+        public void Draw(RenderTarget target)
         {
             target.Draw(this.Sprite);
+        }
+
+
+        public Vector2i Position
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

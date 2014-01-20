@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CEngineSharp_Server.World
+﻿namespace CEngineSharp_Server.World
 {
     public class Item
     {

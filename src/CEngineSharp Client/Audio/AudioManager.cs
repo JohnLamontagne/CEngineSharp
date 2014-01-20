@@ -7,34 +7,34 @@ namespace CEngineSharp_Client.Audio
 {
     public class AudioManager
     {
-        private static Dictionary<string, SoundBuffer> sounds;
+        private static Dictionary<string, SoundBuffer> _sounds;
 
-        private static Dictionary<string, Music> music;
+        private static Dictionary<string, Music> _music;
         private static Music _currentMusic;
 
         public static void LoadMusic(string musicSoundPath)
         {
-            music = new Dictionary<string, Music>();
+            _music = new Dictionary<string, Music>();
         }
 
         public static void LoadSounds(string soundFilePath)
         {
-            DirectoryInfo dI = new DirectoryInfo(soundFilePath);
+            var dI = new DirectoryInfo(soundFilePath);
 
-            if (sounds == null)
-                sounds = new Dictionary<string, SoundBuffer>();
+            if (_sounds == null)
+                _sounds = new Dictionary<string, SoundBuffer>();
             else
-                sounds.Clear();
+                _sounds.Clear();
 
             foreach (var file in dI.GetFiles("*.ogg", SearchOption.AllDirectories))
             {
-                sounds.Add(file.Name.Remove(file.Name.Length - 4, 4), new SoundBuffer(file.FullName));
+                _sounds.Add(file.Name.Remove(file.Name.Length - 4, 4), new SoundBuffer(file.FullName));
             }
         }
 
         public static void PlayMusic(string musicName)
         {
-            _currentMusic = music[musicName];
+            _currentMusic = _music[musicName];
             _currentMusic.Play();
         }
 
@@ -63,21 +63,26 @@ namespace CEngineSharp_Client.Audio
 
             int volume = (int)(maxSoundDistance - totalDistance) * (100 / maxSoundDistance);
 
-            Sound sound = new Sound(sounds[soundName]);
-            sound.Volume = volume;
+            var sound = new Sound(_sounds[soundName])
+            {
+                Volume = volume
+            };
             sound.Play();
         }
 
         public static void PlaySound(string soundName)
         {
-            Sound sound = new Sound(sounds[soundName]);
-            sound.Loop = true;
+            var sound = new Sound(_sounds[soundName])
+            {
+                Loop = true
+            };
+
             sound.Play();
         }
 
         public static Sound GetSound(string soundName)
         {
-            return new Sound(sounds[soundName]);
+            return new Sound(_sounds[soundName]);
         }
     }
 }

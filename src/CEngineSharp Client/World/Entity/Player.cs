@@ -1,27 +1,23 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
+using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
 using CEngineSharp_Client.World.Content_Managers;
 using SFML.Graphics;
 using SFML.Window;
-using System;
 using System.Collections.Generic;
 using TGUI;
 
 namespace CEngineSharp_Client.World.Entity
 {
-    public class Player
+    public class Player : IEntity
     {
-        private readonly Sprite sprite;
 
-        public Sprite PlayerSprite
-        {
-            get { return this.sprite; }
-        }
+        public Sprite Sprite { get; set; }
 
-        public int X { get; private set; }
+        public string Name { get; set; }
 
-        public int Y { get; private set; }
+        public Vector2i Position { get; set; }
 
         public bool CanMove { get; set; }
 
@@ -31,21 +27,21 @@ namespace CEngineSharp_Client.World.Entity
 
         public Camera Camera { get; set; }
 
-        public int HP { get; set; }
+        public int Hp { get; set; }
 
-        private List<Item> _inventory;
+        private readonly List<Item> _inventory;
 
-        private byte previousStep;
+        private byte _previousStep;
 
         public byte Step
         {
             get
             {
-                return (byte)(this.sprite.TextureRect.Left / 32);
+                return (byte)(this.Sprite.TextureRect.Left / 32);
             }
             set
             {
-                this.sprite.TextureRect = new IntRect(value * 32, (int)this.Direction * 32, 32, 32);
+                this.Sprite.TextureRect = new IntRect(value * 32, (int)this.Direction * 32, 32, 32);
             }
         }
 
@@ -53,17 +49,18 @@ namespace CEngineSharp_Client.World.Entity
         {
             get
             {
-                return (Directions)(sprite.TextureRect.Top / 32);
+                return (Directions)(this.Sprite.TextureRect.Top / 32);
             }
             set
             {
-                this.sprite.TextureRect = new IntRect(this.Step * 32, (int)value * 32, 32, 32);
+                this.Sprite.TextureRect = new IntRect(this.Step * 32, (int)value * 32, 32, 32);
             }
         }
 
-        public Player(Texture texture)
+        public Player(Texture texture, Vector2i position)
         {
-            this.sprite = new Sprite(texture);
+            this.Position = position;
+            this.Sprite = new Sprite(texture);
             _inventory = new List<Item>();
 
             this.Direction = Directions.Down;
@@ -75,13 +72,13 @@ namespace CEngineSharp_Client.World.Entity
 
         public int MouseCordToSlotNum(int mouseX, int mouseY)
         {
-            GameRenderer gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
+            var gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
 
-            int invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
-            int invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
+            var invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
+            var invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
 
-            int x = (mouseX - invenPosX) / 32;
-            int y = (mouseY - invenPosY) / 32;
+            var x = (mouseX - invenPosX) / 32;
+            var y = (mouseY - invenPosY) / 32;
 
             return (x + (y * 5));
         }
@@ -110,73 +107,71 @@ namespace CEngineSharp_Client.World.Entity
 
             int slotNum = _inventory.Count - 1;
 
-            GameRenderer gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
+            var gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
 
-            float invenPosX = gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
-            float invenPosY = gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
+            if (gameRenderer != null)
+            {
+                var invenPosX = gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
+                var invenPosY = gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
 
-            int itemPosY = (int)invenPosY + (32 * (slotNum / 5));
+                var itemPosY = (int)invenPosY + (32 * (slotNum / 5));
 
-            int itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
+                var itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
 
-            item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
+                item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
+            }
         }
 
         public void TryDropInventoryItem(int mouseX, int mouseY)
         {
-            int slotNum = this.MouseCordToSlotNum(mouseX, mouseY);
+            var slotNum = this.MouseCordToSlotNum(mouseX, mouseY);
 
-            Console.WriteLine("Slot Num: " + slotNum);
+            if (this.GetInventoryItem(slotNum) == null) return;
 
-            if (this.GetInventoryItem(slotNum) != null)
-            {
-                DropItemPacket dropItemPacket = new DropItemPacket();
-                dropItemPacket.WriteData(slotNum);
-                Networking.SendPacket(dropItemPacket);
-            }
+            var dropItemPacket = new DropItemPacket();
+            dropItemPacket.WriteData(slotNum);
+            Networking.Instance.SendPacket(dropItemPacket);
         }
 
         public void Warp(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+            MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
 
-            this.X = newX;
-            this.Y = newY;
+            this.Position = new Vector2i(newX, newY);
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
+            MapManager.Map.GetTile(newX, newY).IsOccupied = true;
 
-            this.PlayerSprite.Position = new Vector2f(newX * 32, newY * 32);
+            this.Sprite.Position = new Vector2f(newX * 32, newY * 32);
         }
 
         public void Move(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+            MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
 
-            this.X = newX;
-            this.Y = newY;
+            this.Position = new Vector2i(newX, newY);
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
+            MapManager.Map.GetTile(newX, newY).IsOccupied = true;
 
-            if (this.Step == 0)
+            switch (this.Step)
             {
-                this.previousStep = 0;
-                this.Step++;
-            }
-            else if (this.Step == 2)
-            {
-                this.previousStep = 2;
-                this.Step--;
-            }
-            else if (this.Step == 1)
-            {
-                if (this.previousStep == 2)
-                    this.Step--;
-                else
+                case 0:
+                    this._previousStep = 0;
                     this.Step++;
+                    break;
+                case 2:
+                    this._previousStep = 2;
+                    this.Step--;
+                    break;
+                case 1:
+                    if (this._previousStep == 2)
+                        this.Step--;
+                    else
+                        this.Step++;
+                    break;
             }
         }
 
@@ -184,19 +179,22 @@ namespace CEngineSharp_Client.World.Entity
         {
             if (this.IsMoving && this.CanMove)
             {
-                var movementPacket = new MovementPacket();
+                var movementPacket = new PlayerMovementPacket();
+
+                int x = this.Position.X;
+                int y = this.Position.Y;
 
                 switch (this.Direction)
                 {
                     case Directions.Down:
 
                         // Client side check to see if the tile is blocked.
-                        if (this.Y < (MapManager.Map.Height - 1) && !MapManager.Map.GetTile(this.X, this.Y + 1).Blocked && !MapManager.Map.GetTile(this.X, this.Y + 1).IsOccupied)
+                        if (y < (MapManager.Map.Height - 1) && !MapManager.Map.GetTile(x, y + 1).Blocked && !MapManager.Map.GetTile(x, y + 1).IsOccupied)
                         {
-                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
-                            this.Y += 1;
-                            movementPacket.WriteData(this.X, this.Y, this.Direction);
-                            Networking.SendPacket(movementPacket);
+                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            y += 1;
+                            movementPacket.WriteData(x, y, this.Direction);
+                            Networking.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -204,12 +202,12 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Up:
                         // Client side check to see if the tile is blocked.
-                        if (this.Y > 0 && !MapManager.Map.GetTile(this.X, this.Y - 1).Blocked && !MapManager.Map.GetTile(this.X, this.Y - 1).IsOccupied)
+                        if (y > 0 && !MapManager.Map.GetTile(x, y - 1).Blocked && !MapManager.Map.GetTile(x, y - 1).IsOccupied)
                         {
-                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
-                            this.Y -= 1;
-                            movementPacket.WriteData(this.X, this.Y, this.Direction);
-                            Networking.SendPacket(movementPacket);
+                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            y -= 1;
+                            movementPacket.WriteData(x, y, this.Direction);
+                            Networking.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -217,12 +215,12 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Right:
                         // Client side check to see if the tile is blocked.
-                        if (this.X < (MapManager.Map.Width - 1) && !MapManager.Map.GetTile(this.X + 1, this.Y).Blocked && !MapManager.Map.GetTile(this.X + 1, this.Y).IsOccupied)
+                        if (x < (MapManager.Map.Width - 1) && !MapManager.Map.GetTile(x + 1, y).Blocked && !MapManager.Map.GetTile(x + 1, y).IsOccupied)
                         {
-                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
-                            this.X += 1;
-                            movementPacket.WriteData(this.X, this.Y, this.Direction);
-                            Networking.SendPacket(movementPacket);
+                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            x += 1;
+                            movementPacket.WriteData(x, y, this.Direction);
+                            Networking.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -230,41 +228,40 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Left:
                         // Client side check to see if the tile is blocked.
-                        if (this.X > 0 && !MapManager.Map.GetTile(this.X - 1, this.Y).Blocked && !MapManager.Map.GetTile(this.X - 1, this.Y).IsOccupied)
+                        if (x > 0 && !MapManager.Map.GetTile(x - 1, y).Blocked && !MapManager.Map.GetTile(x - 1, y).IsOccupied)
                         {
-                            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
-                            this.X -= 1;
-                            movementPacket.WriteData(this.X, this.Y, this.Direction);
-                            Networking.SendPacket(movementPacket);
+                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            x -= 1;
+                            movementPacket.WriteData(x, y, this.Direction);
+                            Networking.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
                         break;
                 }
+
+                this.Position = new Vector2i(x, y);
             }
         }
 
+
         public void Update(GameTime gameTime)
         {
-            int x = this.X * 32;
-            int y = this.Y * 32;
+            var x = this.Position.X * 32;
+            var y = this.Position.Y * 32;
 
-            if (x == this.PlayerSprite.Position.X && y == this.PlayerSprite.Position.Y)
+            if (x == this.Sprite.Position.X && y == this.Sprite.Position.Y)
             {
                 this.CanMove = true;
-
-                this.Camera.SnapToTarget();
-
                 this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
-
                 return;
             }
 
-            Vector2f position = this.PlayerSprite.Position;
+            var position = this.Sprite.Position;
 
-            if (x < this.PlayerSprite.Position.X)
+            if (x < this.Sprite.Position.X)
             {
-                position.X = this.PlayerSprite.Position.X - (this.PlayerSpeed * gameTime.UpdateTime);
+                position.X = this.Sprite.Position.X - (this.PlayerSpeed * gameTime.UpdateTime);
 
                 if (x >= position.X)
                 {
@@ -272,9 +269,9 @@ namespace CEngineSharp_Client.World.Entity
                     position.X = x;
                 }
             }
-            else if (x > this.PlayerSprite.Position.X)
+            else if (x > this.Sprite.Position.X)
             {
-                position.X = this.PlayerSprite.Position.X + (this.PlayerSpeed * gameTime.UpdateTime);
+                position.X = this.Sprite.Position.X + (this.PlayerSpeed * gameTime.UpdateTime);
 
                 if (x <= position.X)
                 {
@@ -283,9 +280,9 @@ namespace CEngineSharp_Client.World.Entity
                 }
             }
 
-            if (y < this.PlayerSprite.Position.Y)
+            if (y < this.Sprite.Position.Y)
             {
-                position.Y = this.PlayerSprite.Position.Y - (this.PlayerSpeed * gameTime.UpdateTime);
+                position.Y = this.Sprite.Position.Y - (this.PlayerSpeed * gameTime.UpdateTime);
 
                 if (y >= position.Y)
                 {
@@ -293,9 +290,9 @@ namespace CEngineSharp_Client.World.Entity
                     position.Y = y;
                 }
             }
-            else if (y > this.PlayerSprite.Position.Y)
+            else if (y > this.Sprite.Position.Y)
             {
-                position.Y = this.PlayerSprite.Position.Y + (this.PlayerSpeed * gameTime.UpdateTime);
+                position.Y = this.Sprite.Position.Y + (this.PlayerSpeed * gameTime.UpdateTime);
 
                 if (y <= position.Y)
                 {
@@ -304,14 +301,14 @@ namespace CEngineSharp_Client.World.Entity
                 }
             }
 
-            this.PlayerSprite.Position = position;
+            this.Sprite.Position = position;
 
             this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
         }
 
-        public void Draw(RenderWindow window)
+        public void Draw(RenderTarget target)
         {
-            window.Draw(sprite);
+            target.Draw(this.Sprite);
         }
 
         public void DrawInventory(RenderWindow window)

@@ -4,38 +4,22 @@ using System.IO;
 
 namespace CEngineSharp_Server.World.Content_Managers
 {
-    public static class ItemManager
+    public sealed class ItemManager
     {
-        private static List<Item> items;
+        private List<Item> _items;
 
-        public static Item GetItem(int itemIndex)
+        public Item GetItem(int itemIndex)
         {
-            return items[itemIndex];
+            return _items[itemIndex];
         }
 
-        public static void LoadItems()
+        private Item LoadItem(string filePath)
         {
-            ItemManager.items = new List<Item>();
+            var item = new Item();
 
-            Console.WriteLine("Loading items...");
-
-            DirectoryInfo dI = new DirectoryInfo(Constants.FILEPATH_ITEMS);
-
-            foreach (var file in dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
+            using (var fs = new FileStream(filePath, FileMode.OpenOrCreate))
             {
-                items.Add(ItemManager.LoadItem(file.FullName));
-            }
-
-            Console.WriteLine("Loaded {0} items!", ItemManager.items.Count);
-        }
-
-        public static Item LoadItem(string filePath)
-        {
-            Item item = new Item();
-
-            using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate))
-            {
-                using (BinaryReader binaryReader = new BinaryReader(fs))
+                using (var binaryReader = new BinaryReader(fs))
                 {
                     item.Name = binaryReader.ReadString();
                     item.TextureNumber = binaryReader.ReadInt32();
@@ -44,5 +28,22 @@ namespace CEngineSharp_Server.World.Content_Managers
 
             return item;
         }
+
+        public void LoadItems()
+        {
+            _items = new List<Item>();
+
+            Console.WriteLine("Loading items...");
+
+            var dI = new DirectoryInfo(Constants.FILEPATH_ITEMS);
+
+            foreach (var file in dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
+            {
+                _items.Add(LoadItem(file.FullName));
+            }
+
+            Console.WriteLine("Loaded {0} items!", _items.Count);
+        }
+
     }
 }

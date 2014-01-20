@@ -8,39 +8,41 @@ namespace CEngineSharp_Client.Graphics
 {
     public abstract class Renderer
     {
-        protected readonly string themeConfigurationPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Gui\Black.conf";
+        protected readonly string ThemeConfigurationPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Gui\Black.conf";
 
         public bool CanRender { get; set; }
 
-        public Renderer()
+        protected Renderer()
         {
-            _window = new RenderWindow(new VideoMode(832, 640), "CEngine# Client", Styles.Default);
-            _window.Closed += _window_Closed;
+            Window = new RenderWindow(new VideoMode(832, 640), "CEngine# Client", Styles.Default);
+            Window.Closed += _window_Closed;
 
-            this.Gui = new Gui(_window);
-
-            this.Gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Fonts\MainFont.ttf");
+            this.Gui = new Gui(Window)
+            {
+                GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"Data\Graphics\Fonts\MainFont.ttf")
+            };
 
             LoadInterface();
         }
 
         private void _window_Closed(object sender, EventArgs e)
         {
-            Networking.Disconnect();
+            Networking.Instance.Disconnect();
             Environment.Exit(0);
         }
 
-        public Renderer(RenderWindow window)
+        protected Renderer(RenderWindow window)
         {
-            _window = window;
-            this.Gui = new Gui(_window);
+            Window = window;
+            this.Gui = new Gui(Window)
+            {
+                GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Fonts\MainFont.ttf")
+            };
 
-            this.Gui.GlobalFont = new Font(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Fonts\MainFont.ttf");
-
-            LoadInterface();
+            this.LoadInterface();
         }
 
-        protected RenderWindow _window;
+        protected RenderWindow Window;
 
         public Gui Gui { get; set; }
 
@@ -57,7 +59,7 @@ namespace CEngineSharp_Client.Graphics
 
         public RenderWindow GetWindow()
         {
-            return _window;
+            return Window;
         }
     }
 }

@@ -1,10 +1,13 @@
-﻿using CEngineSharp_Server.GameLogic;
-using CEngineSharp_Server.Net.Packets;
+﻿using CEngineSharp_Server.Networking.Packets.AuthenticationPackets;
+using CEngineSharp_Server.Networking.Packets.MapUpdatePackets;
+using CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Entities;
+using CEngineSharp_World;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CEngineSharp_Server.World.Maps
 {
@@ -13,7 +16,7 @@ namespace CEngineSharp_Server.World.Maps
 
         public class Tile
         {
-            private Layer[] layers;
+            private readonly Layer[] _layers;
 
             public bool Blocked { get; set; }
 
@@ -28,18 +31,18 @@ namespace CEngineSharp_Server.World.Maps
 
             public Tile()
             {
-                this.layers = new Layer[(int)Layers.Fringe2 + 1];
+                this._layers = new Layer[(int)Layers.Fringe2 + 1];
                 this.IsOccupied = false;
             }
 
             public Layer GetLayer(Layers layer)
             {
-                return this.layers[(int)layer];
+                return this._layers[(int)layer];
             }
 
             public void SetLayer(Layer layerValue, Layers layer)
             {
-                this.layers[(int)layer] = layerValue;
+                this._layers[(int)layer] = layerValue;
             }
         }
 
@@ -76,7 +79,7 @@ namespace CEngineSharp_Server.World.Maps
             this.mapNpcs = new List<MapNpc>();
         }
 
-        public Tile GetTile(Vector2i position)
+        public Tile GetTile(Vector position)
         {
             return this.GetTile(position.X, position.Y);
         }
@@ -86,7 +89,7 @@ namespace CEngineSharp_Server.World.Maps
             return this.tiles[x, y];
         }
 
-        public void SetTile(Vector2i position, Tile tile)
+        public void SetTile(Vector position, Tile tile)
         {
             this.SetTile(position.X, position.Y, tile);
         }
@@ -103,10 +106,9 @@ namespace CEngineSharp_Server.World.Maps
             var playerDataPacket = new PlayerDataPacket();
             playerDataPacket.WriteData(player);
 
-            foreach (var mPlayer in this.players)
+            foreach (var mPlayer in this.players.Where(mPlayer => mPlayer != player))
             {
-                if (mPlayer != player)
-                    mPlayer.SendPacket(playerDataPacket);
+                mPlayer.SendPacket(playerDataPacket);
             }
         }
 
@@ -118,16 +120,15 @@ namespace CEngineSharp_Server.World.Maps
             // Remove the player from the map player list.
             this.players.Remove(player);
 
-            LogoutPacket logoutPacket = new LogoutPacket();
+            var logoutPacket = new LogoutPacket();
             logoutPacket.WriteData(player.PlayerIndex);
             this.SendPacket(logoutPacket);
 
-            if (leftGame)
+            if (!leftGame) return;
+
+            foreach (var mapPlayer in this.players)
             {
-                foreach (var mPlayer in this.players)
-                {
-                    mPlayer.SendMessage(player.Name + " has left " + ServerConfiguration.GameName + ".");
-                }
+                mapPlayer.SendMessage(player.Name + " has left " + ServerConfiguration.GameName + ".");
             }
         }
 
@@ -141,15 +142,9 @@ namespace CEngineSharp_Server.World.Maps
             return this.players.ToArray();
         }
 
-        public MapItem GetMapItem(Vector2i mapItemPos)
+        public MapItem GetMapItem(Vector mapItemPos)
         {
-            foreach (var mapItem in this.items)
-            {
-                if (mapItem.X == mapItemPos.X && mapItem.Y == mapItemPos.Y)
-                    return mapItem;
-            }
-
-            return null;
+            return this.items.FirstOrDefault(mapItem => mapItem.Position == mapItemPos);
         }
 
         public MapItem[] GetMapItems()
@@ -166,9 +161,9 @@ namespace CEngineSharp_Server.World.Maps
             this.items.Remove(mapItem);
         }
 
-        public void SpawnItem(Item item, int x, int y, int spawnTime)
+        public void SpawnItem(Item item, Vector position, int spawnTime)
         {
-            MapItem mapItem = new MapItem(item, x, y, spawnTime);
+            var mapItem = new MapItem(item, position, spawnTime);
 
             this.items.Add(mapItem);
 
@@ -187,7 +182,7 @@ namespace CEngineSharp_Server.World.Maps
             return this.mapNpcs.ToArray();
         }
 
-        public void SpawnMapNpc(Npc npc, Vector2i position)
+        public void SpawnMapNpc(Npc npc, Vector position)
         {
 
             this.mapNpcs.Add(new MapNpc(npc, position));
@@ -208,9 +203,10 @@ namespace CEngineSharp_Server.World.Maps
         public void ResizeMap(int newWidth, int newHeight)
         {
             var newArray = new Tile[newWidth, newHeight];
-            int columnCount = this.tiles.GetLength(1);
-            int columnCount2 = newHeight;
-            int columns = this.tiles.GetUpperBound(0);
+            var columnCount = this.tiles.GetLength(1);
+            var columnCount2 = newHeight;
+            var columns = this.tiles.GetUpperBound(0);
+
             for (int co = 0; co <= columns; co++)
                 Array.Copy(this.tiles, co * columnCount, newArray, co * columnCount2, columnCount);
 

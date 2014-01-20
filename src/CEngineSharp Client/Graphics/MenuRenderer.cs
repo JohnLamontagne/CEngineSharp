@@ -1,9 +1,8 @@
 ﻿using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
+using CEngineSharp_Client.Net.Packets.AuthenticationPacket;
 using SFML.Graphics;
-
 using SFML.Window;
-
 using System;
 using System.IO;
 using System.Threading;
@@ -13,7 +12,7 @@ namespace CEngineSharp_Client.Graphics
 {
     public class MenuRenderer : Renderer
     {
-        private Sprite menuBackground;
+        private Sprite _menuBackground;
 
         public MenuRenderer(RenderWindow window)
             : base(window)
@@ -28,12 +27,12 @@ namespace CEngineSharp_Client.Graphics
 
         protected override void LoadInterface()
         {
-            this.menuBackground = new Sprite(RenderManager.TextureManager.GetTexture("MenuBackground"));
+            this._menuBackground = new Sprite(RenderManager.TextureManager.GetTexture("MenuBackground"));
 
             #region Status Label
 
             Label labelStatus = this.Gui.Add(new Label(), "labelStatus");
-            labelStatus.Position = new Vector2f((_window.Size.X / 2) - (labelStatus.Size.X / 2), 150);
+            labelStatus.Position = new Vector2f((Window.Size.X / 2) - (labelStatus.Size.X / 2), 150);
             labelStatus.Visible = false;
 
             #endregion Status Label
@@ -42,13 +41,13 @@ namespace CEngineSharp_Client.Graphics
 
             Label labelNews = this.Gui.Add(new Label(), "labelNews");
             LoadNews(labelNews);
-            labelNews.Position = new Vector2f((_window.Size.X / 2) - (labelNews.Size.X / 2), 200);
+            labelNews.Position = new Vector2f((Window.Size.X / 2) - (labelNews.Size.X / 2), 200);
 
             #endregion News Label
 
             #region Login Button
 
-            Button loginButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogin");
+            Button loginButton = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonLogin");
             loginButton.Position = new Vector2f(100, 500);
             loginButton.Text = "Login";
             loginButton.LeftMouseClickedCallback += buttonLogin_LeftMouseClickedCallback;
@@ -57,7 +56,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Registration Button
 
-            Button registrationButton = this.Gui.Add(new Button(themeConfigurationPath), "buttonRegistration");
+            Button registrationButton = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonRegistration");
             registrationButton.Position = new Vector2f(500, 500);
             registrationButton.Text = "Register";
             registrationButton.LeftMouseClickedCallback += buttonRegistration_LeftMouseClickedCallback;
@@ -84,7 +83,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Text User
 
-            EditBox textUser = this.Gui.Add(new EditBox(themeConfigurationPath), "textUser");
+            EditBox textUser = this.Gui.Add(new EditBox(ThemeConfigurationPath), "textUser");
             textUser.Position = new Vector2f(255, 90);
             textUser.Size = new Vector2f(340, 40);
             textUser.Visible = false;
@@ -93,7 +92,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Text Password
 
-            EditBox textPassword = this.Gui.Add(new EditBox(themeConfigurationPath), "textPassword");
+            EditBox textPassword = this.Gui.Add(new EditBox(ThemeConfigurationPath), "textPassword");
             textPassword.Position = new Vector2f(255, 150);
             textPassword.Size = new Vector2f(340, 40);
             textPassword.PasswordCharacter = "*";
@@ -103,7 +102,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region SendLogin Button
 
-            Button buttonSendLogin = this.Gui.Add(new Button(themeConfigurationPath), "buttonSendLogin");
+            Button buttonSendLogin = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonSendLogin");
             buttonSendLogin.Position = new Vector2f(300, 250);
             buttonSendLogin.Text = "Login!";
             buttonSendLogin.LeftMouseClickedCallback += buttonSendLogin_LeftMouseClickedCallback;
@@ -113,7 +112,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region SendRegistration Button
 
-            Button buttonSendRegistration = this.Gui.Add(new Button(themeConfigurationPath), "buttonSendRegistration");
+            Button buttonSendRegistration = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonSendRegistration");
             buttonSendRegistration.Position = new Vector2f(300, 250);
             buttonSendRegistration.Text = "Register!";
             buttonSendRegistration.LeftMouseClickedCallback += buttonSendRegistartion_LeftMouseClickedCallback;
@@ -123,7 +122,7 @@ namespace CEngineSharp_Client.Graphics
 
             #region Back Button
 
-            Button buttonBack = this.Gui.Add(new Button(themeConfigurationPath), "buttonBack");
+            Button buttonBack = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonBack");
             buttonBack.Position = new Vector2f(300, 400);
             buttonBack.Visible = false;
             buttonBack.Text = "Back";
@@ -134,15 +133,15 @@ namespace CEngineSharp_Client.Graphics
 
         public override void Render(GameTime gameTime)
         {
-            _window.DispatchEvents();
+            Window.DispatchEvents();
 
-            _window.Clear();
+            Window.Clear();
 
-            _window.Draw(this.menuBackground);
+            Window.Draw(_menuBackground);
 
             this.Gui.Draw();
 
-            _window.Display();
+            Window.Display();
 
             Thread.Sleep(1);
         }
@@ -160,17 +159,17 @@ namespace CEngineSharp_Client.Graphics
         public void SetMenuStatus(string status)
         {
             this.Gui.Get<Label>("labelStatus").Text = status;
-            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
         }
 
         private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            Networking.Connect();
+            Networking.Instance.Connect();
 
             var registrationPacket = new RegisterationPacket();
             registrationPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
 
-            Networking.SendPacket(registrationPacket);
+            Networking.Instance.SendPacket(registrationPacket);
         }
 
         private void buttonBack_LeftMouseClickedCallback(object sender, CallbackArgs e)
@@ -218,21 +217,21 @@ namespace CEngineSharp_Client.Graphics
         private void buttonSendLogin_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
             this.Gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
-            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+            this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
-            if (Networking.Connect())
+            if (Networking.Instance.Connect())
             {
                 this.Gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
-                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
                 var loginPacket = new LoginPacket();
                 loginPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
-                Networking.SendPacket(loginPacket);
+                Networking.Instance.SendPacket(loginPacket);
             }
             else
             {
                 this.Gui.Get<Label>("labelStatus").Text = "Failed to connect to the server!";
-                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((_window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
+                this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
             }
         }
     }

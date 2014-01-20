@@ -90,28 +90,28 @@
     <Compile Include="Graphics\RenderManager.cs" />
     <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Graphics\TextureManager\ITextureManager.cs" />
-    <Compile Include="Net\Packets\ChatMessagePacket.cs" />
-    <Compile Include="Net\Packets\AlertMessagePacket.cs" />
-    <Compile Include="Net\Packets\DespawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\DropItemPacket.cs" />
-    <Compile Include="Net\Packets\InventoryUpdatePacket.cs" />
-    <Compile Include="Net\Packets\LoginPacket.cs" />
+    <Compile Include="Net\Packets\SocialPackets\ChatMessagePacket.cs" />
+    <Compile Include="Net\Packets\SocialPackets\AlertMessagePacket.cs" />
+    <Compile Include="Net\Packets\MapUpdatePackets\DespawnMapItemPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\DropItemPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\UpdateInventoryPacket.cs" />
+    <Compile Include="Net\Packets\AuthenticationPacket\LoginPacket.cs" />
     <Compile Include="Net\Networking.cs" />
-    <Compile Include="Net\Packets\LogoutPacket.cs" />
-    <Compile Include="Net\Packets\MapCheckPacket.cs" />
-    <Compile Include="Net\Packets\MapDataPacket.cs" />
-    <Compile Include="Net\Packets\MapNpcsPacket.cs" />
-    <Compile Include="Net\Packets\MovementPacket.cs" />
+    <Compile Include="Net\Packets\AuthenticationPacket\LogoutPacket.cs" />
+    <Compile Include="Net\Packets\MapUpdatePackets\MapCheckPacket.cs" />
+    <Compile Include="Net\Packets\MapUpdatePackets\MapDataPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\PlayerMovementPacket.cs" />
     <Compile Include="Client.cs" />
-    <Compile Include="Net\Packets\PlayerDataPacket.cs" />
-    <Compile Include="Net\Packets\PlayerVitalUpdatePacket.cs" />
-    <Compile Include="Net\Packets\SpawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\PickupItemPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\PlayerDataPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\UpdatePlayerStatsPacket.cs" />
+    <Compile Include="Net\Packets\MapUpdatePackets\SpawnMapItemPacket.cs" />
+    <Compile Include="Net\Packets\PlayerUpdatePackets\PickupItemPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Net\Packets\RegisterationPacket.cs" />
+    <Compile Include="Net\Packets\AuthenticationPacket\RegisterationPacket.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
     <Compile Include="World\Entity\Directions.cs" />
+    <Compile Include="World\Entity\IEntity.cs" />
     <Compile Include="World\Entity\Npc.cs" />
     <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
@@ -139,6 +139,17 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CEngineSharp Utilities\CEngineSharp Utilities.csproj">
+      <Project>{1a9ec1bf-e330-494f-bd56-9b94c831a015}</Project>
+      <Name>CEngineSharp Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CEngineSharp World\CEngineSharp World.csproj">
+      <Project>{4D2C2F4C-3DBE-41C0-828E-7AE858A51739}</Project>
+      <Name>CEngineSharp World</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

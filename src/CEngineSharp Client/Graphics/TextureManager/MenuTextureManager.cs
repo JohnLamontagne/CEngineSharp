@@ -11,8 +11,13 @@ namespace CEngineSharp_Client.Graphics
 
         public void LoadTextures()
         {
-            _textures = new Dictionary<string, Texture>();
-            _textures.Add("MenuBackground", new Texture(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Backgrounds\MainMenu.png"));
+            _textures = new Dictionary<string, Texture>
+            {
+                {
+                    "MenuBackground",
+                    new Texture(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Graphics\Backgrounds\MainMenu.png")
+                }
+            };
         }
 
         public void UnloadTextures()

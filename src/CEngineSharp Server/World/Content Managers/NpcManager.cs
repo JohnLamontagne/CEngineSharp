@@ -1,67 +1,50 @@
 ﻿using CEngineSharp_Server.World.Entities;
-using System;
+using CEngineSharp_World.Entities;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CEngineSharp_Server.World.Content_Managers
 {
-    class NpcManager
+    public sealed class NpcManager
     {
-        private static List<Npc> _npcs = new List<Npc>();
 
-        public static Npc GetNpc(int npcIndex)
+        private readonly List<Npc> _npcs;
+
+        public NpcManager()
+        {
+            _npcs = new List<Npc>();
+        }
+
+        public Npc GetNpc(int npcIndex)
         {
             return _npcs[npcIndex];
         }
 
-        public static Npc GetNpc(string npcName)
+        public Npc GetNpc(string npcName)
         {
-            foreach (var npc in _npcs)
-            {
-                if (npc.Name == npcName)
-                    return npc;
-            }
-
-            return null;
+            return _npcs.FirstOrDefault(npc => npc.Name == npcName);
         }
 
-        public static Npc[] GetNpcs()
+        public Npc[] GetNpcs()
         {
             return _npcs.ToArray();
         }
 
-        public static void LoadNpcs()
+        public void LoadNpcs()
         {
-            DirectoryInfo dI = new DirectoryInfo(Constants.FILEPATH_NPCS);
-            FileInfo[] fileInfo = dI.GetFiles("*.dat", SearchOption.TopDirectoryOnly);
+            var directoryInfo = new DirectoryInfo(Constants.FILEPATH_NPCS);
 
-            Console.WriteLine("Loading npcs...");
-
-            foreach (var npcFile in fileInfo)
+            foreach (var file in directoryInfo.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
             {
-                _npcs.Add(NpcManager.LoadNpc(npcFile.FullName));
+                _npcs.Add(BaseNpc.LoadNpc(file.FullName) as Npc);
             }
-
-            Console.WriteLine("Loaded {0} npcs", fileInfo.Count());
         }
 
-        private static Npc LoadNpc(string filePath)
+        public void SaveNpcs()
         {
-            Npc npc = new Npc();
-
-            using (FileStream fs = new FileStream(filePath, FileMode.Open))
-            {
-                using (BinaryReader binaryReader = new BinaryReader(fs))
-                {
-                    npc.Name = binaryReader.ReadString();
-                    npc.TextureNumber = binaryReader.ReadInt32();
-                }
-            }
-
-            return npc;
+            foreach (var npc in _npcs)
+                npc.Save(Constants.FILEPATH_NPCS + npc.Name + ".dat");
         }
     }
 }

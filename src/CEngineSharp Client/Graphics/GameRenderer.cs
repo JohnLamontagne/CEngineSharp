@@ -1,7 +1,6 @@
-﻿using CEngineSharp_Client.Graphics.TextureManager;
-using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
-using CEngineSharp_Client.World;
+using CEngineSharp_Client.Net.Packets.SocialPackets;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
@@ -12,61 +11,61 @@ namespace CEngineSharp_Client.Graphics
 {
     public class GameRenderer : Renderer
     {
-        private int fpsCounter;
-        private int fpsTimer;
-        private bool inventoryVisible;
+        private int _fpsCounter;
+        private int _fpsTimer;
+        private bool _inventoryVisible;
 
 
         public GameRenderer(RenderWindow window)
             : base(window)
         {
-            _window.KeyPressed += _window_KeyPressed;
-            _window.KeyReleased += _window_KeyReleased;
-            _window.Resized += _window_Resized;
-            _window.MouseButtonPressed += _window_MouseButtonPressed;
+            Window.KeyPressed += _window_KeyPressed;
+            Window.KeyReleased += _window_KeyReleased;
+            Window.Resized += _window_Resized;
+            Window.MouseButtonPressed += _window_MouseButtonPressed;
 
-            RenderManager.CurrentResolutionWidth = (int)_window.GetView().Size.X;
-            RenderManager.CurrentResolutionHeight = (int)_window.GetView().Size.Y;
+            RenderManager.CurrentResolutionWidth = (int)Window.GetView().Size.X;
+            RenderManager.CurrentResolutionHeight = (int)Window.GetView().Size.Y;
 
             this.CanRender = true;
         }
 
         public override void Render(GameTime gameTime)
         {
-            _window.DispatchEvents();
+            Window.DispatchEvents();
 
-            _window.Clear();
+            Window.Clear();
 
             if (Client.InGame)
             {
                 if (MapManager.Map != null)
-                    MapManager.Map.Draw(_window);
+                    MapManager.Map.Draw(Window);
 
                 this.Gui.Draw();
 
-                if (this.inventoryVisible)
-                    PlayerManager.GetPlayer(PlayerManager.MyIndex).DrawInventory(_window);
+                if (this._inventoryVisible)
+                    PlayerManager.GetPlayer(PlayerManager.MyIndex).DrawInventory(Window);
 
                 var healthBar = this.Gui.Get<LoadingBar>("healthBar");
-                if (PlayerManager.GetPlayer(PlayerManager.MyIndex).HP != healthBar.Value)
+                if (PlayerManager.GetPlayer(PlayerManager.MyIndex).Hp != healthBar.Value)
                 {
-                    healthBar.Value = PlayerManager.GetPlayer(PlayerManager.MyIndex).HP;
+                    healthBar.Value = PlayerManager.GetPlayer(PlayerManager.MyIndex).Hp;
                     healthBar.Text = "HP: " + healthBar.Value + "/" + healthBar.Maximum;
                 }
             }
 
-            _window.Display();
+            Window.Display();
 
             #region Fps Logic
 
-            if (this.fpsTimer < gameTime.TotalElapsedTime)
+            if (this._fpsTimer < gameTime.TotalElapsedTime)
             {
-                this.Gui.Get<Label>("labelFps").Text = "Fps: " + this.fpsCounter;
-                this.fpsCounter = 0;
-                this.fpsTimer = (int)gameTime.TotalElapsedTime + 1000;
+                this.Gui.Get<Label>("labelFps").Text = "Fps: " + _fpsCounter;
+                this._fpsCounter = 0;
+                this._fpsTimer = (int)gameTime.TotalElapsedTime + 1000;
             }
 
-            this.fpsCounter++;
+            this._fpsCounter++;
 
             #endregion Fps Logic
         }
@@ -75,10 +74,7 @@ namespace CEngineSharp_Client.Graphics
         {
             try
             {
-                ChatBox chatBox = this.Gui.Get<ChatBox>("textChat");
-
-                // if (chatBox.GetLineAmount() > Constants.MAX_CHAT_LINES)
-                //  chatBox.RemoveLine(0);
+                var chatBox = this.Gui.Get<ChatBox>("textChat");
 
                 chatBox.AddLine(message, color);
             }
@@ -106,29 +102,29 @@ namespace CEngineSharp_Client.Graphics
 
             Color color = Color.Black;
             color.A = 100;
-            ChatBox textChat = this.Gui.Add(new ChatBox(themeConfigurationPath), "textChat");
+            ChatBox textChat = this.Gui.Add(new ChatBox(ThemeConfigurationPath), "textChat");
             textChat.Position = new Vector2f(5, 350);
             textChat.Size = new Vector2f(400, 200);
             textChat.BackgroundColor = color;
 
-            EditBox textMyChat = this.Gui.Add(new EditBox(themeConfigurationPath), "textMyChat");
+            EditBox textMyChat = this.Gui.Add(new EditBox(ThemeConfigurationPath), "textMyChat");
             textMyChat.Position = new Vector2f(5, textChat.Position.Y + textChat.Size.Y + 5);
             textMyChat.Size = new Vector2f(textChat.Size.X, 40);
             textMyChat.ReturnKeyPressedCallback += textMyChat_ReturnKeyPressedCallback;
             textMyChat.Transparency = 150;
 
-            MessageBox messageBoxAlert = this.Gui.Add(new MessageBox(themeConfigurationPath), "messageBoxAlert");
+            MessageBox messageBoxAlert = this.Gui.Add(new MessageBox(ThemeConfigurationPath), "messageBoxAlert");
             messageBoxAlert.Visible = false;
             messageBoxAlert.ClosedCallback += messageBoxAlert_ClosedCallback;
             messageBoxAlert.Add(new Label(), "labelAlert");
             messageBoxAlert.Size = new Vector2f(400, 100);
 
-            Label labelFps = this.Gui.Add(new Label(themeConfigurationPath), "labelFps");
+            Label labelFps = this.Gui.Add(new Label(ThemeConfigurationPath), "labelFps");
             labelFps.TextSize = 30;
             labelFps.TextColor = Color.Black;
             labelFps.Position = new Vector2f(700, 10);
 
-            Button buttonInventory = this.Gui.Add(new Button(themeConfigurationPath), "buttonInventory");
+            Button buttonInventory = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonInventory");
             buttonInventory.Text = "Inventory";
             buttonInventory.Position = new Vector2f(550, 600);
             buttonInventory.Size = new Vector2f(100, 25);
@@ -136,7 +132,7 @@ namespace CEngineSharp_Client.Graphics
             buttonInventory.LeftMouseClickedCallback += buttonInventory_LeftMouseClickedCallback;
 
 
-            Button buttonLogout = this.Gui.Add(new Button(themeConfigurationPath), "buttonLogout");
+            Button buttonLogout = this.Gui.Add(new Button(ThemeConfigurationPath), "buttonLogout");
             buttonLogout.Text = "Logout";
             buttonLogout.Position = new Vector2f(700, 600);
             buttonLogout.Size = new Vector2f(100, 25);
@@ -148,7 +144,7 @@ namespace CEngineSharp_Client.Graphics
             picInventory.LeftMouseClickedCallback += picInventory_LeftMouseClickedCallback;
             picInventory.Visible = false;
 
-            LoadingBar healthBar = this.Gui.Add(new LoadingBar(themeConfigurationPath), "healthBar");
+            LoadingBar healthBar = this.Gui.Add(new LoadingBar(ThemeConfigurationPath), "healthBar");
             healthBar.Text = "HP";
             healthBar.Size = new Vector2f(300, 20);
             healthBar.Position = new Vector2f(0, 10);
@@ -159,9 +155,9 @@ namespace CEngineSharp_Client.Graphics
 
         private void buttonInventory_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            this.inventoryVisible = !this.inventoryVisible;
+            this._inventoryVisible = !this._inventoryVisible;
 
-            this.Gui.Get<Picture>("picInventory").Visible = this.inventoryVisible;
+            this.Gui.Get<Picture>("picInventory").Visible = this._inventoryVisible;
 
         }
 
@@ -240,14 +236,14 @@ namespace CEngineSharp_Client.Graphics
 
         private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
         {
-            RenderManager.RenderState = RenderStates.Render_Menu;
-            Networking.Disconnect();
+            RenderManager.RenderState = RenderStates.RenderMenu;
+            Networking.Instance.Disconnect();
         }
 
         private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
 
-            Networking.Disconnect();
+            Networking.Instance.Disconnect();
         }
 
         private void textMyChat_ReturnKeyPressedCallback(object sender, CallbackArgs e)
@@ -256,7 +252,7 @@ namespace CEngineSharp_Client.Graphics
             var chatMessagePacket = new ChatMessagePacket();
 
             chatMessagePacket.WriteData(textMyChat.Text);
-            Networking.SendPacket(chatMessagePacket);
+            Networking.Instance.SendPacket(chatMessagePacket);
             textMyChat.Text = "";
         }
 
@@ -268,8 +264,6 @@ namespace CEngineSharp_Client.Graphics
         {
             RenderManager.CurrentResolutionHeight = (int)e.Height;
             RenderManager.CurrentResolutionWidth = (int)e.Width;
-
-            PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView().Size = new Vector2f(RenderManager.CurrentResolutionWidth, RenderManager.CurrentResolutionHeight);
         }
     }
 }

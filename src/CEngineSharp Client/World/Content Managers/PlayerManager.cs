@@ -8,7 +8,7 @@ namespace CEngineSharp_Client.World.Content_Managers
     {
         public static int MyIndex { get; set; }
 
-        private static Dictionary<int, Player> _players = new Dictionary<int, Player>();
+        private static readonly Dictionary<int, Player> _players = new Dictionary<int, Player>();
 
         public static int PlayerCount { get { return _players.Count; } }
 
@@ -42,7 +42,7 @@ namespace CEngineSharp_Client.World.Content_Managers
 
         public static Player[] GetPlayers()
         {
-            Player[] players = new Player[_players.Count];
+            var players = new Player[_players.Count];
 
             _players.Values.CopyTo(players, 0);
 

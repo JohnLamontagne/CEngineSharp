@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace CEngineSharp_Server.Utilities
 {
@@ -51,15 +50,15 @@ namespace CEngineSharp_Server.Utilities
 
                     // Set the ShuttingDown variable to true.
                     // This will notify the GameLoop that it is time to clean things up.
-                    Globals.ShuttingDown = true;
+                    Server.ShuttingDown = true;
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show(exception.StackTrace, "Fatal Error!");
-                Globals.ShuttingDown = true;
+                Console.WriteLine(exception.Message + ": " + exception.StackTrace);
+                Console.ReadLine();
+                Server.ShuttingDown = true;
             }
-
         }
 
         private static void LogError(Exception ex, ErrorLevels errorLevel)

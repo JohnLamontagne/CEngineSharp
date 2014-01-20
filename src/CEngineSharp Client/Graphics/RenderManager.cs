@@ -1,6 +1,4 @@
-﻿using CEngineSharp_Client.Audio;
-using CEngineSharp_Client.Graphics.TextureManager;
-using System;
+﻿using CEngineSharp_Client.Graphics.TextureManager;
 
 namespace CEngineSharp_Client.Graphics
 {
@@ -35,11 +33,11 @@ namespace CEngineSharp_Client.Graphics
 
         public static long FrameTime { get; set; }
 
-        private static long nextRenderTime;
+        private static long _nextRenderTime;
 
         public static void Initiate()
         {
-            RenderManager.RenderState = RenderStates.Render_Menu;
+            RenderManager.RenderState = RenderStates.RenderMenu;
         }
 
         public static void Render(GameTime gameTime)
@@ -48,7 +46,7 @@ namespace CEngineSharp_Client.Graphics
             {
                 switch (_renderstate)
                 {
-                    case RenderStates.Render_Game:
+                    case RenderStates.RenderGame:
 
                         if (_renderer != null)
                             _renderer.Unload();
@@ -59,7 +57,7 @@ namespace CEngineSharp_Client.Graphics
                         _renderStateChanged = false;
                         break;
 
-                    case RenderStates.Render_Menu:
+                    case RenderStates.RenderMenu:
 
                         if (_renderer != null)
                         {
@@ -80,13 +78,12 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (_renderer.CanRender)// && gameTime.TotalElapsedTime >= RenderManager.nextRenderTime)
-            {
-                long startTime = gameTime.TotalElapsedTime;
-                _renderer.Render(gameTime);
-                RenderManager.FrameTime = gameTime.TotalElapsedTime - startTime;
-                RenderManager.nextRenderTime = gameTime.TotalElapsedTime + ((1000 / 61) - RenderManager.FrameTime);
-            }
+            if (_renderer == null || !_renderer.CanRender) return;
+
+            var startTime = gameTime.TotalElapsedTime;
+            _renderer.Render(gameTime);
+            RenderManager.FrameTime = gameTime.TotalElapsedTime - startTime;
+            RenderManager._nextRenderTime = gameTime.TotalElapsedTime + ((1000 / Constants.MAX_FPS) - RenderManager.FrameTime);
         }
     }
 }

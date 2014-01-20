@@ -1,4 +1,4 @@
-﻿using CEngineSharp_Client.World.Content_Managers;
+﻿﻿using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
 using SFML.Window;
@@ -55,8 +55,8 @@ namespace CEngineSharp_Client.Graphics
 
         public void SnapToTarget()
         {
-            int x = this.Target.X * 32;
-            int y = this.Target.Y * 32;
+            int x = this.Target.Position.X * 32;
+            int y = this.Target.Position.Y * 32;
 
             Vector2f center = this.GetCenter();
 
@@ -83,10 +83,10 @@ namespace CEngineSharp_Client.Graphics
 
         public void Update(float playerSpeed)
         {
-            this.SetCenter(this.Target.PlayerSprite.Position);
+            this.SetCenter(this.Target.Sprite.Position);
 
-            float x = this.Target.PlayerSprite.Position.X;
-            float y = this.Target.PlayerSprite.Position.Y;
+            float x = this.Target.Sprite.Position.X;
+            float y = this.Target.Sprite.Position.Y;
 
             Vector2f center = this.GetCenter();
 

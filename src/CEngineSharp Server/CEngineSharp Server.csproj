@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ED4FF59C-B197-41C4-89D6-1FE53CE97F25}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
@@ -44,54 +44,42 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="GameLogic\ServerLoop.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="MainWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainWindow.Designer.cs">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Net\Networking.cs" />
-    <Compile Include="Net\Packets\AlertMessagePacket.cs" />
-    <Compile Include="Net\Packets\ChatMessagePacket.cs" />
-    <Compile Include="Net\Packets\DespawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\DropItemPacket.cs" />
-    <Compile Include="Net\Packets\InventoryUpdatePacket.cs" />
-    <Compile Include="Net\Packets\LoginPacket.cs" />
-    <Compile Include="Net\Packets\LogoutPacket.cs" />
-    <Compile Include="Net\Packets\MapCheckPacket.cs" />
-    <Compile Include="Net\Packets\MapDataPacket.cs" />
-    <Compile Include="Net\Packets\MapNpcsPacket.cs" />
-    <Compile Include="Net\Packets\MapNpcSpawnPacket.cs" />
-    <Compile Include="Net\Packets\PickupItemPacket.cs" />
-    <Compile Include="Net\Packets\PlayerVitalUpdatePacket.cs" />
-    <Compile Include="Net\Packets\SpawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\MovementPacket.cs" />
-    <Compile Include="Net\Packets\PlayerDataPacket.cs" />
-    <Compile Include="Net\Packets\RegisterationPacket.cs" />
+    <Compile Include="ServerLoop.cs" />
+    <Compile Include="Networking\NetworkManager.cs" />
+    <Compile Include="Networking\Packets\SocialPackets\AlertMessagePacket.cs" />
+    <Compile Include="Networking\Packets\SocialPackets\ChatMessagePacket.cs" />
+    <Compile Include="Networking\Packets\MapUpdatePackets\DespawnMapItemPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\DropItemPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\UpdateInventoryPacket.cs" />
+    <Compile Include="Networking\Packets\AuthenticationPackets\LoginPacket.cs" />
+    <Compile Include="Networking\Packets\AuthenticationPackets\LogoutPacket.cs" />
+    <Compile Include="Networking\Packets\MapUpdatePackets\MapCheckPacket.cs" />
+    <Compile Include="Networking\Packets\MapUpdatePackets\MapDataPacket.cs" />
+    <Compile Include="Networking\Packets\MapUpdatePackets\SpawnMapNpcPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\PickupItemPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\UpdatePlayerStatsPacket.cs" />
+    <Compile Include="Networking\Packets\MapUpdatePackets\SpawnMapItemPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\PlayerMovementPacket.cs" />
+    <Compile Include="Networking\Packets\PlayerUpdatePackets\PlayerDataPacket.cs" />
+    <Compile Include="Networking\Packets\AuthenticationPackets\RegisterationPacket.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Utilities\Color.cs" />
     <Compile Include="Utilities\ErrorHandler.cs" />
     <Compile Include="Utilities\Rect.cs" />
     <Compile Include="Utilities\ServerConfig.cs" />
-    <Compile Include="Utilities\TextboxStreamWriter.cs" />
-    <Compile Include="Utilities\ThreadManager.cs" />
-    <Compile Include="Utilities\Vector2i.cs" />
     <Compile Include="World\Content Managers\ItemManager.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Content Managers\NpcManager.cs" />
-    <Compile Include="World\Entites\IEntity.cs" />
-    <Compile Include="World\Entites\MapNpc.cs" />
-    <Compile Include="World\Entites\Npc.cs" />
-    <Compile Include="World\Entites\Player.cs" />
+    <Compile Include="World\ContentManager.cs" />
+    <Compile Include="World\Entities\IEntity.cs" />
+    <Compile Include="World\Entities\MapNpc.cs" />
+    <Compile Include="World\Entities\Npc.cs" />
+    <Compile Include="World\Entities\Player.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
     <Compile Include="World\Item.cs" />
     <Compile Include="World\Maps\Layers.cs" />
     <Compile Include="World\Maps\Map.cs" />
     <Compile Include="World\Maps\MapItem.cs" />
-    <Compile Include="World\Entites\Stats.cs" />
-    <Compile Include="World\Entites\Vitals.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -106,9 +94,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MainWindow.resx">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-    </EmbeddedResource>
+    <ProjectReference Include="..\CEngineSharp Utilities\CEngineSharp Utilities.csproj">
+      <Project>{1a9ec1bf-e330-494f-bd56-9b94c831a015}</Project>
+      <Name>CEngineSharp Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CEngineSharp World\CEngineSharp World.csproj">
+      <Project>{4d2c2f4c-3dbe-41c0-828e-7ae858a51739}</Project>
+      <Name>CEngineSharp World</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

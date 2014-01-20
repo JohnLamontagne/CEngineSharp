@@ -2,7 +2,7 @@
 {
     public enum RenderStates
     {
-        Render_Menu,
-        Render_Game
+        RenderMenu,
+        RenderGame
     }
 }
