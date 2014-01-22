@@ -13,7 +13,7 @@ namespace CEngineSharp_Client.Net.Packets.AuthenticationPacket
 
             if (PlayerManager.MyIndex == playerIndex)
             {
-                RenderManager.RenderState = RenderStates.RenderMenu;
+                RenderManager.Instance.RenderState = RenderStates.RenderMenu;
 
                 PlayerManager.ClearPlayers();
 

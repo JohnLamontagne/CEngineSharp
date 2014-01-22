@@ -1,7 +1,7 @@
-﻿using CEngineSharp_Server.Utilities;
+﻿using CEngineSharp_Server;
+using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Entities;
-using CEngineSharp_World;
-using CEngineSharp_World.Entities;
+using CEngineSharp_Utilities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
@@ -59,9 +59,27 @@ namespace CEngineSharp_Server.World.Content_Managers
             }
         }
 
-        public BasePlayer LoadPlayer(string playerName)
+        public Player LoadPlayer(string filePath)
         {
-            return BasePlayer.LoadPlayer(Constants.FILEPATH_PLAYERS + playerName + ".dat");
+            var player = new Player { Position = new Vector() };
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            {
+                using (var binaryReader = new BinaryReader(fileStream))
+                {
+                    player.Name = binaryReader.ReadString();
+                    player.Password = binaryReader.ReadString();
+                    player.TextureNumber = binaryReader.ReadInt32();
+                    player.Position.X = binaryReader.ReadInt32();
+                    player.Position.Y = binaryReader.ReadInt32();
+
+                    int statCount = binaryReader.ReadInt32();
+                    for (int i = 0; i < statCount; i++)
+                        player.SetStat((Stats)i, binaryReader.ReadInt32());
+                }
+            }
+
+            return player;
         }
 
         private bool CheckName(string name)

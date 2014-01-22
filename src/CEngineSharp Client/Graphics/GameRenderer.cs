@@ -24,8 +24,8 @@ namespace CEngineSharp_Client.Graphics
             Window.Resized += _window_Resized;
             Window.MouseButtonPressed += _window_MouseButtonPressed;
 
-            RenderManager.CurrentResolutionWidth = (int)Window.GetView().Size.X;
-            RenderManager.CurrentResolutionHeight = (int)Window.GetView().Size.Y;
+            RenderManager.Instance.CurrentResolutionWidth = (int)Window.GetView().Size.X;
+            RenderManager.Instance.CurrentResolutionHeight = (int)Window.GetView().Size.Y;
 
             this.CanRender = true;
         }
@@ -236,14 +236,14 @@ namespace CEngineSharp_Client.Graphics
 
         private void messageBoxAlert_ClosedCallback(object sender, CallbackArgs e)
         {
-            RenderManager.RenderState = RenderStates.RenderMenu;
-            Networking.Instance.Disconnect();
+            RenderManager.Instance.RenderState = RenderStates.RenderMenu;
+            NetManager.Instance.Disconnect();
         }
 
         private void buttonLogout_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
 
-            Networking.Instance.Disconnect();
+            NetManager.Instance.Disconnect();
         }
 
         private void textMyChat_ReturnKeyPressedCallback(object sender, CallbackArgs e)
@@ -252,7 +252,7 @@ namespace CEngineSharp_Client.Graphics
             var chatMessagePacket = new ChatMessagePacket();
 
             chatMessagePacket.WriteData(textMyChat.Text);
-            Networking.Instance.SendPacket(chatMessagePacket);
+            NetManager.Instance.SendPacket(chatMessagePacket);
             textMyChat.Text = "";
         }
 
@@ -262,8 +262,8 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Resized(object sender, SizeEventArgs e)
         {
-            RenderManager.CurrentResolutionHeight = (int)e.Height;
-            RenderManager.CurrentResolutionWidth = (int)e.Width;
+            RenderManager.Instance.CurrentResolutionHeight = (int)e.Height;
+            RenderManager.Instance.CurrentResolutionWidth = (int)e.Width;
         }
     }
 }

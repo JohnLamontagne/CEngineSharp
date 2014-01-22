@@ -13,7 +13,7 @@ namespace CEngineSharp_Client
             {
                 gameTime.Update();
 
-                Networking.Instance.ExecuteQueue();
+                NetManager.Instance.ExecuteQueue();
 
                 if (Client.InGame && PlayerManager.GetPlayer(PlayerManager.MyIndex) != null)
                 {
@@ -27,7 +27,7 @@ namespace CEngineSharp_Client
                     MapManager.Map.Update(gameTime);
                 }
 
-                RenderManager.Render(gameTime);
+                RenderManager.Instance.Render(gameTime);
 
             }
         }

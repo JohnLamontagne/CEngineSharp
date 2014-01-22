@@ -78,6 +78,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioManager.cs" />
+    <Compile Include="Audio\MusicManager.cs" />
+    <Compile Include="Audio\SFXManager.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="GameLoop.cs" />
@@ -96,7 +98,7 @@
     <Compile Include="Net\Packets\PlayerUpdatePackets\DropItemPacket.cs" />
     <Compile Include="Net\Packets\PlayerUpdatePackets\UpdateInventoryPacket.cs" />
     <Compile Include="Net\Packets\AuthenticationPacket\LoginPacket.cs" />
-    <Compile Include="Net\Networking.cs" />
+    <Compile Include="Net\NetManager.cs" />
     <Compile Include="Net\Packets\AuthenticationPacket\LogoutPacket.cs" />
     <Compile Include="Net\Packets\MapUpdatePackets\MapCheckPacket.cs" />
     <Compile Include="Net\Packets\MapUpdatePackets\MapDataPacket.cs" />
@@ -143,10 +145,6 @@
     <ProjectReference Include="..\CEngineSharp Utilities\CEngineSharp Utilities.csproj">
       <Project>{1a9ec1bf-e330-494f-bd56-9b94c831a015}</Project>
       <Name>CEngineSharp Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CEngineSharp World\CEngineSharp World.csproj">
-      <Project>{4D2C2F4C-3DBE-41C0-828E-7AE858A51739}</Project>
-      <Name>CEngineSharp World</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

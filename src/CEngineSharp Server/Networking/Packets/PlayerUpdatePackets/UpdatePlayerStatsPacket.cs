@@ -1,6 +1,6 @@
-﻿using CEngineSharp_Server.World.Entities;
+﻿using CEngineSharp_Server.World;
+using CEngineSharp_Server.World.Entities;
 using CEngineSharp_Utilities;
-using CEngineSharp_World.Entities;
 using SharpNetty;
 
 namespace CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets

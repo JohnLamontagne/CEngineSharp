@@ -1,6 +1,5 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
-using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
@@ -73,7 +72,7 @@ namespace CEngineSharp_Client.World
 
             public long SpawnDuration { get; set; }
 
-            public MapItem(Item item, int x, int y, int spawnDuration = -1)
+            public MapItem(Item item, int spawnDuration = -1)
             {
                 this.Item = item;
 
@@ -81,88 +80,87 @@ namespace CEngineSharp_Client.World
             }
         }
 
+        private readonly List<MapItem> _items;
 
-        private readonly List<MapItem> items;
+        private readonly List<Npc> _mapNpcs;
 
-        private readonly List<Npc> mapNpcs;
-
-        private Tile[,] tiles;
+        private Tile[,] _tiles;
 
         public string Name { get; set; }
 
-        public int Width { get { return this.tiles.GetLength(0); } }
+        public int Width { get { return this._tiles.GetLength(0); } }
 
-        public int Height { get { return this.tiles.GetLength(1); } }
+        public int Height { get { return this._tiles.GetLength(1); } }
 
         public int Version { get; set; }
 
         public Map()
         {
-            this.tiles = new Tile[0, 0];
-            this.items = new List<MapItem>();
-            this.mapNpcs = new List<Npc>();
+            this._tiles = new Tile[0, 0];
+            this._items = new List<MapItem>();
+            this._mapNpcs = new List<Npc>();
         }
 
         public Tile GetTile(int x, int y)
         {
-            return this.tiles[x, y];
+            return this._tiles[x, y];
         }
 
         public void SetTile(int x, int y, Tile tile)
         {
-            this.tiles[x, y] = tile;
+            this._tiles[x, y] = tile;
         }
 
         public void ResizeMap(int newWidth, int newHeight)
         {
             var newArray = new Tile[newWidth, newHeight];
-            int columnCount = this.tiles.GetLength(1);
+            int columnCount = this._tiles.GetLength(1);
             int columnCount2 = newHeight;
-            int columns = this.tiles.GetUpperBound(0);
+            int columns = this._tiles.GetUpperBound(0);
             for (int co = 0; co <= columns; co++)
-                Array.Copy(this.tiles, co * columnCount, newArray, co * columnCount2, columnCount);
+                Array.Copy(this._tiles, co * columnCount, newArray, co * columnCount2, columnCount);
 
-            this.tiles = newArray;
+            this._tiles = newArray;
         }
 
         public void SpawnMapItem(Item item, int x, int y, int spawnDuration)
         {
-            this.items.Add(new MapItem(item, x, y, spawnDuration));
+            this._items.Add(new MapItem(item, spawnDuration));
         }
 
         public void CacheMap()
         {
-            using (FileStream fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + this.Name + ".map", FileMode.OpenOrCreate))
+            using (var fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + this.Name + ".map", FileMode.OpenOrCreate))
             {
-                using (BinaryWriter binaryWriter = new BinaryWriter(fileStream))
+                using (var binaryWriter = new BinaryWriter(fileStream))
                 {
                     binaryWriter.Write(this.Name);
 
                     binaryWriter.Write(this.Version);
 
-                    binaryWriter.Write(this.tiles.GetLength(0));
-                    binaryWriter.Write(this.tiles.GetLength(1));
+                    binaryWriter.Write(this._tiles.GetLength(0));
+                    binaryWriter.Write(this._tiles.GetLength(1));
 
-                    for (int x = 0; x < this.tiles.GetLength(0); x++)
+                    for (int x = 0; x < this._tiles.GetLength(0); x++)
                     {
-                        for (int y = 0; y < this.tiles.GetLength(1); y++)
+                        for (int y = 0; y < this._tiles.GetLength(1); y++)
                         {
                             binaryWriter.Write(this.GetTile(x, y).Blocked);
 
                             foreach (Layers layer in Enum.GetValues(typeof(Map.Layers)))
                             {
-                                if (this.tiles[x, y].GetLayer(layer) == null)
+                                if (this._tiles[x, y].GetLayer(layer) == null)
                                 {
                                     binaryWriter.Write(false);
                                     continue;
                                 }
 
                                 binaryWriter.Write(true);
-                                binaryWriter.Write(RenderManager.TextureManager.GetTextureName(this.tiles[x, y].GetLayer(layer).Sprite.Texture));
-                                binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Left);
-                                binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Top);
-                                binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Width);
-                                binaryWriter.Write(this.tiles[x, y].GetLayer(layer).Sprite.TextureRect.Height);
+                                binaryWriter.Write(RenderManager.Instance.TextureManager.GetTextureName(this._tiles[x, y].GetLayer(layer).Sprite.Texture));
+                                binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Left);
+                                binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Top);
+                                binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Width);
+                                binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Height);
                             }
                         }
                     }
@@ -185,7 +183,7 @@ namespace CEngineSharp_Client.World
 
                     this.ResizeMap(mapWidth, mapHeight);
 
-                    while (RenderManager.CurrentRenderer is MenuRenderer) ;
+                    while (RenderManager.Instance.CurrentRenderer is MenuRenderer) ;
 
                     for (int x = 0; x < mapWidth; x++)
                     {
@@ -207,7 +205,7 @@ namespace CEngineSharp_Client.World
 
                                 var tileRect = new IntRect(tileLeft, tileTop, tileWidth, tileHeight);
 
-                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(RenderManager.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
+                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(RenderManager.Instance.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
                             }
                         }
                     }
@@ -217,7 +215,7 @@ namespace CEngineSharp_Client.World
 
         public Npc GetMapNpc(int index)
         {
-            return this.mapNpcs[index];
+            return this._mapNpcs[index];
         }
 
         public void Draw(RenderWindow window)
@@ -257,7 +255,7 @@ namespace CEngineSharp_Client.World
 
             if (mapItem != null)
             {
-                this.items.Remove(mapItem);
+                this._items.Remove(mapItem);
             }
         }
 
@@ -272,17 +270,17 @@ namespace CEngineSharp_Client.World
 
             var pickupItemPacket = new PickupItemPacket();
             pickupItemPacket.WriteData(mapItem);
-            Networking.Instance.SendPacket(pickupItemPacket);
+            NetManager.Instance.SendPacket(pickupItemPacket);
         }
 
         public MapItem FindMapItem(Vector2f position)
         {
-            return this.items.FirstOrDefault(mapItem => mapItem.Item.Sprite.Position.X == position.X && mapItem.Item.Sprite.Position.Y == position.Y);
+            return this._items.FirstOrDefault(mapItem => mapItem.Item.Sprite.Position.X == position.X && mapItem.Item.Sprite.Position.Y == position.Y);
         }
 
         private void DrawNpcs(RenderTarget window, int left, int top, int width, int height)
         {
-            foreach (var npc in this.mapNpcs)
+            foreach (var npc in this._mapNpcs)
             {
                 if (npc.X < left || npc.X > (left + width)) continue;
                 if (npc.Y < top || npc.Y > (top + height)) continue;
@@ -310,7 +308,7 @@ namespace CEngineSharp_Client.World
             left *= 32;
             top *= 32;
 
-            foreach (var mapItem in this.items)
+            foreach (var mapItem in this._items)
             {
                 if (mapItem.Item.Sprite.Position.X >= left && mapItem.Item.Sprite.Position.X <= (left + width))
                 {
@@ -328,14 +326,14 @@ namespace CEngineSharp_Client.World
             {
                 for (int y = top; y < height; y++)
                 {
-                    if (this.tiles[x, y].GetLayer(Layers.Ground) != null)
-                        window.Draw(this.tiles[x, y].GetLayer(Layers.Ground).Sprite);
+                    if (this._tiles[x, y].GetLayer(Layers.Ground) != null)
+                        window.Draw(this._tiles[x, y].GetLayer(Layers.Ground).Sprite);
 
-                    if (this.tiles[x, y].GetLayer(Layers.Mask) != null)
-                        window.Draw(this.tiles[x, y].GetLayer(Layers.Mask).Sprite);
+                    if (this._tiles[x, y].GetLayer(Layers.Mask) != null)
+                        window.Draw(this._tiles[x, y].GetLayer(Layers.Mask).Sprite);
 
-                    if (this.tiles[x, y].GetLayer(Layers.Mask2) != null)
-                        window.Draw(this.tiles[x, y].GetLayer(Layers.Mask2).Sprite);
+                    if (this._tiles[x, y].GetLayer(Layers.Mask2) != null)
+                        window.Draw(this._tiles[x, y].GetLayer(Layers.Mask2).Sprite);
                 }
             }
         }
@@ -346,23 +344,23 @@ namespace CEngineSharp_Client.World
             {
                 for (int y = top; y < height; y++)
                 {
-                    if (this.tiles[x, y].GetLayer(Layers.Fringe) != null)
-                        window.Draw(this.tiles[x, y].GetLayer(Layers.Fringe).Sprite);
+                    if (this._tiles[x, y].GetLayer(Layers.Fringe) != null)
+                        window.Draw(this._tiles[x, y].GetLayer(Layers.Fringe).Sprite);
 
-                    if (this.tiles[x, y].GetLayer(Layers.Fringe2) != null)
-                        window.Draw(this.tiles[x, y].GetLayer(Layers.Fringe2).Sprite);
+                    if (this._tiles[x, y].GetLayer(Layers.Fringe2) != null)
+                        window.Draw(this._tiles[x, y].GetLayer(Layers.Fringe2).Sprite);
                 }
             }
         }
 
         public void SpawnMapNpc(Npc mapNpc)
         {
-            this.mapNpcs.Add(mapNpc);
+            this._mapNpcs.Add(mapNpc);
         }
 
         public void Update(GameTime gameTime)
         {
-            foreach (var npc in this.mapNpcs)
+            foreach (var npc in this._mapNpcs)
             {
                 npc.Update(gameTime);
             }

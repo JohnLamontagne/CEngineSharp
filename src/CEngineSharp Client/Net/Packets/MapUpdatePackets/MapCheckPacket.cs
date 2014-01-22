@@ -30,7 +30,7 @@ namespace CEngineSharp_Client.Net.Packets.MapUpdatePackets
 
             this.WriteData((mapExistence & mapVersionMatch));
 
-            Networking.Instance.SendPacket(this);
+            NetManager.Instance.SendPacket(this);
         }
 
         public override int PacketID

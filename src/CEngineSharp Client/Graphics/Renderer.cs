@@ -27,7 +27,7 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Closed(object sender, EventArgs e)
         {
-            Networking.Instance.Disconnect();
+            NetManager.Instance.Disconnect();
             Environment.Exit(0);
         }
 

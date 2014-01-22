@@ -1,18 +1,19 @@
-﻿using CEngineSharp_Server.Networking.Packets.MapUpdatePackets;
+﻿using CEngineSharp_Server;
+using CEngineSharp_Server.Networking.Packets.MapUpdatePackets;
 using CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets;
 using CEngineSharp_Server.Networking.Packets.SocialPackets;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Maps;
-using CEngineSharp_World;
-using CEngineSharp_World.Entities;
+using CEngineSharp_Utilities;
 using SharpNetty;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Map = CEngineSharp_Server.World.Maps.Map;
 
 namespace CEngineSharp_Server.World.Entities
 {
-    public class Player : BasePlayer, IEntity
+    public class Player : IEntity
     {
         public enum AccessLevels
         {
@@ -21,6 +22,21 @@ namespace CEngineSharp_Server.World.Entities
             Moderator,
             Admin
         }
+
+        public string Name { get; set; }
+
+        public string Password { get; set; }
+
+        public Vector Position { get; set; }
+
+        public int Level { get; set; }
+
+        public int TextureNumber { get; set; }
+
+        public int MapNum { get; protected set; }
+
+        private readonly int[] _stats;
+
 
         private readonly List<Item> _inventory = new List<Item>();
 
@@ -44,6 +60,23 @@ namespace CEngineSharp_Server.World.Entities
         {
             this.Position = new Vector(0, 0);
             this.PlayerIndex = index;
+            _stats = new int[(int)Stats.STAT_COUNT];
+        }
+
+        public Player()
+        {
+            _stats = new int[(int)Stats.STAT_COUNT];
+            this.Position = new Vector();
+        }
+
+        public int GetStat(Stats stat)
+        {
+            return _stats[(int)stat];
+        }
+
+        public void SetStat(Stats stat, int value)
+        {
+            _stats[(int)stat] = value;
         }
 
         public Item[] GetInventory()
@@ -244,6 +277,27 @@ namespace CEngineSharp_Server.World.Entities
         public void SendPacket(Packet packet)
         {
             this.Connection.SendPacket(packet);
+        }
+
+
+        public void Save(string filePath)
+        {
+            using (var fileStream = new FileStream(filePath + this.Name + ".dat", FileMode.OpenOrCreate))
+            {
+                using (var binaryWriter = new BinaryWriter(fileStream))
+                {
+                    binaryWriter.Write(this.Name);
+                    binaryWriter.Write(this.Password);
+                    binaryWriter.Write(this.Position.X);
+                    binaryWriter.Write(this.Position.Y);
+
+                    binaryWriter.Write(_stats.Length);
+                    foreach (var stat in _stats)
+                    {
+                        binaryWriter.Write(stat);
+                    }
+                }
+            }
         }
     }
 }

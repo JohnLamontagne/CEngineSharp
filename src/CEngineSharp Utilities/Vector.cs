@@ -1,4 +1,4 @@
-﻿namespace CEngineSharp_World
+﻿namespace CEngineSharp_Utilities
 {
     public sealed class Vector
     {

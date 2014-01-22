@@ -1,5 +1,6 @@
-﻿using CEngineSharp_Server.World.Entities;
-using CEngineSharp_World.Entities;
+﻿using CEngineSharp_Server;
+using CEngineSharp_Server.World.Entities;
+using CEngineSharp_Utilities;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace CEngineSharp_Server.World.Content_Managers
 
             foreach (var file in directoryInfo.GetFiles("*.dat", SearchOption.TopDirectoryOnly))
             {
-                _npcs.Add(BaseNpc.LoadNpc(file.FullName) as Npc);
+                _npcs.Add(this.LoadNpc(file.FullName));
             }
         }
 
@@ -45,6 +46,28 @@ namespace CEngineSharp_Server.World.Content_Managers
         {
             foreach (var npc in _npcs)
                 npc.Save(Constants.FILEPATH_NPCS + npc.Name + ".dat");
+        }
+
+        public Npc LoadNpc(string filePath)
+        {
+            var npc = new Npc() { Position = new Vector() };
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            {
+                using (var binaryReader = new BinaryReader(fileStream))
+                {
+                    npc.Name = binaryReader.ReadString();
+                    npc.TextureNumber = binaryReader.ReadInt32();
+                    npc.Position.X = binaryReader.ReadInt32();
+                    npc.Position.Y = binaryReader.ReadInt32();
+
+                    var statCount = binaryReader.ReadInt32();
+                    for (int i = 0; i < statCount; i++)
+                        npc.SetStat((Stats)i, binaryReader.ReadInt32());
+                }
+            }
+
+            return npc;
         }
     }
 }

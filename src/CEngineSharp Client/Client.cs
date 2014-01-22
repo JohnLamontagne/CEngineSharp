@@ -21,9 +21,9 @@ namespace CEngineSharp_Client
 
             ShuttingDown = false;
 
-            AudioManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
+            AudioManager.Instance.SfxManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
 
-            RenderManager.Initiate();
+            RenderManager.Instance.Initiate();
 
             GameLoop.Start(gameTime);
         }

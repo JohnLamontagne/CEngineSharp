@@ -14,7 +14,7 @@ namespace CEngineSharp_Client.Net.Packets.PlayerUpdatePackets
 
             var player = PlayerManager.GetPlayer(PlayerManager.MyIndex);
 
-            var packets = Networking.Instance;
+            var packets = NetManager.Instance;
 
             player.ClearInventory();
 

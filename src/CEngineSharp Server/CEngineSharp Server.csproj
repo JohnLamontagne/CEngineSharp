@@ -80,6 +80,7 @@
     <Compile Include="World\Maps\Layers.cs" />
     <Compile Include="World\Maps\Map.cs" />
     <Compile Include="World\Maps\MapItem.cs" />
+    <Compile Include="World\Stats.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -97,10 +98,6 @@
     <ProjectReference Include="..\CEngineSharp Utilities\CEngineSharp Utilities.csproj">
       <Project>{1a9ec1bf-e330-494f-bd56-9b94c831a015}</Project>
       <Name>CEngineSharp Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CEngineSharp World\CEngineSharp World.csproj">
-      <Project>{4d2c2f4c-3dbe-41c0-828e-7ae858a51739}</Project>
-      <Name>CEngineSharp World</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

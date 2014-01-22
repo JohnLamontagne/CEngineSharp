@@ -1,4 +1,5 @@
-﻿using CEngineSharp_World;
+﻿using CEngineSharp_Server;
+using CEngineSharp_Utilities;
 
 namespace CEngineSharp_Server.World.Entities
 {
@@ -13,5 +14,17 @@ namespace CEngineSharp_Server.World.Entities
         void MoveTo(Vector vector, byte direction);
 
         int GetDamage();
+
+        string Name { get; set; }
+
+        int TextureNumber { get; set; }
+
+        int Level { get; set; }
+
+        Vector Position { get; set; }
+
+        int GetStat(Stats stat);
+
+        void SetStat(Stats stat, int value);
     }
 }

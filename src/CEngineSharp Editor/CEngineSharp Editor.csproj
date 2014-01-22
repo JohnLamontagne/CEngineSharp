@@ -134,12 +134,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CEngineSharp World\CEngineSharp World.csproj">
-      <Project>{4d2c2f4c-3dbe-41c0-828e-7ae858a51739}</Project>
-      <Name>CEngineSharp World</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

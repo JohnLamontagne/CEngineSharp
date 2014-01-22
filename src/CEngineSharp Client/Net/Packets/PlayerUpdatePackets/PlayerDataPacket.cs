@@ -20,9 +20,9 @@ namespace CEngineSharp_Client.Net.Packets.PlayerUpdatePackets
             var direction = this.DataBuffer.ReadByte();
             var textureNumber = this.DataBuffer.ReadInteger();
 
-            var gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
+            var gameRenderer = RenderManager.Instance.CurrentRenderer as GameRenderer;
 
-            var player = new Player(RenderManager.TextureManager.GetTexture("character" + textureNumber), new Vector2i(positionX, positionY));
+            var player = new Player(RenderManager.Instance.TextureManager.GetTexture("character" + textureNumber), new Vector2i(positionX, positionY));
             PlayerManager.AddPlayer(playerIndex, player);
 
             if (playerIndex == PlayerManager.MyIndex)

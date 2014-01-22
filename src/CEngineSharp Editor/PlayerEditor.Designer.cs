@@ -127,7 +127,7 @@
             this.textMP.Name = "textMP";
             this.textMP.Size = new System.Drawing.Size(100, 20);
             this.textMP.TabIndex = 1;
-            this.textMP.TextChanged += new System.EventHandler(this.textMP_TextChanged);
+            //this.textMP.TextChanged += new System.EventHandler(this.textMP_TextChanged);
             // 
             // textHP
             // 
@@ -135,7 +135,7 @@
             this.textHP.Name = "textHP";
             this.textHP.Size = new System.Drawing.Size(100, 20);
             this.textHP.TabIndex = 0;
-            this.textHP.TextChanged += new System.EventHandler(this.textHP_TextChanged);
+            //this.textHP.TextChanged += new System.EventHandler(this.textHP_TextChanged);
             // 
             // label2
             // 
@@ -152,7 +152,7 @@
             this.playerTextureScrollBar.Name = "playerTextureScrollBar";
             this.playerTextureScrollBar.Size = new System.Drawing.Size(83, 17);
             this.playerTextureScrollBar.TabIndex = 4;
-            this.playerTextureScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.playerTextureScrollBar_Scroll);
+            //this.playerTextureScrollBar.Scroll += new System.Windows.Forms.ScrollEventHandler(this.playerTextureScrollBar_Scroll);
             // 
             // playerSpritePic
             // 

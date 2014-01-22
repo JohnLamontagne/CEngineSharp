@@ -1,27 +1,17 @@
 ﻿using CEngineSharp_Client.Graphics;
-using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
 using CEngineSharp_Client.World.Content_Managers;
-using CEngineSharp_Utilities;
 using SharpNetty;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace CEngineSharp_Client.Net
 {
-    public class Networking
+    public class NetManager
     {
-        private static Networking _networking;
+        private static NetManager _networking;
 
-        public static Networking Instance
+        public static NetManager Instance
         {
-            get
-            {
-                if (_networking == null) _networking = new Networking();
-
-                return _networking;
-            }
+            get { return _networking ?? (_networking = new NetManager()); }
         }
 
         private NettyClient _nettyClient;
@@ -50,7 +40,7 @@ namespace CEngineSharp_Client.Net
             {
                 Client.InGame = false;
 
-                RenderManager.RenderState = RenderStates.RenderMenu;
+                RenderManager.Instance.RenderState = RenderStates.RenderMenu;
 
                 PlayerManager.ClearPlayers();
             }
@@ -69,7 +59,7 @@ namespace CEngineSharp_Client.Net
             {
                 Client.InGame = false;
 
-                RenderManager.RenderState = RenderStates.RenderMenu;
+                RenderManager.Instance.RenderState = RenderStates.RenderMenu;
 
                 PlayerManager.ClearPlayers();
             }

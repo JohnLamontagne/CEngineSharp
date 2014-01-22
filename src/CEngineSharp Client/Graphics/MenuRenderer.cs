@@ -27,7 +27,7 @@ namespace CEngineSharp_Client.Graphics
 
         protected override void LoadInterface()
         {
-            this._menuBackground = new Sprite(RenderManager.TextureManager.GetTexture("MenuBackground"));
+            this._menuBackground = new Sprite(RenderManager.Instance.TextureManager.GetTexture("MenuBackground"));
 
             #region Status Label
 
@@ -164,12 +164,12 @@ namespace CEngineSharp_Client.Graphics
 
         private void buttonSendRegistartion_LeftMouseClickedCallback(object sender, CallbackArgs e)
         {
-            Networking.Instance.Connect();
+            NetManager.Instance.Connect();
 
             var registrationPacket = new RegisterationPacket();
             registrationPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
 
-            Networking.Instance.SendPacket(registrationPacket);
+            NetManager.Instance.SendPacket(registrationPacket);
         }
 
         private void buttonBack_LeftMouseClickedCallback(object sender, CallbackArgs e)
@@ -219,14 +219,14 @@ namespace CEngineSharp_Client.Graphics
             this.Gui.Get<Label>("labelStatus").Text = "Connecting to the server...";
             this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
-            if (Networking.Instance.Connect())
+            if (NetManager.Instance.Connect())
             {
                 this.Gui.Get<Label>("labelStatus").Text = "Connected! Sending login information...";
                 this.Gui.Get<Label>("labelStatus").Position = new Vector2f((Window.Size.X / 2) - (this.Gui.Get<Label>("labelStatus").Size.X / 2), 50);
 
                 var loginPacket = new LoginPacket();
                 loginPacket.WriteData(this.Gui.Get<EditBox>("textUser").Text, this.Gui.Get<EditBox>("textPassword").Text);
-                Networking.Instance.SendPacket(loginPacket);
+                NetManager.Instance.SendPacket(loginPacket);
             }
             else
             {

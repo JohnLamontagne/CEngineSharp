@@ -19,9 +19,9 @@ namespace CEngineSharp_Client.Net.Packets.SocialPackets
             var b = this.DataBuffer.ReadByte();
             var alertColor = new Color(r, g, b);
 
-            if (RenderManager.CurrentRenderer.GetType() != typeof(GameRenderer)) return;
+            if (RenderManager.Instance.CurrentRenderer.GetType() != typeof(GameRenderer)) return;
 
-            var gameRenderer = RenderManager.CurrentRenderer as GameRenderer;
+            var gameRenderer = RenderManager.Instance.CurrentRenderer as GameRenderer;
 
             // This should NEVER be true if all is well.
             Debug.Assert(gameRenderer != null, "Graphical transition error!");

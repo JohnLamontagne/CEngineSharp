@@ -22,7 +22,7 @@ namespace CEngineSharp_Client.Graphics
 
         public Camera(Player target)
         {
-            this._view = new View((RenderManager.CurrentRenderer as GameRenderer).GetWindow().DefaultView);
+            _view = new View((RenderManager.Instance.CurrentRenderer).GetWindow().DefaultView);
             this.Target = target;
         }
 
@@ -55,27 +55,27 @@ namespace CEngineSharp_Client.Graphics
 
         public void SnapToTarget()
         {
-            int x = this.Target.Position.X * 32;
-            int y = this.Target.Position.Y * 32;
+            var x = this.Target.Position.X * 32;
+            var y = this.Target.Position.Y * 32;
 
-            Vector2f center = this.GetCenter();
+            var center = this.GetCenter();
 
-            if (x >= (RenderManager.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
+            if (x >= (RenderManager.Instance.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
             {
                 center.X = x;
             }
-            else if (x > ((MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2)))
+            else if (x > ((MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2)))
             {
-                center.X = (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2);
+                center.X = (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2);
             }
 
-            if (y >= (RenderManager.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
+            if (y >= (RenderManager.Instance.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
             {
                 center.Y = y;
             }
-            else if (y > ((MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2)))
+            else if (y > ((MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2)))
             {
-                center.Y = (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2);
+                center.Y = (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2);
             }
 
             this.SetCenter(center);
@@ -85,12 +85,12 @@ namespace CEngineSharp_Client.Graphics
         {
             this.SetCenter(this.Target.Sprite.Position);
 
-            float x = this.Target.Sprite.Position.X;
-            float y = this.Target.Sprite.Position.Y;
+            var x = this.Target.Sprite.Position.X;
+            var y = this.Target.Sprite.Position.Y;
 
-            Vector2f center = this.GetCenter();
+            var center = this.GetCenter();
 
-            if (x >= (RenderManager.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
+            if (x >= (RenderManager.Instance.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
             {
                 if (x < _view.Center.X)
                 {
@@ -102,7 +102,7 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (y >= (RenderManager.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
+            if (y >= (RenderManager.Instance.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
             {
                 if (y < _view.Center.Y)
                 {
@@ -114,17 +114,17 @@ namespace CEngineSharp_Client.Graphics
                 }
             }
 
-            if (center.X < (RenderManager.CurrentResolutionWidth / 2))
-                center.X = RenderManager.CurrentResolutionWidth / 2;
+            if (center.X < (RenderManager.Instance.CurrentResolutionWidth / 2))
+                center.X = RenderManager.Instance.CurrentResolutionWidth / 2;
 
-            if (x >= (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2))
-                center.X = (MapManager.Map.Width * 32) - (RenderManager.CurrentResolutionWidth / 2);
+            if (x >= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
+                center.X = (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2);
 
-            if (center.Y < (RenderManager.CurrentResolutionHeight / 2))
-                center.Y = RenderManager.CurrentResolutionHeight / 2;
+            if (center.Y < (RenderManager.Instance.CurrentResolutionHeight / 2))
+                center.Y = RenderManager.Instance.CurrentResolutionHeight / 2;
 
-            if (y >= (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2))
-                center.Y = (MapManager.Map.Height * 32) - (RenderManager.CurrentResolutionHeight / 2);
+            if (y >= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
+                center.Y = (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2);
 
             this.SetCenter(center);
         }

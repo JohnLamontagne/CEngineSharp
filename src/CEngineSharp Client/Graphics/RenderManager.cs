@@ -2,23 +2,33 @@
 
 namespace CEngineSharp_Client.Graphics
 {
-    public static class RenderManager
+    public class RenderManager
     {
-        private static Renderer _renderer;
+        #region Singleton
 
-        public static Renderer CurrentRenderer { get { return _renderer; } private set { _renderer = value; } }
+        private static RenderManager _renderManager;
 
-        public static int CurrentResolutionWidth { get; set; }
+        public static RenderManager Instance { get { return _renderManager ?? (_renderManager = new RenderManager()); } }
 
-        public static int CurrentResolutionHeight { get; set; }
+        #endregion
 
-        public static ITextureManager TextureManager { get; private set; }
+        private Renderer _renderer;
 
-        private static RenderStates _renderstate;
+        public Renderer CurrentRenderer { get { return _renderer; } private set { _renderer = value; } }
 
-        private static bool _renderStateChanged = false;
+        public int CurrentResolutionWidth { get; set; }
 
-        public static RenderStates RenderState
+        public int CurrentResolutionHeight { get; set; }
+
+        public ITextureManager TextureManager { get; private set; }
+
+        public bool FpsLock { get; set; }
+
+        private RenderStates _renderstate;
+
+        private bool _renderStateChanged = false;
+
+        public RenderStates RenderState
         {
             get
             {
@@ -31,16 +41,16 @@ namespace CEngineSharp_Client.Graphics
             }
         }
 
-        public static long FrameTime { get; set; }
+        public long FrameTime { get; set; }
 
-        private static long _nextRenderTime;
+        private long _nextRenderTime;
 
-        public static void Initiate()
+        public void Initiate()
         {
-            RenderManager.RenderState = RenderStates.RenderMenu;
+            RenderState = RenderStates.RenderMenu;
         }
 
-        public static void Render(GameTime gameTime)
+        public void Render(GameTime gameTime)
         {
             if (_renderStateChanged)
             {
@@ -51,9 +61,9 @@ namespace CEngineSharp_Client.Graphics
                         if (_renderer != null)
                             _renderer.Unload();
 
-                        RenderManager.TextureManager = new GameTextureManager();
-                        RenderManager.TextureManager.LoadTextures();
-                        RenderManager.CurrentRenderer = new GameRenderer(_renderer.GetWindow());
+                        TextureManager = new GameTextureManager();
+                        TextureManager.LoadTextures();
+                        CurrentRenderer = new GameRenderer(_renderer.GetWindow());
                         _renderStateChanged = false;
                         break;
 
@@ -62,15 +72,15 @@ namespace CEngineSharp_Client.Graphics
                         if (_renderer != null)
                         {
                             _renderer.Unload();
-                            RenderManager.TextureManager = new MenuTextureManager();
-                            RenderManager.TextureManager.LoadTextures();
-                            RenderManager.CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+                            TextureManager = new MenuTextureManager();
+                            TextureManager.LoadTextures();
+                            CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
                         }
                         else
                         {
-                            RenderManager.TextureManager = new MenuTextureManager();
-                            RenderManager.TextureManager.LoadTextures();
-                            RenderManager.CurrentRenderer = new MenuRenderer();
+                            TextureManager = new MenuTextureManager();
+                            TextureManager.LoadTextures();
+                            CurrentRenderer = new MenuRenderer();
                         }
 
                         _renderStateChanged = false;
@@ -81,9 +91,12 @@ namespace CEngineSharp_Client.Graphics
             if (_renderer == null || !_renderer.CanRender) return;
 
             var startTime = gameTime.TotalElapsedTime;
-            _renderer.Render(gameTime);
-            RenderManager.FrameTime = gameTime.TotalElapsedTime - startTime;
-            RenderManager._nextRenderTime = gameTime.TotalElapsedTime + ((1000 / Constants.MAX_FPS) - RenderManager.FrameTime);
+
+            if (!this.FpsLock || gameTime.TotalElapsedTime >= _nextRenderTime)
+                _renderer.Render(gameTime);
+
+            FrameTime = gameTime.TotalElapsedTime - startTime;
+            _nextRenderTime = gameTime.TotalElapsedTime + ((1000 / Constants.MAX_FPS) - this.FrameTime);
         }
     }
 }

@@ -20,18 +20,18 @@ namespace CEngineSharp_Client.Net.Packets.AuthenticationPacket
             {
                 PlayerManager.MyIndex = this.DataBuffer.ReadInteger();
 
-                RenderManager.RenderState = RenderStates.RenderGame;
+                RenderManager.Instance.RenderState = RenderStates.RenderGame;
             }
             else
             {
-                var menuRenderer = RenderManager.CurrentRenderer as MenuRenderer;
+                var menuRenderer = RenderManager.Instance.CurrentRenderer as MenuRenderer;
 
 
                 // This should NEVER be true if all is well.
                 Debug.Assert(menuRenderer != null, "Graphical transition error!");
                 menuRenderer.SetMenuStatus(this.DataBuffer.ReadString());
 
-                Networking.Instance.Disconnect();
+                NetManager.Instance.Disconnect();
             }
         }
 

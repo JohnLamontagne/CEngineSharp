@@ -72,7 +72,7 @@ namespace CEngineSharp_Client.World.Entity
 
         public int MouseCordToSlotNum(int mouseX, int mouseY)
         {
-            var gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
+            var gameRenderer = (RenderManager.Instance.CurrentRenderer as GameRenderer);
 
             var invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
             var invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
@@ -107,7 +107,7 @@ namespace CEngineSharp_Client.World.Entity
 
             int slotNum = _inventory.Count - 1;
 
-            var gameRenderer = (RenderManager.CurrentRenderer as GameRenderer);
+            var gameRenderer = (RenderManager.Instance.CurrentRenderer as GameRenderer);
 
             if (gameRenderer != null)
             {
@@ -130,7 +130,7 @@ namespace CEngineSharp_Client.World.Entity
 
             var dropItemPacket = new DropItemPacket();
             dropItemPacket.WriteData(slotNum);
-            Networking.Instance.SendPacket(dropItemPacket);
+            NetManager.Instance.SendPacket(dropItemPacket);
         }
 
         public void Warp(int newX, int newY, Directions direction)
@@ -194,7 +194,7 @@ namespace CEngineSharp_Client.World.Entity
                             MapManager.Map.GetTile(x, y).IsOccupied = false;
                             y += 1;
                             movementPacket.WriteData(x, y, this.Direction);
-                            Networking.Instance.SendPacket(movementPacket);
+                            NetManager.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -207,7 +207,7 @@ namespace CEngineSharp_Client.World.Entity
                             MapManager.Map.GetTile(x, y).IsOccupied = false;
                             y -= 1;
                             movementPacket.WriteData(x, y, this.Direction);
-                            Networking.Instance.SendPacket(movementPacket);
+                            NetManager.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -220,7 +220,7 @@ namespace CEngineSharp_Client.World.Entity
                             MapManager.Map.GetTile(x, y).IsOccupied = false;
                             x += 1;
                             movementPacket.WriteData(x, y, this.Direction);
-                            Networking.Instance.SendPacket(movementPacket);
+                            NetManager.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 
@@ -233,7 +233,7 @@ namespace CEngineSharp_Client.World.Entity
                             MapManager.Map.GetTile(x, y).IsOccupied = false;
                             x -= 1;
                             movementPacket.WriteData(x, y, this.Direction);
-                            Networking.Instance.SendPacket(movementPacket);
+                            NetManager.Instance.SendPacket(movementPacket);
                             this.CanMove = false;
                         }
 

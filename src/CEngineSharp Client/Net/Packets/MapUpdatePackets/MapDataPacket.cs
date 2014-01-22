@@ -22,7 +22,7 @@ namespace CEngineSharp_Client.Net.Packets.MapUpdatePackets
 
             map.ResizeMap(this.DataBuffer.ReadInteger(), this.DataBuffer.ReadInteger());
 
-            while (RenderManager.CurrentRenderer is MenuRenderer) ;
+            while (RenderManager.Instance.CurrentRenderer is MenuRenderer) ;
 
             for (int x = 0; x < map.Width; x++)
             {
@@ -44,7 +44,7 @@ namespace CEngineSharp_Client.Net.Packets.MapUpdatePackets
 
                         var textureRect = new IntRect(left, top, width, height);
 
-                        var tileSprite = new Sprite(RenderManager.TextureManager.GetTexture("tileset" + textureNumber.ToString()))
+                        var tileSprite = new Sprite(RenderManager.Instance.TextureManager.GetTexture("tileset" + textureNumber.ToString()))
                         {
                             TextureRect = textureRect
                         };
@@ -62,7 +62,7 @@ namespace CEngineSharp_Client.Net.Packets.MapUpdatePackets
                 {
                     Name = this.DataBuffer.ReadString(),
                     Level = this.DataBuffer.ReadInteger(),
-                    Sprite = new Sprite(RenderManager.TextureManager.GetTexture("npc" + this.DataBuffer.ReadInteger())),
+                    Sprite = new Sprite(RenderManager.Instance.TextureManager.GetTexture("npc" + this.DataBuffer.ReadInteger())),
                 };
                 var position = this.DataBuffer.ReadVector();
                 npc.Position = new Vector2i(position.X, position.Y);
@@ -74,7 +74,7 @@ namespace CEngineSharp_Client.Net.Packets.MapUpdatePackets
             // Notify the server that we're now in the game.
             var mapCheckPacket = new MapCheckPacket();
             mapCheckPacket.WriteData(true);
-            Networking.Instance.SendPacket(mapCheckPacket);
+            NetManager.Instance.SendPacket(mapCheckPacket);
         }
 
         public override int PacketID
