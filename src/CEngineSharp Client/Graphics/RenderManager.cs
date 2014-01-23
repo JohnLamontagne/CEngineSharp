@@ -98,5 +98,40 @@ namespace CEngineSharp_Client.Graphics
             FrameTime = gameTime.TotalElapsedTime - startTime;
             _nextRenderTime = gameTime.TotalElapsedTime + ((1000 / Constants.MAX_FPS) - this.FrameTime);
         }
+
+
+        public void ForceRenderState(RenderStates renderState)
+        {
+            switch (renderState)
+            {
+                case RenderStates.RenderGame:
+                    if (_renderer != null)
+                        _renderer.Unload();
+
+                    TextureManager = new GameTextureManager();
+                    TextureManager.LoadTextures();
+                    CurrentRenderer = new GameRenderer(_renderer.GetWindow());
+                    _renderStateChanged = false;
+                    break;
+
+                case RenderStates.RenderMenu:
+                    if (_renderer != null)
+                    {
+                        _renderer.Unload();
+                        TextureManager = new MenuTextureManager();
+                        TextureManager.LoadTextures();
+                        CurrentRenderer = new MenuRenderer(_renderer.GetWindow());
+                    }
+                    else
+                    {
+                        TextureManager = new MenuTextureManager();
+                        TextureManager.LoadTextures();
+                        CurrentRenderer = new MenuRenderer();
+                    }
+
+                    _renderStateChanged = false;
+                    break;
+            }
+        }
     }
 }

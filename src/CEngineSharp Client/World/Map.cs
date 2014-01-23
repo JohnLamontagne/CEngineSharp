@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RenderStates = CEngineSharp_Client.Graphics.RenderStates;
 
 namespace CEngineSharp_Client.World
 {
@@ -170,6 +171,11 @@ namespace CEngineSharp_Client.World
 
         public void LoadCache(string mapName)
         {
+            if (RenderManager.Instance.CurrentRenderer is MenuRenderer)
+            {
+                RenderManager.Instance.ForceRenderState(RenderStates.RenderGame);
+            }
+
             using (var fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + mapName + ".map", FileMode.OpenOrCreate))
             {
                 using (var binaryReader = new BinaryReader(fileStream))
@@ -182,8 +188,6 @@ namespace CEngineSharp_Client.World
                     var mapHeight = binaryReader.ReadInt32();
 
                     this.ResizeMap(mapWidth, mapHeight);
-
-                    while (RenderManager.Instance.CurrentRenderer is MenuRenderer) ;
 
                     for (int x = 0; x < mapWidth; x++)
                     {
@@ -218,36 +222,7 @@ namespace CEngineSharp_Client.World
             return this._mapNpcs[index];
         }
 
-        public void Draw(RenderWindow window)
-        {
-            var camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
 
-            var left = (int)(camera.ViewLeft / 32);
-            var top = (int)(camera.ViewTop / 32);
-
-            var width = left + (int)(camera.ViewWidth / 32) + 2;
-            var height = top + (int)(camera.ViewHeight / 32) + 1;
-
-            if (width > this.Width)
-                width = this.Width;
-
-            if (height > this.Height)
-                height = this.Height;
-
-            window.SetView(PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.GetView());
-
-            this.DrawLowerTiles(window, left, top, width, height);
-
-            this.DrawMapItems(window, left, top, width, height);
-
-            this.DrawPlayers(window, left, top, width, height);
-
-            this.DrawNpcs(window, left, top, width, height);
-
-            this.DrawUpperTiles(window, left, top, width, height);
-
-            window.SetView(window.DefaultView);
-        }
 
         public void RemoveMapItem(int mapItemX, int mapItemY)
         {
@@ -276,6 +251,34 @@ namespace CEngineSharp_Client.World
         public MapItem FindMapItem(Vector2f position)
         {
             return this._items.FirstOrDefault(mapItem => mapItem.Item.Sprite.Position.X == position.X && mapItem.Item.Sprite.Position.Y == position.Y);
+        }
+
+        public void Draw(RenderWindow window)
+        {
+            var camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
+
+            var left = (int)(camera.ViewRect.Left / 32);
+            var top = (int)(camera.ViewRect.Top / 32);
+
+            var width = left + (int)(camera.ViewRect.Width / 32) + 2;
+            var height = top + (int)(camera.ViewRect.Height / 32) + 1;
+
+            if (width > this.Width)
+                width = this.Width;
+
+            if (height > this.Height)
+                height = this.Height;
+
+            this.DrawLowerTiles(window, left, top, width, height);
+
+            this.DrawMapItems(window, left, top, width, height);
+
+            this.DrawPlayers(window, left, top, width, height);
+
+            this.DrawNpcs(window, left, top, width, height);
+
+            this.DrawUpperTiles(window, left, top, width, height);
+
         }
 
         private void DrawNpcs(RenderTarget window, int left, int top, int width, int height)

@@ -25,7 +25,7 @@ namespace CEngineSharp_Client.Audio
                 _sounds.Add(file.Name.Remove(file.Name.Length - 4, 4), new SoundBuffer(file.FullName));
             }
 
-            Console.WriteLine(@"Loaded {0} sound effects.", _sounds.Count);
+            Console.WriteLine(@"Loaded {0} sound effect(s).", _sounds.Count);
         }
 
         public void PlaySound(string soundName, double listenerX, double listenerY, double soundX, double soundY, int maxSoundDistance)

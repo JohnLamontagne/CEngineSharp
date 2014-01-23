@@ -25,7 +25,7 @@ namespace CEngineSharp_Server.Networking.Packets.AuthenticationPackets
             catch (Exception ex)
             {
                 ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-                NetworkManager.Instance.KickPlayer(playerIndex);
+                NetManager.Instance.KickPlayer(playerIndex);
             }
         }
 
@@ -53,13 +53,13 @@ namespace CEngineSharp_Server.Networking.Packets.AuthenticationPackets
 
                 else
                 {
-                    NetworkManager.Instance.RemoveConnection(player.PlayerIndex);
+                    NetManager.Instance.RemoveConnection(player.PlayerIndex);
                 }
             }
             catch (Exception ex)
             {
                 ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-                NetworkManager.Instance.KickPlayer(this.SocketIndex);
+                NetManager.Instance.KickPlayer(this.SocketIndex);
             }
         }
 

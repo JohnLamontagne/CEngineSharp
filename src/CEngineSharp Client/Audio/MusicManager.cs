@@ -1,5 +1,7 @@
 ﻿using SFML.Audio;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace CEngineSharp_Client.Audio
 {
@@ -10,7 +12,21 @@ namespace CEngineSharp_Client.Audio
 
         public void LoadMusic(string musicSoundPath)
         {
-            _music = new Dictionary<string, Music>();
+            var dI = new DirectoryInfo(musicSoundPath);
+
+            if (_music == null)
+                _music = new Dictionary<string, Music>();
+            else
+                _music.Clear();
+
+            Console.WriteLine(@"Loading music.");
+
+            foreach (var file in dI.GetFiles("*.ogg", SearchOption.AllDirectories))
+            {
+                _music.Add(file.Name.Remove(file.Name.Length - 4, 4), new Music(file.FullName));
+            }
+
+            Console.WriteLine(@"Loaded {0} music file(s).", _music.Count);
         }
 
         public void PlayMusic(string musicName)
@@ -21,7 +37,8 @@ namespace CEngineSharp_Client.Audio
 
         public void StopMusic()
         {
-            _currentMusic.Stop();
+            if (_currentMusic != null)
+                _currentMusic.Stop();
         }
 
         public void PauseMusic()

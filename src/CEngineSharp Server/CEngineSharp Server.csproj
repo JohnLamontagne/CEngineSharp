@@ -9,12 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -45,7 +45,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="ServerLoop.cs" />
-    <Compile Include="Networking\NetworkManager.cs" />
+    <Compile Include="Networking\NetManager.cs" />
     <Compile Include="Networking\Packets\SocialPackets\AlertMessagePacket.cs" />
     <Compile Include="Networking\Packets\SocialPackets\ChatMessagePacket.cs" />
     <Compile Include="Networking\Packets\MapUpdatePackets\DespawnMapItemPacket.cs" />

@@ -53,13 +53,13 @@ namespace CEngineSharp_Server.Networking.Packets.AuthenticationPackets
                 }
                 else
                 {
-                    NetworkManager.Instance.KickPlayer(this.SocketIndex);
+                    NetManager.Instance.KickPlayer(this.SocketIndex);
                 }
             }
             catch (Exception ex)
             {
                 ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-                NetworkManager.Instance.KickPlayer(this.SocketIndex);
+                NetManager.Instance.KickPlayer(this.SocketIndex);
             }
         }
 

@@ -9,21 +9,21 @@ using System.Net;
 
 namespace CEngineSharp_Server.Networking
 {
-    public class NetworkManager
+    public class NetManager
     {
         #region Singleton
         private readonly NettyServer _nettyServer;
 
-        private static NetworkManager _networking;
+        private static NetManager _networking;
 
-        public static NetworkManager Instance
+        public static NetManager Instance
         {
-            get { return _networking ?? (_networking = new NetworkManager()); }
+            get { return _networking ?? (_networking = new NetManager()); }
         }
 
         #endregion
 
-        public NetworkManager()
+        public NetManager()
         {
             _nettyServer = new NettyServer(true)
             {

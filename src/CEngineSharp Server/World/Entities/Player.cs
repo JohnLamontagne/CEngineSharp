@@ -288,6 +288,7 @@ namespace CEngineSharp_Server.World.Entities
                 {
                     binaryWriter.Write(this.Name);
                     binaryWriter.Write(this.Password);
+                    binaryWriter.Write(this.TextureNumber);
                     binaryWriter.Write(this.Position.X);
                     binaryWriter.Write(this.Position.Y);
 

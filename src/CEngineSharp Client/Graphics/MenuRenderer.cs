@@ -1,4 +1,5 @@
-﻿using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Audio;
+using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.Net.Packets.AuthenticationPacket;
 using SFML.Graphics;
@@ -18,11 +19,15 @@ namespace CEngineSharp_Client.Graphics
             : base(window)
         {
             this.CanRender = true;
+
+            AudioManager.Instance.MusicManager.PlayMusic("MainMenu");
         }
 
         public MenuRenderer()
         {
             this.CanRender = true;
+
+            AudioManager.Instance.MusicManager.PlayMusic("MainMenu");
         }
 
         protected override void LoadInterface()

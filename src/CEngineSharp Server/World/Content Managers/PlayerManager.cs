@@ -63,7 +63,7 @@ namespace CEngineSharp_Server.World.Content_Managers
         {
             var player = new Player { Position = new Vector() };
 
-            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            using (var fileStream = new FileStream(filePath + ".dat", FileMode.Open))
             {
                 using (var binaryReader = new BinaryReader(fileStream))
                 {
@@ -120,14 +120,13 @@ namespace CEngineSharp_Server.World.Content_Managers
 
         private bool AuthenticateLogin(Player player)
         {
-            var actualPlayer = this.LoadPlayer(player.Name);
+            var actualPlayer = this.LoadPlayer(Constants.FILEPATH_PLAYERS + player.Name);
 
-            if (actualPlayer.Password == player.Name && actualPlayer.Name == player.Password)
+            if (actualPlayer.Name == player.Name && actualPlayer.Password == player.Password)
             {
                 // Alright, the player is a-okay; let's really load him in now, and pass on the connection from the 'temporary' player.
-                var authenticatedPlayer = actualPlayer as Player;
-                authenticatedPlayer.Connection = player.Connection;
-                player = authenticatedPlayer;
+                actualPlayer.Connection = player.Connection;
+                player = actualPlayer;
 
                 return true;
             }
@@ -139,13 +138,7 @@ namespace CEngineSharp_Server.World.Content_Managers
         {
             var player = this.GetPlayer(playerIndex);
 
-            if (player != null && this.AuthenticateLogin(player))
-            {
-                player.EnterGame();
-                return true;
-            }
-
-            return false;
+            return player != null && this.AuthenticateLogin(player);
         }
     }
 }

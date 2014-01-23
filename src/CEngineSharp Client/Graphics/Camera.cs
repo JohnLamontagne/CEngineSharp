@@ -1,132 +1,118 @@
-﻿﻿using CEngineSharp_Client.World.Content_Managers;
+﻿using CEngineSharp_Client.World;
+using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
 using SFML.Window;
-using System;
 
 namespace CEngineSharp_Client.Graphics
 {
     public class Camera
     {
-        private View _view;
+        private Vector2f _center;
 
-        public Player Target { get; set; }
+        public FloatRect ViewRect { get; private set; }
 
-        public float ViewWidth { get { return _view.Size.X; } }
+        public IEntity Target { get; set; }
 
-        public float ViewHeight { get { return _view.Size.Y; } }
+        public View View { get; private set; }
 
-        public float ViewLeft { get; set; }
+        public Vector2f StationaryBounds { get; set; }
 
-        public float ViewTop { get; set; }
+        public bool CanViewOutside { get; set; }
 
-        public Camera(Player target)
+        public Vector2f Center
         {
-            _view = new View((RenderManager.Instance.CurrentRenderer).GetWindow().DefaultView);
+            get { return _center; }
+            set
+            {
+                _center = value;
+
+                this.ViewRect = new FloatRect()
+                {
+                    Top = _center.Y - (RenderManager.Instance.CurrentResolutionHeight / 2),
+                    Left = _center.X - (RenderManager.Instance.CurrentResolutionWidth / 2),
+                    Width = RenderManager.Instance.CurrentResolutionWidth,
+                    Height = RenderManager.Instance.CurrentResolutionHeight
+                };
+
+                this.View = new View(_center, new Vector2f(this.ViewRect.Width, this.ViewRect.Height));
+            }
+        }
+
+        public Camera(IEntity target)
+        {
+            _center = new Vector2f(RenderManager.Instance.CurrentResolutionWidth / 2, RenderManager.Instance.CurrentResolutionHeight / 2);
             this.Target = target;
-        }
-
-        public void SetCenter(Vector2f center)
-        {
-            this.ViewLeft += center.X - this._view.Center.X;
-            this.ViewTop += center.Y - this._view.Center.Y;
-            this._view.Center = center;
-        }
-
-        public Vector2f GetCenter()
-        {
-            return this._view.Center;
-        }
-
-        public View GetView()
-        {
-            return _view;
-        }
-
-        public void SetView(View view)
-        {
-            _view = view;
-        }
-
-        public void Zoom(float factor)
-        {
-            _view.Zoom(factor);
+            this.StationaryBounds = new Vector2f(RenderManager.Instance.CurrentResolutionWidth / 2, RenderManager.Instance.CurrentResolutionHeight / 2);
+            this.CanViewOutside = false;
         }
 
         public void SnapToTarget()
         {
-            var x = this.Target.Position.X * 32;
-            var y = this.Target.Position.Y * 32;
-
-            var center = this.GetCenter();
-
-            if (x >= (RenderManager.Instance.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
-            {
-                center.X = x;
-            }
-            else if (x > ((MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2)))
-            {
-                center.X = (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2);
-            }
-
-            if (y >= (RenderManager.Instance.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
-            {
-                center.Y = y;
-            }
-            else if (y > ((MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2)))
-            {
-                center.Y = (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2);
-            }
-
-            this.SetCenter(center);
+            this.Center = new Vector2f(this.Target.Position.X, this.Target.Position.Y);
         }
 
-        public void Update(float playerSpeed)
+        public void Update(float playerSpeed, GameTime gameTime)
         {
-            this.SetCenter(this.Target.Sprite.Position);
 
-            var x = this.Target.Sprite.Position.X;
-            var y = this.Target.Sprite.Position.Y;
+            float delta = playerSpeed * gameTime.UpdateTime;
 
-            var center = this.GetCenter();
+            var centerX = this.Center.X;
+            var centerY = this.Center.Y;
 
-            if (x >= (RenderManager.Instance.CurrentResolutionWidth / 2) && x <= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
+            var targetX = this.Target.Position.X * 32;
+            var targetY = this.Target.Position.Y * 32;
+
+            if (targetX >= this.StationaryBounds.X)
             {
-                if (x < _view.Center.X)
+                var mapBoundsX = (MapManager.Map.Width * 32) - (this.ViewRect.Width / 2);
+
+                if (CanViewOutside || targetX <= mapBoundsX)
                 {
-                    center.X = _view.Center.X - playerSpeed;
+                    if (this.Center.X < targetX)
+                    {
+                        centerX += delta;
+
+                        if (centerX > targetX)
+                            centerX = targetX;
+                    }
+
+                    if (this.Center.X > targetX)
+                    {
+                        centerX -= delta;
+
+                        if (centerX < targetX)
+                            centerX = targetX;
+                    }
                 }
-                else if (x > _view.Center.X)
+
+            }
+
+            if (targetY >= this.StationaryBounds.Y)
+            {
+                var mapBoundsY = (MapManager.Map.Height * 32) - (this.ViewRect.Height / 2);
+
+                if (CanViewOutside || targetY <= mapBoundsY)
                 {
-                    center.X = _view.Center.X + playerSpeed;
+                    if (this.Center.Y < targetY)
+                    {
+                        centerY += delta;
+
+                        if (centerY > targetY)
+                            centerY = targetY;
+                    }
+
+                    if (this.Center.Y > targetY)
+                    {
+                        centerY -= delta;
+
+                        if (centerY < targetY)
+                            centerY = targetY;
+                    }
                 }
             }
 
-            if (y >= (RenderManager.Instance.CurrentResolutionHeight / 2) && y <= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
-            {
-                if (y < _view.Center.Y)
-                {
-                    center.Y = _view.Center.Y - playerSpeed;
-                }
-                else if (y > _view.Center.Y)
-                {
-                    center.Y = _view.Center.Y + playerSpeed;
-                }
-            }
-
-            if (center.X < (RenderManager.Instance.CurrentResolutionWidth / 2))
-                center.X = RenderManager.Instance.CurrentResolutionWidth / 2;
-
-            if (x >= (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2))
-                center.X = (MapManager.Map.Width * 32) - (RenderManager.Instance.CurrentResolutionWidth / 2);
-
-            if (center.Y < (RenderManager.Instance.CurrentResolutionHeight / 2))
-                center.Y = RenderManager.Instance.CurrentResolutionHeight / 2;
-
-            if (y >= (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2))
-                center.Y = (MapManager.Map.Height * 32) - (RenderManager.Instance.CurrentResolutionHeight / 2);
-
-            this.SetCenter(center);
+            this.Center = new Vector2f(centerX, centerY);
         }
     }
 }

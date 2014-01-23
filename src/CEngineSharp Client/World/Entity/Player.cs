@@ -253,7 +253,7 @@ namespace CEngineSharp_Client.World.Entity
             if (x == this.Sprite.Position.X && y == this.Sprite.Position.Y)
             {
                 this.CanMove = true;
-                this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
+                this.Camera.Update(this.PlayerSpeed, gameTime);
                 return;
             }
 
@@ -303,7 +303,7 @@ namespace CEngineSharp_Client.World.Entity
 
             this.Sprite.Position = position;
 
-            this.Camera.Update(this.PlayerSpeed * gameTime.UpdateTime);
+            this.Camera.Update(this.PlayerSpeed, gameTime);
         }
 
         public void Draw(RenderTarget target)

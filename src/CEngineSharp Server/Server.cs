@@ -25,7 +25,7 @@ namespace CEngineSharp_Server
 
             ServerConfiguration.LoadConfig();
             ContentManager.Instance.LoadContent();
-            NetworkManager.Instance.Start();
+            NetManager.Instance.Start();
             var serverLoop = new ServerLoop();
             serverLoop.Start();
         }

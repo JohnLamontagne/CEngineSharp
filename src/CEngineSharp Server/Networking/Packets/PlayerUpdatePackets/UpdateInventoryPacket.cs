@@ -23,7 +23,7 @@ namespace CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets
             catch (Exception ex)
             {
                 ErrorHandler.HandleException(ex, ErrorHandler.ErrorLevels.Low);
-                NetworkManager.Instance.KickPlayer(player.PlayerIndex);
+                NetManager.Instance.KickPlayer(player.PlayerIndex);
             }
         }
 

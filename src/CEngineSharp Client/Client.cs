@@ -21,7 +21,8 @@ namespace CEngineSharp_Client
 
             ShuttingDown = false;
 
-            AudioManager.Instance.SfxManager.LoadSounds(AppDomain.CurrentDomain.BaseDirectory + @"\Data\Sounds");
+            AudioManager.Instance.SfxManager.LoadSounds(Constants.FILEPATH_SFX);
+            AudioManager.Instance.MusicManager.LoadMusic(Constants.FILEPATH_MUSIC);
 
             RenderManager.Instance.Initiate();
 

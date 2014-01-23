@@ -1,9 +1,4 @@
-﻿using SFML.Audio;
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace CEngineSharp_Client.Audio
+﻿namespace CEngineSharp_Client.Audio
 {
     public class AudioManager
     {
@@ -13,7 +8,7 @@ namespace CEngineSharp_Client.Audio
 
         public static AudioManager Instance { get { return _audioManager ?? (_audioManager = new AudioManager()); } }
 
-        #endregion
+        #endregion Singleton
 
         public MusicManager MusicManager { get; set; }
 
@@ -23,7 +18,6 @@ namespace CEngineSharp_Client.Audio
         {
             SfxManager = new SfxManager();
             MusicManager = new MusicManager();
-
         }
     }
 }

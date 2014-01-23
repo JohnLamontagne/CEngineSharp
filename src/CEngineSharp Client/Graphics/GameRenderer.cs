@@ -1,10 +1,12 @@
-﻿using CEngineSharp_Client.Net;
+﻿using CEngineSharp_Client.Audio;
+using CEngineSharp_Client.Net;
 using CEngineSharp_Client.Net.Packets;
 using CEngineSharp_Client.Net.Packets.SocialPackets;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
 using SFML.Window;
+using System.Linq.Expressions;
 using TGUI;
 
 namespace CEngineSharp_Client.Graphics
@@ -14,6 +16,8 @@ namespace CEngineSharp_Client.Graphics
         private int _fpsCounter;
         private int _fpsTimer;
         private bool _inventoryVisible;
+
+        private View _mainView;
 
 
         public GameRenderer(RenderWindow window)
@@ -28,6 +32,10 @@ namespace CEngineSharp_Client.Graphics
             RenderManager.Instance.CurrentResolutionHeight = (int)Window.GetView().Size.Y;
 
             this.CanRender = true;
+
+            AudioManager.Instance.MusicManager.StopMusic();
+
+            _mainView = this.Window.GetView();
         }
 
         public override void Render(GameTime gameTime)
@@ -39,9 +47,13 @@ namespace CEngineSharp_Client.Graphics
             if (Client.InGame)
             {
                 if (MapManager.Map != null)
+                {
+                    this.Window.SetView(PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.View);
                     MapManager.Map.Draw(Window);
+                    this.Window.SetView(_mainView);
+                }
 
-                this.Gui.Draw();
+                this.Gui.Draw(true);
 
                 if (this._inventoryVisible)
                     PlayerManager.GetPlayer(PlayerManager.MyIndex).DrawInventory(Window);
@@ -262,8 +274,12 @@ namespace CEngineSharp_Client.Graphics
 
         private void _window_Resized(object sender, SizeEventArgs e)
         {
-            RenderManager.Instance.CurrentResolutionHeight = (int)e.Height;
-            RenderManager.Instance.CurrentResolutionWidth = (int)e.Width;
+            this.Window.SetView(new View(new FloatRect(0f, 0f, e.Width, e.Height)));
+
+            RenderManager.Instance.CurrentResolutionWidth = (int)Window.GetView().Size.X;
+            RenderManager.Instance.CurrentResolutionHeight = (int)Window.GetView().Size.Y;
+
+            //PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera.SetView(this.Window.GetView());
         }
     }
 }
