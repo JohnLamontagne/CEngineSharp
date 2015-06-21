@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Server</RootNamespace>
     <AssemblyName>CEngineSharp Server</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,29 +44,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Networking\ChannelTypes.cs" />
+    <Compile Include="Networking\ConnectionEventArgs.cs" />
+    <Compile Include="Networking\Packet.cs" />
+    <Compile Include="Networking\PacketReceivedEventArgs.cs" />
     <Compile Include="ServerLoop.cs" />
     <Compile Include="Networking\NetManager.cs" />
-    <Compile Include="Networking\Packets\SocialPackets\AlertMessagePacket.cs" />
-    <Compile Include="Networking\Packets\SocialPackets\ChatMessagePacket.cs" />
-    <Compile Include="Networking\Packets\MapUpdatePackets\DespawnMapItemPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\DropItemPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\UpdateInventoryPacket.cs" />
-    <Compile Include="Networking\Packets\AuthenticationPackets\LoginPacket.cs" />
-    <Compile Include="Networking\Packets\AuthenticationPackets\LogoutPacket.cs" />
-    <Compile Include="Networking\Packets\MapUpdatePackets\MapCheckPacket.cs" />
-    <Compile Include="Networking\Packets\MapUpdatePackets\MapDataPacket.cs" />
-    <Compile Include="Networking\Packets\MapUpdatePackets\SpawnMapNpcPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\PickupItemPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\UpdatePlayerStatsPacket.cs" />
-    <Compile Include="Networking\Packets\MapUpdatePackets\SpawnMapItemPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\PlayerMovementPacket.cs" />
-    <Compile Include="Networking\Packets\PlayerUpdatePackets\PlayerDataPacket.cs" />
-    <Compile Include="Networking\Packets\AuthenticationPackets\RegisterationPacket.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Utilities\Color.cs" />
     <Compile Include="Utilities\ErrorHandler.cs" />
     <Compile Include="Utilities\Rect.cs" />
     <Compile Include="Utilities\ServerConfig.cs" />
+    <Compile Include="Utilities\ServiceLocators\IServiceLocator.cs" />
+    <Compile Include="Utilities\ServiceLocators\NetServiceLocator.cs" />
     <Compile Include="World\Content Managers\ItemManager.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Content Managers\NpcManager.cs" />
@@ -83,9 +73,8 @@
     <Compile Include="World\Stats.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="SharpNetty, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\SharpNetty\src\bin\Debug\SharpNetty.dll</HintPath>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

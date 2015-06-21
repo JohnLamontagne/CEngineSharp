@@ -1,4 +1,5 @@
 ﻿using SFML.Graphics;
+using SFML.System;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace CEngineSharp_Editor.World
                 public Layer(Sprite sprite, int posX, int posY)
                 {
                     this.Sprite = sprite;
-                    this.Sprite.Position = new SFML.Window.Vector2f(posX * 32, posY * 32);
+                    this.Sprite.Position = new Vector2f(posX * 32, posY * 32);
                 }
             }
 
@@ -179,7 +180,7 @@ namespace CEngineSharp_Editor.World
 
                             if (map.tiles[x, y].Blocked)
                             {
-                                map.tiles[x, y].BlockedCover = new RectangleShape(new SFML.Window.Vector2f(32, 32));
+                                map.tiles[x, y].BlockedCover = new RectangleShape(new Vector2f(32, 32));
                                 map.tiles[x, y].BlockedCover.FillColor = new Color(255, 0, 0, 100);
                                 map.tiles[x, y].BlockedCover.Position = new Vector2f(x * 32, y * 32);
                             }

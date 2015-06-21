@@ -1,6 +1,4 @@
-﻿using CEngineSharp_Client.Graphics;
-using CEngineSharp_Client.Net;
-using CEngineSharp_Client.World.Content_Managers;
+﻿using CEngineSharp_Client.Utilities;
 using System.Diagnostics;
 
 namespace CEngineSharp_Client
@@ -13,22 +11,22 @@ namespace CEngineSharp_Client
             {
                 gameTime.Update();
 
-                NetManager.Instance.ExecuteQueue();
+                ServiceLocator.NetManager.Update();
 
-                if (Client.InGame && PlayerManager.GetPlayer(PlayerManager.MyIndex) != null)
+                if (Client.InGame && ServiceLocator.WorldManager.PlayerManager.GetPlayer(ServiceLocator.WorldManager.PlayerManager.ClientID) != null)
                 {
-                    PlayerManager.GetPlayer(PlayerManager.MyIndex).TryMove();
+                    ServiceLocator.WorldManager.PlayerManager.GetPlayer(ServiceLocator.WorldManager.PlayerManager.ClientID).TryMove();
 
-                    foreach (var player in PlayerManager.GetPlayers())
+                    foreach (var player in ServiceLocator.WorldManager.PlayerManager.GetPlayers())
                     {
                         player.Update(gameTime);
                     }
 
-                    MapManager.Map.Update(gameTime);
+                    ServiceLocator.WorldManager.MapManager.Map.Update(gameTime);
                 }
 
-                RenderManager.Instance.Render(gameTime);
-
+                // Render
+                ServiceLocator.ScreenManager.Render(gameTime);
             }
         }
     }

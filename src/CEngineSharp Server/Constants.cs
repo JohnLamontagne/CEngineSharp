@@ -16,5 +16,7 @@
         public const int SERVER_STARTER_MAP = 0;
 
         public const int MAX_INVENTORY_ITEMS = 20;
+
+        public const int SERVER_PORT = 4000;
     }
 }

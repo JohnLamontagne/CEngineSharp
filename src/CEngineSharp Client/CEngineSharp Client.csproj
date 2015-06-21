@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CEngineSharp_Client</RootNamespace>
     <AssemblyName>CEngineSharp Client</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,20 +38,20 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="sfmlnet-audio-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\sfmlnet-audio-2.dll</HintPath>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-graphics-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\sfmlnet-graphics-2.dll</HintPath>
+    <Reference Include="sfmlnet-audio-2">
+      <HintPath>..\libs\sfmlnet-audio-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-window-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\sfmlnet-window-2.dll</HintPath>
+    <Reference Include="sfmlnet-graphics-2">
+      <HintPath>..\libs\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
-    <Reference Include="SharpNetty">
-      <HintPath>..\..\..\SharpNetty\src\bin\Debug\SharpNetty.dll</HintPath>
+    <Reference Include="sfmlnet-system-2">
+      <HintPath>..\libs\sfmlnet-system-2.dll</HintPath>
+    </Reference>
+    <Reference Include="sfmlnet-window-2">
+      <HintPath>..\libs\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,17 +63,11 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tao.OpenGl, Version=0.0.0.0, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Tao.OpenGl.dll</HintPath>
+    <Reference Include="Tao.OpenGl">
+      <HintPath>..\libs\Tao.OpenGl.dll</HintPath>
     </Reference>
-    <Reference Include="Tao.OpenGl.ExtensionLoader, Version=1.5.0.3, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Tao.OpenGl.ExtensionLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="tguinet, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Program. related files\TGUI.Net-master\TGUI.Net-master\lib\x86\tguinet.dll</HintPath>
+    <Reference Include="Tao.OpenGl.ExtensionLoader">
+      <HintPath>..\libs\Tao.OpenGl.ExtensionLoader.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -84,40 +78,30 @@
     <Compile Include="Direction.cs" />
     <Compile Include="GameLoop.cs" />
     <Compile Include="Graphics\Camera.cs" />
-    <Compile Include="Graphics\GameRenderer.cs" />
-    <Compile Include="Graphics\MenuRenderer.cs" />
+    <Compile Include="Graphics\GameScreen.cs" />
+    <Compile Include="Graphics\MenuScreen.cs" />
+    <Compile Include="Graphics\Screen.cs" />
+    <Compile Include="Graphics\ScreenManager.cs" />
     <Compile Include="Graphics\TextureManager\GameTextureManager.cs" />
     <Compile Include="Graphics\TextureManager\MenuTextureManager.cs" />
-    <Compile Include="Graphics\Renderer.cs" />
-    <Compile Include="Graphics\RenderManager.cs" />
-    <Compile Include="Graphics\RenderStates.cs" />
     <Compile Include="Graphics\TextureManager\ITextureManager.cs" />
-    <Compile Include="Net\Packets\SocialPackets\ChatMessagePacket.cs" />
-    <Compile Include="Net\Packets\SocialPackets\AlertMessagePacket.cs" />
-    <Compile Include="Net\Packets\MapUpdatePackets\DespawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\DropItemPacket.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\UpdateInventoryPacket.cs" />
-    <Compile Include="Net\Packets\AuthenticationPacket\LoginPacket.cs" />
+    <Compile Include="Net\ChannelTypes.cs" />
+    <Compile Include="Net\Packet.cs" />
+    <Compile Include="Net\PacketReceivedEventArgs.cs" />
     <Compile Include="Net\NetManager.cs" />
-    <Compile Include="Net\Packets\AuthenticationPacket\LogoutPacket.cs" />
-    <Compile Include="Net\Packets\MapUpdatePackets\MapCheckPacket.cs" />
-    <Compile Include="Net\Packets\MapUpdatePackets\MapDataPacket.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\PlayerMovementPacket.cs" />
     <Compile Include="Client.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\PlayerDataPacket.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\UpdatePlayerStatsPacket.cs" />
-    <Compile Include="Net\Packets\MapUpdatePackets\SpawnMapItemPacket.cs" />
-    <Compile Include="Net\Packets\PlayerUpdatePackets\PickupItemPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Net\Packets\AuthenticationPacket\RegisterationPacket.cs" />
+    <Compile Include="Utilities\ServiceLocator.cs" />
     <Compile Include="World\Content Managers\MapManager.cs" />
     <Compile Include="World\Content Managers\PlayerManager.cs" />
+    <Compile Include="World\Content Managers\WorldManager.cs" />
     <Compile Include="World\Entity\Directions.cs" />
     <Compile Include="World\Entity\IEntity.cs" />
     <Compile Include="World\Entity\Npc.cs" />
     <Compile Include="World\Item.cs" />
     <Compile Include="World\Map.cs" />
     <Compile Include="World\Entity\Player.cs" />
+    <Compile Include="World\Vector2f.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -142,6 +126,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Downloads\TGUI.Net-master\TGUI.Net-master\src\tgui-x86.csproj">
+      <Project>{d17de83d-a592-461f-8af2-53f9e22e1d0f}</Project>
+      <Name>tgui-x86</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CEngineSharp Utilities\CEngineSharp Utilities.csproj">
       <Project>{1a9ec1bf-e330-494f-bd56-9b94c831a015}</Project>
       <Name>CEngineSharp Utilities</Name>

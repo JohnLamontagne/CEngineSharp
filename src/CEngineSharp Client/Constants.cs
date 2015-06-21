@@ -10,11 +10,13 @@ namespace CEngineSharp_Client
 
         public static readonly string FILEPATH_GRAPHICS = FILEPATH_DATA + "/Graphics/";
 
+        public static readonly string FILEPATH_THEME_CONFIG = FILEPATH_GRAPHICS + "/Interface/Black.conf";
+
         public static readonly string FILEPATH_MUSIC = FILEPATH_DATA + "/Music/";
 
         public static readonly string FILEPATH_SFX = FILEPATH_DATA + "/Sfx/";
 
-        public const int PORT = 4500;
+        public const int PORT = 4000;
 
         public const string IP = "127.0.0.1";
 

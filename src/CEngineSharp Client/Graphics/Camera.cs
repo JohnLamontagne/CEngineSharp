@@ -1,8 +1,7 @@
-﻿using CEngineSharp_Client.World;
-using CEngineSharp_Client.World.Content_Managers;
+﻿using CEngineSharp_Client.Utilities;
 using CEngineSharp_Client.World.Entity;
 using SFML.Graphics;
-using SFML.Window;
+using SFML.System;
 
 namespace CEngineSharp_Client.Graphics
 {
@@ -29,10 +28,10 @@ namespace CEngineSharp_Client.Graphics
 
                 this.ViewRect = new FloatRect()
                 {
-                    Top = _center.Y - (RenderManager.Instance.CurrentResolutionHeight / 2),
-                    Left = _center.X - (RenderManager.Instance.CurrentResolutionWidth / 2),
-                    Width = RenderManager.Instance.CurrentResolutionWidth,
-                    Height = RenderManager.Instance.CurrentResolutionHeight
+                    Top = _center.Y - (ServiceLocator.ScreenManager.Resolution.Y / 2),
+                    Left = _center.X - (ServiceLocator.ScreenManager.Resolution.X / 2),
+                    Width = ServiceLocator.ScreenManager.Resolution.X,
+                    Height = ServiceLocator.ScreenManager.Resolution.Y
                 };
 
                 this.View = new View(_center, new Vector2f(this.ViewRect.Width, this.ViewRect.Height));
@@ -41,9 +40,9 @@ namespace CEngineSharp_Client.Graphics
 
         public Camera(IEntity target)
         {
-            _center = new Vector2f(RenderManager.Instance.CurrentResolutionWidth / 2, RenderManager.Instance.CurrentResolutionHeight / 2);
+            _center = new Vector2f(ServiceLocator.ScreenManager.Resolution.X / 2, ServiceLocator.ScreenManager.Resolution.Y / 2);
             this.Target = target;
-            this.StationaryBounds = new Vector2f(RenderManager.Instance.CurrentResolutionWidth / 2, RenderManager.Instance.CurrentResolutionHeight / 2);
+            this.StationaryBounds = new Vector2f(ServiceLocator.ScreenManager.Resolution.X / 2, ServiceLocator.ScreenManager.Resolution.Y / 2);
             this.CanViewOutside = false;
         }
 
@@ -54,7 +53,6 @@ namespace CEngineSharp_Client.Graphics
 
         public void Update(float playerSpeed, GameTime gameTime)
         {
-
             float delta = playerSpeed * gameTime.UpdateTime;
 
             var centerX = this.Center.X;
@@ -65,7 +63,7 @@ namespace CEngineSharp_Client.Graphics
 
             if (targetX >= this.StationaryBounds.X)
             {
-                var mapBoundsX = (MapManager.Map.Width * 32) - (this.ViewRect.Width / 2);
+                var mapBoundsX = (ServiceLocator.WorldManager.MapManager.Map.Width * 32) - (this.ViewRect.Width / 2);
 
                 if (CanViewOutside || targetX <= mapBoundsX)
                 {
@@ -85,12 +83,11 @@ namespace CEngineSharp_Client.Graphics
                             centerX = targetX;
                     }
                 }
-
             }
 
             if (targetY >= this.StationaryBounds.Y)
             {
-                var mapBoundsY = (MapManager.Map.Height * 32) - (this.ViewRect.Height / 2);
+                var mapBoundsY = (ServiceLocator.WorldManager.MapManager.Map.Height * 32) - (this.ViewRect.Height / 2);
 
                 if (CanViewOutside || targetY <= mapBoundsY)
                 {

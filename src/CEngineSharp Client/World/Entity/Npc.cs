@@ -1,8 +1,6 @@
-﻿using CEngineSharp_Client.World.Content_Managers;
+﻿using CEngineSharp_Client.Utilities;
 using SFML.Graphics;
-using SFML.Window;
-
-using System;
+using SFML.System;
 
 namespace CEngineSharp_Client.World.Entity
 {
@@ -17,6 +15,7 @@ namespace CEngineSharp_Client.World.Entity
         public bool IsMoving { get; set; }
 
         public int X { get; private set; }
+
         public int Y { get; private set; }
 
         public int Level { get; set; }
@@ -101,19 +100,18 @@ namespace CEngineSharp_Client.World.Entity
             }
 
             this.Sprite.Position = position;
-
         }
 
         public void Warp(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
 
             this.X = newX;
             this.Y = newY;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
 
             this.Sprite.Position = new Vector2f(newX * 32, newY * 32);
         }
@@ -122,12 +120,12 @@ namespace CEngineSharp_Client.World.Entity
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.X, this.Y).IsOccupied = false;
 
             this.X = newX;
             this.Y = newY;
 
-            MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.X, this.Y).IsOccupied = true;
 
             if (this.Step == 0)
             {
@@ -155,17 +153,6 @@ namespace CEngineSharp_Client.World.Entity
             target.Draw(this.Sprite);
         }
 
-
-        public Vector2i Position
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public Vector2i Position { get; set; }
     }
 }

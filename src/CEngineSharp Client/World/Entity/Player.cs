@@ -1,10 +1,11 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
-using CEngineSharp_Client.Net.Packets;
-using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
-using CEngineSharp_Client.World.Content_Managers;
+using CEngineSharp_Client.Networking;
+using CEngineSharp_Client.Utilities;
+using CEngineSharp_Utilities;
+using Lidgren.Network;
 using SFML.Graphics;
-using SFML.Window;
+using SFML.System;
 using System.Collections.Generic;
 using TGUI;
 
@@ -12,7 +13,6 @@ namespace CEngineSharp_Client.World.Entity
 {
     public class Player : IEntity
     {
-
         public Sprite Sprite { get; set; }
 
         public string Name { get; set; }
@@ -72,10 +72,8 @@ namespace CEngineSharp_Client.World.Entity
 
         public int MouseCordToSlotNum(int mouseX, int mouseY)
         {
-            var gameRenderer = (RenderManager.Instance.CurrentRenderer as GameRenderer);
-
-            var invenPosX = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
-            var invenPosY = (int)gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
+            var invenPosX = (int)ServiceLocator.ScreenManager.ActiveScreen.GUI.Get<Picture>("picInventory").Position.X;
+            var invenPosY = (int)ServiceLocator.ScreenManager.ActiveScreen.GUI.Get<Picture>("picInventory").Position.Y;
 
             var x = (mouseX - invenPosX) / 32;
             var y = (mouseY - invenPosY) / 32;
@@ -107,19 +105,14 @@ namespace CEngineSharp_Client.World.Entity
 
             int slotNum = _inventory.Count - 1;
 
-            var gameRenderer = (RenderManager.Instance.CurrentRenderer as GameRenderer);
+            var invenPosX = ServiceLocator.ScreenManager.ActiveScreen.GUI.Get<Picture>("picInventory").Position.X;
+            var invenPosY = ServiceLocator.ScreenManager.ActiveScreen.GUI.Get<Picture>("picInventory").Position.Y;
 
-            if (gameRenderer != null)
-            {
-                var invenPosX = gameRenderer.Gui.Get<Picture>("picInventory").Position.X;
-                var invenPosY = gameRenderer.Gui.Get<Picture>("picInventory").Position.Y;
+            var itemPosY = (int)invenPosY + (32 * (slotNum / 5));
 
-                var itemPosY = (int)invenPosY + (32 * (slotNum / 5));
+            var itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
 
-                var itemPosX = (int)invenPosX + (32 * (slotNum - (((itemPosY - (int)invenPosY) / 32) * 5)));
-
-                item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
-            }
+            item.Sprite.Position = new Vector2f(itemPosX, itemPosY);
         }
 
         public void TryDropInventoryItem(int mouseX, int mouseY)
@@ -128,20 +121,20 @@ namespace CEngineSharp_Client.World.Entity
 
             if (this.GetInventoryItem(slotNum) == null) return;
 
-            var dropItemPacket = new DropItemPacket();
-            dropItemPacket.WriteData(slotNum);
-            NetManager.Instance.SendPacket(dropItemPacket);
+            var dropItemPacket = new Packet(PacketType.DropItemPacket);
+            dropItemPacket.Message.Write(slotNum);
+            ServiceLocator.NetManager.SendMessage(dropItemPacket.Message, NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD);
         }
 
         public void Warp(int newX, int newY, Directions direction)
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
 
             this.Position = new Vector2i(newX, newY);
 
-            MapManager.Map.GetTile(newX, newY).IsOccupied = true;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(newX, newY).IsOccupied = true;
 
             this.Sprite.Position = new Vector2f(newX * 32, newY * 32);
         }
@@ -150,11 +143,11 @@ namespace CEngineSharp_Client.World.Entity
         {
             this.Direction = direction;
 
-            MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(this.Position.X, this.Position.Y).IsOccupied = false;
 
             this.Position = new Vector2i(newX, newY);
 
-            MapManager.Map.GetTile(newX, newY).IsOccupied = true;
+            ServiceLocator.WorldManager.MapManager.Map.GetTile(newX, newY).IsOccupied = true;
 
             switch (this.Step)
             {
@@ -162,10 +155,12 @@ namespace CEngineSharp_Client.World.Entity
                     this._previousStep = 0;
                     this.Step++;
                     break;
+
                 case 2:
                     this._previousStep = 2;
                     this.Step--;
                     break;
+
                 case 1:
                     if (this._previousStep == 2)
                         this.Step--;
@@ -175,11 +170,20 @@ namespace CEngineSharp_Client.World.Entity
             }
         }
 
+        private void SendMovement(int x, int y, Directions direction)
+        {
+            var packet = new Packet(PacketType.PlayerMovementPacket);
+            packet.Message.Write(x);
+            packet.Message.Write(y);
+            packet.Message.Write((byte)this.Direction);
+            ServiceLocator.NetManager.SendMessage(packet.Message, Lidgren.Network.NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD);
+        }
+
         public void TryMove()
         {
             if (this.IsMoving && this.CanMove)
             {
-                var movementPacket = new PlayerMovementPacket();
+                var mapManager = ServiceLocator.WorldManager.MapManager;
 
                 int x = this.Position.X;
                 int y = this.Position.Y;
@@ -189,12 +193,11 @@ namespace CEngineSharp_Client.World.Entity
                     case Directions.Down:
 
                         // Client side check to see if the tile is blocked.
-                        if (y < (MapManager.Map.Height - 1) && !MapManager.Map.GetTile(x, y + 1).Blocked && !MapManager.Map.GetTile(x, y + 1).IsOccupied)
+                        if (y < (mapManager.Map.Height - 1) && !mapManager.Map.GetTile(x, y + 1).Blocked && !mapManager.Map.GetTile(x, y + 1).IsOccupied)
                         {
-                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            mapManager.Map.GetTile(x, y).IsOccupied = false;
                             y += 1;
-                            movementPacket.WriteData(x, y, this.Direction);
-                            NetManager.Instance.SendPacket(movementPacket);
+                            this.SendMovement(x, y, this.Direction);
                             this.CanMove = false;
                         }
 
@@ -202,12 +205,11 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Up:
                         // Client side check to see if the tile is blocked.
-                        if (y > 0 && !MapManager.Map.GetTile(x, y - 1).Blocked && !MapManager.Map.GetTile(x, y - 1).IsOccupied)
+                        if (y > 0 && !mapManager.Map.GetTile(x, y - 1).Blocked && !mapManager.Map.GetTile(x, y - 1).IsOccupied)
                         {
-                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            mapManager.Map.GetTile(x, y).IsOccupied = false;
                             y -= 1;
-                            movementPacket.WriteData(x, y, this.Direction);
-                            NetManager.Instance.SendPacket(movementPacket);
+                            this.SendMovement(x, y, this.Direction);
                             this.CanMove = false;
                         }
 
@@ -215,12 +217,11 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Right:
                         // Client side check to see if the tile is blocked.
-                        if (x < (MapManager.Map.Width - 1) && !MapManager.Map.GetTile(x + 1, y).Blocked && !MapManager.Map.GetTile(x + 1, y).IsOccupied)
+                        if (x < (mapManager.Map.Width - 1) && !mapManager.Map.GetTile(x + 1, y).Blocked && !mapManager.Map.GetTile(x + 1, y).IsOccupied)
                         {
-                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            mapManager.Map.GetTile(x, y).IsOccupied = false;
                             x += 1;
-                            movementPacket.WriteData(x, y, this.Direction);
-                            NetManager.Instance.SendPacket(movementPacket);
+                            this.SendMovement(x, y, this.Direction);
                             this.CanMove = false;
                         }
 
@@ -228,12 +229,11 @@ namespace CEngineSharp_Client.World.Entity
 
                     case Directions.Left:
                         // Client side check to see if the tile is blocked.
-                        if (x > 0 && !MapManager.Map.GetTile(x - 1, y).Blocked && !MapManager.Map.GetTile(x - 1, y).IsOccupied)
+                        if (x > 0 && !mapManager.Map.GetTile(x - 1, y).Blocked && !mapManager.Map.GetTile(x - 1, y).IsOccupied)
                         {
-                            MapManager.Map.GetTile(x, y).IsOccupied = false;
+                            mapManager.Map.GetTile(x, y).IsOccupied = false;
                             x -= 1;
-                            movementPacket.WriteData(x, y, this.Direction);
-                            NetManager.Instance.SendPacket(movementPacket);
+                            this.SendMovement(x, y, this.Direction);
                             this.CanMove = false;
                         }
 
@@ -243,7 +243,6 @@ namespace CEngineSharp_Client.World.Entity
                 this.Position = new Vector2i(x, y);
             }
         }
-
 
         public void Update(GameTime gameTime)
         {

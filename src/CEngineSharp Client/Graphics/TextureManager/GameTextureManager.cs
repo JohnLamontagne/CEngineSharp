@@ -46,7 +46,7 @@ namespace CEngineSharp_Client.Graphics.TextureManager
 
         private void LoadTileSetTextures()
         {
-            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/TileSets/");
+            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + @"/Data/Graphics/Tilesets/");
 
             foreach (var file in dI.GetFiles("*.png"))
             {

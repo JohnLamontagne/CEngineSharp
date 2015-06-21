@@ -1,7 +1,7 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.World.Content_Managers;
 using CEngineSharp_Utilities;
-using SharpNetty;
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 
@@ -9,85 +9,109 @@ namespace CEngineSharp_Client.Net
 {
     public class NetManager
     {
-        private static NetManager _networking;
+        private NetClient _netClient;
+        private Dictionary<PacketType, List<Action<PacketReceivedEventArgs>>> _packetHandlers;
 
-        public static NetManager Instance
+        private List<Tuple<NetOutgoingMessage, NetDeliveryMethod, ChannelTypes>> _packetCache;
+
+        public bool Connected { get { return _netClient.ConnectionStatus == NetConnectionStatus.Connected; } }
+
+        public NetManager()
         {
-            get { return _networking ?? (_networking = new NetManager()); }
+            _packetHandlers = new Dictionary<PacketType, List<Action<PacketReceivedEventArgs>>>();
+            _packetCache = new List<Tuple<NetOutgoingMessage, NetDeliveryMethod, ChannelTypes>>();
+
+            NetPeerConfiguration config = new NetPeerConfiguration("CEngineSharp");
+            config.EnableMessageType(NetIncomingMessageType.Data);
+            config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+
+            _netClient = new NetClient(config);
+            _netClient.Start();
         }
 
-        private NettyClient _nettyClient;
-
-        private List<Packet> _packetExecutionQueue;
-
-        public bool Connect()
+        public void Connect()
         {
-            if (_nettyClient == null)
-            {
-                _nettyClient = new NettyClient(true)
-                {
-                    Handle_ConnectionLost = Handle_ConnectionLost,
-                    Handle_Packet = Handle_Packet
-                };
-
-                _packetExecutionQueue = new List<Packet>();
-            }
-
-            return _nettyClient.Connect(Constants.IP, Constants.PORT, 1);
+            _netClient.DiscoverKnownPeer(Constants.IP, Constants.PORT);
         }
 
         public void Disconnect()
         {
-            if (Client.InGame)
-            {
-                Client.InGame = false;
-
-                RenderManager.Instance.RenderState = RenderStates.RenderMenu;
-
-                PlayerManager.ClearPlayers();
-            }
-
-            _nettyClient.Disconnect();
+            _netClient.Disconnect("Cya");
         }
 
-        private void Handle_Packet(Packet packet)
+        public void Update()
         {
-            _packetExecutionQueue.Add(packet);
-        }
-
-        private void Handle_ConnectionLost()
-        {
-            if (Client.InGame)
+            NetIncomingMessage message;
+            while ((message = _netClient.ReadMessage()) != null)
             {
-                Client.InGame = false;
+                switch (message.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        PacketType packetType = (PacketType)message.ReadInt16();
 
-                RenderManager.Instance.RenderState = RenderStates.RenderMenu;
+                        if (_packetHandlers.ContainsKey(packetType))
+                        {
+                            PacketReceivedEventArgs args = new PacketReceivedEventArgs(message);
 
-                PlayerManager.ClearPlayers();
+                            foreach (var handler in _packetHandlers[packetType])
+                                handler.Invoke(args);
+                        }
+                        break;
+
+                    case NetIncomingMessageType.DiscoveryResponse:
+                        _netClient.Connect(message.SenderEndPoint);
+                        break;
+                }
+
+                _netClient.Recycle(message);
+            }
+
+            if (_packetCache.Count > 0 && _netClient.ConnectionStatus == NetConnectionStatus.Connected)
+            {
+                this.SendPacketCache();
             }
         }
 
-        public void ExecuteQueue()
+        private void SendPacketCache()
         {
-            if (_packetExecutionQueue == null) return;
-
-            int packetCount = _packetExecutionQueue.Count;
-
-            for (int i = 0; i < packetCount; i++)
+            for (int i = 0; i < _packetCache.Count; i++)
             {
-                _packetExecutionQueue[i].Execute(_nettyClient);
-            }
+                var success = this.SendMessage(_packetCache[i].Item1, _packetCache[i].Item2, _packetCache[i].Item3);
 
-            for (int i = packetCount - 1; i >= 0; i--)
-            {
-                _packetExecutionQueue.RemoveAt(i);
+                if (success)
+                {
+                    _packetCache.RemoveAt(i);
+                    i--;
+                }
             }
-
         }
 
-        public void SendPacket(Packet packet)
+        public bool SendMessage(NetOutgoingMessage message, NetDeliveryMethod method, ChannelTypes channelType)
         {
-            _nettyClient.SendPacket(packet);
+            if (_netClient.ConnectionStatus == NetConnectionStatus.Connected)
+            {
+                _netClient.SendMessage(message, method, (int)channelType);
+                return true;
+            }
+            else
+            {
+                _packetCache.Add(new Tuple<NetOutgoingMessage, NetDeliveryMethod, ChannelTypes>(message, method, channelType));
+                return false;
+            }
+        }
+
+        public void AddPacketHandler(PacketType packetType, Action<PacketReceivedEventArgs> handler)
+        {
+            if (!_packetHandlers.ContainsKey(packetType))
+                _packetHandlers.Add(packetType, new List<Action<PacketReceivedEventArgs>>());
+
+            _packetHandlers[packetType].Add(handler);
+        }
+
+        public NetOutgoingMessage ConstructMessage()
+        {
+            return _netClient.CreateMessage();
         }
     }
 }

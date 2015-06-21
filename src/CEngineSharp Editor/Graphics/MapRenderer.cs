@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Editor.World;
 using SFML.Graphics;
+using SFML.System;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -40,23 +41,23 @@ namespace CEngineSharp_Editor.Graphics
 
         public MapRenderer(IntPtr mapRenderWindowHandle, IntPtr tileSetRenderHandle, MapEditor.MapEditorProperties mapEditorProperties)
         {
-            this._mapRenderWindow = new RenderWindow(mapRenderWindowHandle);
-            this._tileSetRenderWindow = new RenderWindow(tileSetRenderHandle);
-            this._mapRenderWindow.MouseButtonPressed += mapRenderWindow_MouseButtonPressed;
-            this._mapRenderWindow.MouseMoved += mapRenderWindow_MouseMoved;
-            this._tileSetRenderWindow.MouseButtonPressed += tileSetRenderWindow_MouseButtonPressed;
-            this._tileSetRenderWindow.MouseMoved += tileSetRenderWindow_MouseMoved;
-            this._tileSetRenderWindow.MouseButtonReleased += tileSetRenderWindow_MouseButtonReleased;
+            _mapRenderWindow = new RenderWindow(mapRenderWindowHandle);
+            _tileSetRenderWindow = new RenderWindow(tileSetRenderHandle);
+            _mapRenderWindow.MouseButtonPressed += mapRenderWindow_MouseButtonPressed;
+            _mapRenderWindow.MouseMoved += mapRenderWindow_MouseMoved;
+            _tileSetRenderWindow.MouseButtonPressed += tileSetRenderWindow_MouseButtonPressed;
+            _tileSetRenderWindow.MouseMoved += tileSetRenderWindow_MouseMoved;
+            _tileSetRenderWindow.MouseButtonReleased += tileSetRenderWindow_MouseButtonReleased;
 
-            this._mapEditorProperties = mapEditorProperties;
-            this._mapEditorProperties.CurrentLayer = World.Map.Layers.Ground;
-            this._mapEditorProperties.MapView = new View(this._mapRenderWindow.DefaultView);
+            _mapEditorProperties = mapEditorProperties;
+            _mapEditorProperties.CurrentLayer = World.Map.Layers.Ground;
+            _mapEditorProperties.MapView = new View(this._mapRenderWindow.DefaultView);
 
-            this._mousePositionText = new Text("", new Font(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/Fonts/MainFont.ttf"), 20);
+            _mousePositionText = new Text("", new Font(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/Fonts/MainFont.ttf"), 20);
 
             this.LoadTileSets();
 
-            this._tileSetView = this._tileSetRenderWindow.DefaultView;
+            _tileSetView = this._tileSetRenderWindow.DefaultView;
 
             this.Running = true;
 
@@ -68,7 +69,7 @@ namespace CEngineSharp_Editor.Graphics
 
         private void LoadTileSets()
         {
-            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/Tile Sets/");
+            var dI = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "/Data/Graphics/TileSets/");
 
             this._tileSetTextures = new List<Texture>();
 
@@ -111,7 +112,7 @@ namespace CEngineSharp_Editor.Graphics
                     {
                         this._mapEditorProperties.CurrentMap.GetTile(position.X + x, position.Y + y).Blocked = true;
 
-                        this._mapEditorProperties.CurrentMap.GetTile(position.X + x, position.Y + y).BlockedCover = new RectangleShape(new SFML.Window.Vector2f(32, 32));
+                        this._mapEditorProperties.CurrentMap.GetTile(position.X + x, position.Y + y).BlockedCover = new RectangleShape(new Vector2f(32, 32));
                         this._mapEditorProperties.CurrentMap.GetTile(position.X + x, position.Y + y).BlockedCover.FillColor = new Color(255, 0, 0, 100);
                         this._mapEditorProperties.CurrentMap.GetTile(position.X + x, position.Y + y).BlockedCover.Position = new Vector2f((position.X + x) * 32, (position.Y + y) * 32);
                     }

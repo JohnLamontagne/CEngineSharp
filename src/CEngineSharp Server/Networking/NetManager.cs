@@ -1,86 +1,110 @@
-﻿using CEngineSharp_Server.Networking.Packets;
-using CEngineSharp_Server.Utilities;
-using CEngineSharp_Server.World;
-using CEngineSharp_Server.World.Content_Managers;
-using CEngineSharp_Server.World.Entities;
-using SharpNetty;
+﻿using CEngineSharp_Utilities;
+using Lidgren.Network;
 using System;
-using System.Net;
+using System.Collections.Generic;
 
 namespace CEngineSharp_Server.Networking
 {
     public class NetManager
     {
-        #region Singleton
-        private readonly NettyServer _nettyServer;
+        private readonly NetServer _netServer;
 
-        private static NetManager _networking;
+        private Dictionary<PacketType, List<Action<PacketReceivedEventArgs>>> _packetHandlers;
 
-        public static NetManager Instance
-        {
-            get { return _networking ?? (_networking = new NetManager()); }
-        }
+        public event EventHandler<ConnectionEventArgs> Connection_Received;
 
-        #endregion
+        public event EventHandler<ConnectionEventArgs> Connection_Lost;
 
         public NetManager()
         {
-            _nettyServer = new NettyServer(true)
-            {
-                Handle_LostConnection = this.Handle_LostConnection,
-                Handle_NewConnection = this.Handle_NewConnection
-            };
+            _packetHandlers = new Dictionary<PacketType, List<Action<PacketReceivedEventArgs>>>();
+
+            NetPeerConfiguration config = new NetPeerConfiguration("CEngineSharp");
+            config.Port = Constants.SERVER_PORT;
+            config.EnableMessageType(NetIncomingMessageType.Data);
+            config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
+
+            _netServer = new NetServer(config);
         }
 
         public void Start()
         {
-            _nettyServer.BindSocket(ServerConfiguration.ServerIP, ServerConfiguration.ServerPort);
-
-            _nettyServer.Listen();
+            _netServer.Start();
         }
 
-        private void Handle_NewConnection(int socketIndex)
+        public void Update()
         {
-            try
+            NetIncomingMessage message;
+
+            while ((message = _netServer.ReadMessage()) != null)
             {
-                var player = new Player(socketIndex);
-                player.Connection = _nettyServer.GetConnection(socketIndex);
-                ContentManager.Instance.PlayerManager.AddPlayer(player, socketIndex);
-            }
-            catch (Exception)
-            {
-                _nettyServer.RemoveConnection(socketIndex);
+                switch (message.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        PacketType packetType = (PacketType)message.ReadInt16();
+
+                        if (_packetHandlers.ContainsKey(packetType))
+                        {
+                            var eventArgs = new PacketReceivedEventArgs(message, message.SenderConnection);
+
+                            foreach (var handler in _packetHandlers[packetType])
+                                handler.Invoke(eventArgs);
+                        }
+                        break;
+
+                    case NetIncomingMessageType.ConnectionApproval:
+                        message.SenderConnection.Approve();
+                        break;
+
+                    case NetIncomingMessageType.StatusChanged:
+                        if (message.SenderConnection.Status == NetConnectionStatus.Connected)
+                        {
+                            Console.WriteLine("Established connection with {0}.", message.SenderConnection.ToString());
+
+                            if (this.Connection_Received != null)
+                                this.Connection_Received.Invoke(this, new ConnectionEventArgs(message.SenderConnection));
+                        }
+                        else if (message.SenderConnection.Status == NetConnectionStatus.Disconnected)
+                        {
+                            Console.WriteLine("Lost connection with {0}.", message.SenderConnection.ToString());
+
+                            if (this.Connection_Lost != null)
+                                this.Connection_Lost.Invoke(this, new ConnectionEventArgs(message.SenderConnection));
+                        }
+                        break;
+
+                    case NetIncomingMessageType.DiscoveryRequest:
+                        NetOutgoingMessage response = _netServer.CreateMessage();
+                        _netServer.SendDiscoveryResponse(response, message.SenderEndPoint);
+                        break;
+
+                    case NetIncomingMessageType.DebugMessage:
+                        Console.WriteLine(message.ReadString());
+                        break;
+
+                    case NetIncomingMessageType.WarningMessage:
+                        Console.WriteLine(message.ReadString());
+                        break;
+
+                    case NetIncomingMessageType.ErrorMessage:
+                        Console.WriteLine(message.ReadString());
+                        break;
+                }
             }
         }
 
-        private void Handle_LostConnection(int socketIndex)
+        public void AddPacketHandler(PacketType packetType, Action<PacketReceivedEventArgs> handler)
         {
-            var player = ContentManager.Instance.PlayerManager.GetPlayer(socketIndex);
+            if (!_packetHandlers.ContainsKey(packetType))
+                _packetHandlers.Add(packetType, new List<Action<PacketReceivedEventArgs>>());
 
-            if (player != null && player.LoggedIn)
-            {
-                Console.WriteLine(player.Name + " has logged out!");
-
-                player.LeaveGame();
-            }
-            else
-            {
-                ContentManager.Instance.PlayerManager.RemovePlayer(socketIndex);
-            }
+            _packetHandlers[packetType].Add(handler);
         }
 
-        public void KickPlayer(int playerIndex)
+        public NetOutgoingMessage ConstructMessage()
         {
-            var alertMessagePacket = new AlertMessagePacket();
-            alertMessagePacket.WriteData("Alert!", "You have been kicked from the server!", 300, 300, Color.Red);
-            ContentManager.Instance.PlayerManager.GetPlayer(playerIndex).SendPacket(alertMessagePacket);
-
-            RemoveConnection(playerIndex);
-        }
-
-        public void RemoveConnection(int playerIndex)
-        {
-            _nettyServer.RemoveConnection(playerIndex);
+            return _netServer.CreateMessage();
         }
     }
 }

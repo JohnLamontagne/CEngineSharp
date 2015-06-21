@@ -1,5 +1,6 @@
 ﻿using CEngineSharp_Editor.Graphics;
 using CEngineSharp_Editor.World;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -178,6 +179,9 @@ namespace CEngineSharp_Editor
 
         private void mapList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (mapList.SelectedIndex < 0 || mapList.SelectedIndex >= mapList.Items.Count)
+                return;
+
             this.mapEditorProperties.CurrentMap = this.maps[mapList.SelectedIndex];
             this.mapPropertyGrid.Refresh();
 
@@ -203,13 +207,13 @@ namespace CEngineSharp_Editor
 
         private void mapScrollY_Scroll(object sender, ScrollEventArgs e)
         {
-            this.mapEditorProperties.MapView.Move(new SFML.Window.Vector2f(0, (e.NewValue - e.OldValue) * 32));
+            this.mapEditorProperties.MapView.Move(new Vector2f(0, (e.NewValue - e.OldValue) * 32));
             this.mapEditorProperties.MapEditorTop = e.NewValue;
         }
 
         private void mapScrollX_Scroll(object sender, ScrollEventArgs e)
         {
-            this.mapEditorProperties.MapView.Move(new SFML.Window.Vector2f((e.NewValue - e.OldValue) * 32, 0));
+            this.mapEditorProperties.MapView.Move(new Vector2f((e.NewValue - e.OldValue) * 32, 0));
             this.mapEditorProperties.MapEditorLeft = e.NewValue;
         }
 
@@ -263,6 +267,5 @@ namespace CEngineSharp_Editor
                 this.mapList.Items.Add(map.Name);
             }
         }
-
     }
 }

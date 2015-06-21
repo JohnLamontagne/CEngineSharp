@@ -1,11 +1,8 @@
-﻿using CEngineSharp_Server;
-using CEngineSharp_Server.Networking.Packets.AuthenticationPackets;
-using CEngineSharp_Server.Networking.Packets.MapUpdatePackets;
-using CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets;
+﻿using CEngineSharp_Server.Networking;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Entities;
 using CEngineSharp_Utilities;
-using SharpNetty;
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +11,6 @@ namespace CEngineSharp_Server.World.Maps
 {
     public class Map
     {
-
         public class Tile
         {
             private readonly Layer[] _layers;
@@ -104,12 +100,17 @@ namespace CEngineSharp_Server.World.Maps
         {
             this.players.Add(player);
 
-            var playerDataPacket = new PlayerDataPacket();
-            playerDataPacket.WriteData(player);
+            Packet packet = new Packet(PacketType.PlayerDataPacket);
+            packet.Message.Write(player.PlayerIndex);
+            packet.Message.Write(player.Name);
+            packet.Message.Write(player.Level);
+            packet.Message.Write(player.Position);
+            packet.Message.Write(player.Direction);
+            packet.Message.Write(player.TextureNumber);
 
             foreach (var mPlayer in this.players.Where(mPlayer => mPlayer != player))
             {
-                mPlayer.SendPacket(playerDataPacket);
+                mPlayer.Connection.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
             }
         }
 
@@ -121,9 +122,9 @@ namespace CEngineSharp_Server.World.Maps
             // Remove the player from the map player list.
             this.players.Remove(player);
 
-            var logoutPacket = new LogoutPacket();
-            logoutPacket.WriteData(player.PlayerIndex);
-            this.SendPacket(logoutPacket);
+            Packet packet = new Packet(PacketType.LogoutPacket);
+            packet.Message.Write(player.PlayerIndex);
+            this.SendPacket(packet, NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD);
 
             if (!leftGame) return;
 
@@ -155,9 +156,9 @@ namespace CEngineSharp_Server.World.Maps
 
         public void RemoveMapItem(MapItem mapItem)
         {
-            var despawnMapItemPacket = new DespawnMapItemPacket();
-            despawnMapItemPacket.WriteData(mapItem);
-            this.SendPacket(despawnMapItemPacket, true);
+            Packet packet = new Packet(PacketType.DespawnMapItemPacket);
+            packet.Message.Write(mapItem.Position);
+            this.SendPacket(packet, NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD, true);
 
             this.items.Remove(mapItem);
         }
@@ -168,9 +169,12 @@ namespace CEngineSharp_Server.World.Maps
 
             this.items.Add(mapItem);
 
-            var spawnMapItemPacket = new SpawnMapItemPacket();
-            spawnMapItemPacket.WriteData(mapItem);
-            this.SendPacket(spawnMapItemPacket, true);
+            Packet packet = new Packet(PacketType.SpawnMapItemPacket);
+            packet.Message.Write(mapItem.Item.Name);
+            packet.Message.Write(mapItem.Item.TextureNumber);
+            packet.Message.Write(mapItem.Position);
+            packet.Message.Write(mapItem.SpawnDuration);
+            this.SendPacket(packet, NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD, true);
         }
 
         public MapNpc GetMapNpc(int mapNpcIndex)
@@ -185,7 +189,6 @@ namespace CEngineSharp_Server.World.Maps
 
         public void SpawnMapNpc(Npc npc, Vector position)
         {
-
             this.mapNpcs.Add(new MapNpc(npc, position));
 
             // TODO: send the spawn packet.
@@ -214,7 +217,7 @@ namespace CEngineSharp_Server.World.Maps
             this.tiles = newArray;
         }
 
-        public void SendPacket(Packet packet, bool checkPlayerLoaded = false)
+        public void SendPacket(Packet packet, NetDeliveryMethod method, ChannelTypes type, bool checkPlayerLoaded = false)
         {
             foreach (var player in this.players)
             {
@@ -224,8 +227,59 @@ namespace CEngineSharp_Server.World.Maps
                         continue;
                 }
 
-                player.SendPacket(packet);
+                player.Connection.SendMessage(packet.Message, method, (int)type);
             }
+        }
+
+        public NetBuffer GetMapData()
+        {
+            NetBuffer buffer = new NetBuffer();
+
+            buffer.Write(this.Name);
+
+            buffer.Write(this.Version);
+
+            buffer.Write(this.MapWidth);
+            buffer.Write(this.MapHeight);
+
+            for (int x = 0; x < this.MapWidth; x++)
+            {
+                for (int y = 0; y < this.MapHeight; y++)
+                {
+                    buffer.Write(this.GetTile(x, y).Blocked);
+
+                    foreach (Layers layer in Enum.GetValues(typeof(Layers)))
+                    {
+                        if (this.GetTile(x, y).GetLayer(layer) == null)
+                        {
+                            buffer.Write(false);
+                            continue;
+                        }
+
+                        buffer.Write(true);
+
+                        buffer.Write(this.GetTile(x, y).GetLayer(layer).TextureNumber);
+                        buffer.Write(this.GetTile(x, y).GetLayer(layer).SpriteRect.Left);
+                        buffer.Write(this.GetTile(x, y).GetLayer(layer).SpriteRect.Top);
+                        buffer.Write(this.GetTile(x, y).GetLayer(layer).SpriteRect.Width);
+                        buffer.Write(this.GetTile(x, y).GetLayer(layer).SpriteRect.Height);
+                    }
+                }
+            }
+
+            var mapNpcs = this.GetMapNpcs();
+
+            buffer.Write(mapNpcs.Length);
+
+            foreach (var npc in mapNpcs)
+            {
+                buffer.Write(npc.Name);
+                buffer.Write(npc.Level);
+                buffer.Write(npc.TextureNumber);
+                buffer.Write(npc.Position);
+            }
+
+            return buffer;
         }
     }
 }

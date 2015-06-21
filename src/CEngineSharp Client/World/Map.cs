@@ -1,15 +1,16 @@
 ﻿using CEngineSharp_Client.Graphics;
 using CEngineSharp_Client.Net;
-using CEngineSharp_Client.Net.Packets.PlayerUpdatePackets;
-using CEngineSharp_Client.World.Content_Managers;
+using CEngineSharp_Client.Networking;
+using CEngineSharp_Client.Utilities;
 using CEngineSharp_Client.World.Entity;
+using CEngineSharp_Utilities;
+using Lidgren.Network;
 using SFML.Graphics;
-using SFML.Window;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using RenderStates = CEngineSharp_Client.Graphics.RenderStates;
 
 namespace CEngineSharp_Client.World
 {
@@ -42,7 +43,6 @@ namespace CEngineSharp_Client.World
             private Layer[] _layers;
 
             public bool Blocked { get; set; }
-
 
             public bool IsOccupied { get; set; }
 
@@ -157,7 +157,7 @@ namespace CEngineSharp_Client.World
                                 }
 
                                 binaryWriter.Write(true);
-                                binaryWriter.Write(RenderManager.Instance.TextureManager.GetTextureName(this._tiles[x, y].GetLayer(layer).Sprite.Texture));
+                                binaryWriter.Write(ServiceLocator.ScreenManager.ActiveScreen.TextureManager.GetTextureName(this._tiles[x, y].GetLayer(layer).Sprite.Texture));
                                 binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Left);
                                 binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Top);
                                 binaryWriter.Write(this._tiles[x, y].GetLayer(layer).Sprite.TextureRect.Width);
@@ -171,11 +171,6 @@ namespace CEngineSharp_Client.World
 
         public void LoadCache(string mapName)
         {
-            if (RenderManager.Instance.CurrentRenderer is MenuRenderer)
-            {
-                RenderManager.Instance.ForceRenderState(RenderStates.RenderGame);
-            }
-
             using (var fileStream = new FileStream(Constants.FILEPATH_CACHE + "Maps/" + mapName + ".map", FileMode.OpenOrCreate))
             {
                 using (var binaryReader = new BinaryReader(fileStream))
@@ -209,7 +204,7 @@ namespace CEngineSharp_Client.World
 
                                 var tileRect = new IntRect(tileLeft, tileTop, tileWidth, tileHeight);
 
-                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(RenderManager.Instance.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
+                                this.GetTile(x, y).SetLayer(layer, new Tile.Layer(new Sprite(ServiceLocator.ScreenManager.ActiveScreen.TextureManager.GetTexture(tileSetTextureName), tileRect), x, y));
                             }
                         }
                     }
@@ -219,10 +214,8 @@ namespace CEngineSharp_Client.World
 
         public Npc GetMapNpc(int index)
         {
-            return this._mapNpcs[index];
+            return _mapNpcs[index];
         }
-
-
 
         public void RemoveMapItem(int mapItemX, int mapItemY)
         {
@@ -236,16 +229,19 @@ namespace CEngineSharp_Client.World
 
         public void TryPickupItem()
         {
-            var x = PlayerManager.GetPlayer(PlayerManager.MyIndex).Position.X * 32;
-            var y = PlayerManager.GetPlayer(PlayerManager.MyIndex).Position.Y * 32;
+            var playerManager = ServiceLocator.WorldManager.PlayerManager;
+
+            var x = playerManager.GetPlayer(playerManager.ClientID).Position.X * 32;
+            var y = playerManager.GetPlayer(playerManager.ClientID).Position.Y * 32;
 
             var mapItem = this.FindMapItem(new Vector2f(x, y));
 
             if (mapItem == null) return;
 
-            var pickupItemPacket = new PickupItemPacket();
-            pickupItemPacket.WriteData(mapItem);
-            NetManager.Instance.SendPacket(pickupItemPacket);
+            var packet = new Packet(PacketType.PickupItemPacket);
+            packet.Message.Write(x);
+            packet.Message.Write(y);
+            ServiceLocator.NetManager.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, ChannelTypes.WORLD);
         }
 
         public MapItem FindMapItem(Vector2f position)
@@ -255,7 +251,7 @@ namespace CEngineSharp_Client.World
 
         public void Draw(RenderWindow window)
         {
-            var camera = PlayerManager.GetPlayer(PlayerManager.MyIndex).Camera;
+            var camera = ServiceLocator.WorldManager.PlayerManager.GetPlayer(ServiceLocator.WorldManager.PlayerManager.ClientID).Camera;
 
             var left = (int)(camera.ViewRect.Left / 32);
             var top = (int)(camera.ViewRect.Top / 32);
@@ -278,7 +274,6 @@ namespace CEngineSharp_Client.World
             this.DrawNpcs(window, left, top, width, height);
 
             this.DrawUpperTiles(window, left, top, width, height);
-
         }
 
         private void DrawNpcs(RenderTarget window, int left, int top, int width, int height)
@@ -294,7 +289,7 @@ namespace CEngineSharp_Client.World
 
         private void DrawPlayers(RenderTarget window, int left, int top, int width, int height)
         {
-            foreach (var player in PlayerManager.GetPlayers())
+            foreach (var player in ServiceLocator.WorldManager.PlayerManager.GetPlayers())
             {
                 if (player.Position.X < left || player.Position.X > (left + width)) continue;
                 if (player.Position.Y < top || player.Position.Y > (top + height)) continue;

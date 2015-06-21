@@ -1,11 +1,8 @@
-﻿using CEngineSharp_Server;
-using CEngineSharp_Server.Networking.Packets.MapUpdatePackets;
-using CEngineSharp_Server.Networking.Packets.PlayerUpdatePackets;
-using CEngineSharp_Server.Networking.Packets.SocialPackets;
+﻿using CEngineSharp_Server.Networking;
 using CEngineSharp_Server.Utilities;
 using CEngineSharp_Server.World.Maps;
 using CEngineSharp_Utilities;
-using SharpNetty;
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +34,6 @@ namespace CEngineSharp_Server.World.Entities
 
         private readonly int[] _stats;
 
-
         private readonly List<Item> _inventory = new List<Item>();
 
         public bool LoggedIn { get; set; }
@@ -46,17 +42,17 @@ namespace CEngineSharp_Server.World.Entities
 
         public Map Map { get; set; }
 
-        public int PlayerIndex { get; private set; }
+        public long PlayerIndex { get; private set; }
 
         public byte Direction { get; set; }
 
         public bool InMap { get; set; }
 
-        public NettyServer.Connection Connection { get; set; }
+        public NetConnection Connection { get; set; }
 
         public int InventoryCount { get { return _inventory.Count; } }
 
-        public Player(int index)
+        public Player(long index)
         {
             this.Position = new Vector(0, 0);
             this.PlayerIndex = index;
@@ -127,9 +123,12 @@ namespace CEngineSharp_Server.World.Entities
                 this.Map.GetTile(vector).IsOccupied = true;
             }
 
-            var movementPacket = new PlayerMovementPacket();
-            movementPacket.WriteData(this.PlayerIndex, this.Position, direction);
-            this.Map.SendPacket(movementPacket);
+            Packet packet = new Packet(PacketType.PlayerMovementPacket);
+            packet.Message.Write(this.PlayerIndex);
+            packet.Message.Write(this.Position);
+            packet.Message.Write(direction);
+            //this.Connection.SendMessage(packet, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
+            // SENDTOMAP
         }
 
         public void GiveItem(Item item)
@@ -205,9 +204,9 @@ namespace CEngineSharp_Server.World.Entities
             //            chatMessagePacket.WriteData(this.Name + " has logged in!");
             //            PlayerManager.Instance.BroadcastPacket(chatMessagePacket);
 
-            var messagePacket = new ChatMessagePacket();
-            messagePacket.WriteData(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
-            this.SendPacket(messagePacket);
+            var packet = new Packet(PacketType.ChatMessagePacket);
+            packet.Message.Write(string.Format("Welcome to {0}, {1}", ServerConfiguration.GameName, this.Name));
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.Unreliable, (int)ChannelTypes.CHAT);
         }
 
         public void JoinMap(Map map)
@@ -221,16 +220,17 @@ namespace CEngineSharp_Server.World.Entities
 
             this.InMap = false;
 
-            var mapCheckPacket = new MapCheckPacket();
-            mapCheckPacket.WriteData(this.Map.Name, this.Map.Version);
-            this.SendPacket(mapCheckPacket);
+            Packet packet = new Packet(PacketType.MapCheckPacket);
+            packet.Message.Write(this.Map.Name);
+            packet.Message.Write(this.Map.Version);
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
         }
 
         public void SendMessage(string message)
         {
-            var chatMessagePacket = new ChatMessagePacket();
-            chatMessagePacket.WriteData(message);
-            this.SendPacket(chatMessagePacket);
+            Packet packet = new Packet(PacketType.ChatMessagePacket);
+            packet.Message.Write(message);
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.Unreliable, (int)ChannelTypes.CHAT);
         }
 
         public void LeaveGame()
@@ -252,9 +252,9 @@ namespace CEngineSharp_Server.World.Entities
 
         public void SendPlayerData()
         {
-            var playerDataPacket = new PlayerDataPacket();
-            playerDataPacket.WriteData(this);
-            this.SendPacket(playerDataPacket);
+            Packet packet = new Packet(PacketType.PlayerDataPacket);
+            packet.Message.Write(this.GetPlayerData());
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
 
             this.SendInventory();
             this.SendVitals();
@@ -262,23 +262,35 @@ namespace CEngineSharp_Server.World.Entities
 
         public void SendInventory()
         {
-            var invenUpdatePacket = new UpdateInventoryPacket();
-            invenUpdatePacket.WriteData(this);
-            this.SendPacket(invenUpdatePacket);
+            Packet packet = new Packet(PacketType.UpdateInventoryPacket);
+            packet.Message.Write(this.InventoryCount);
+            foreach (var item in this.GetInventory())
+            {
+                packet.Message.Write(item.Name);
+                packet.Message.Write(item.TextureNumber);
+            }
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
         }
 
         public void SendVitals()
         {
-            var vitalUpdatePacket = new UpdatePlayerStatsPacket();
-            vitalUpdatePacket.WriteData(this);
-            this.SendPacket(vitalUpdatePacket);
+            Packet packet = new Packet(PacketType.UpdatePlayerStatsPacket);
+            packet.Message.Write(this.GetStat(Stats.Health));
+            packet.Message.Write(0);
+            this.Connection.SendMessage(packet.Message, NetDeliveryMethod.ReliableOrdered, (int)ChannelTypes.WORLD);
         }
 
-        public void SendPacket(Packet packet)
+        public NetBuffer GetPlayerData()
         {
-            this.Connection.SendPacket(packet);
+            NetBuffer buffer = new NetBuffer();
+            buffer.Write(this.PlayerIndex);
+            buffer.Write(this.Name);
+            buffer.Write(this.Level);
+            buffer.Write(this.Position);
+            buffer.Write(this.Direction);
+            buffer.Write(this.TextureNumber);
+            return buffer;
         }
-
 
         public void Save(string filePath)
         {

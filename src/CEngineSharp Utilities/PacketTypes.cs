@@ -1,6 +1,6 @@
 ﻿namespace CEngineSharp_Utilities
 {
-    public enum PacketTypes
+    public enum PacketType
     {
         LoginPacket = 0,
         RegistrationPacket,

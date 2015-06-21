@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Server.Utilities;
+using CEngineSharp_Server.Utilities.ServiceLocators;
 using CEngineSharp_Server.World;
 using CEngineSharp_Server.World.Content_Managers;
 using System;
@@ -43,7 +44,6 @@ namespace CEngineSharp_Server.GameLogic
             {
                 if (lastConsoleTitleUpdateTime <= GameTime.GetTotalTimeElapsed())
                 {
-
                     var serverWindowTitle = ServerConfiguration.GameName + " - " + ServerConfiguration.ServerIP + ":" +
                                                ServerConfiguration.ServerPort + " - Player Count: " +
                                                ContentManager.Instance.PlayerManager.PlayerCount + " - Debug Mode: " +
@@ -55,6 +55,8 @@ namespace CEngineSharp_Server.GameLogic
 
                     lastConsoleTitleUpdateTime = GameTime.GetTotalTimeElapsed() + 500;
                 }
+
+                NetServiceLocator.Singleton.GetService().Update();
 
                 if (lastCpsCheck <= GameTime.GetTotalTimeElapsed())
                 {

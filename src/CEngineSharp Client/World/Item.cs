@@ -1,4 +1,5 @@
 ﻿using CEngineSharp_Client.Graphics;
+using CEngineSharp_Client.Utilities;
 using SFML.Graphics;
 
 namespace CEngineSharp_Client.World
@@ -12,7 +13,7 @@ namespace CEngineSharp_Client.World
         public Item(string name, int itemTextureNumber)
         {
             this.Name = name;
-            this.Sprite = new Sprite(RenderManager.Instance.TextureManager.GetTexture("item" + itemTextureNumber));
+            this.Sprite = new Sprite(ServiceLocator.ScreenManager.ActiveScreen.TextureManager.GetTexture("item" + itemTextureNumber));
         }
     }
 }
